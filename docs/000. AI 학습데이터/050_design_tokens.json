@@ -1,0 +1,25 @@
+{
+  "colors": {
+    "primary": "#2563EB",
+    "primary700": "#1D4ED8",
+    "accent": "#06B6D4",
+    "green": "#22C55E",
+    "gray700": "#374151",
+    "gray50": "#F9FAFB",
+    "border": "#E5E7EB"
+  },
+  "radius": 12,
+  "shadow": "0 6px 16px rgba(0,0,0,.06)",
+  "containerMax": 1200,
+  "gridGap": 24,
+  "fontFamily": "Inter, Pretendard, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+  "headings": {
+    "fontWeight": 600
+  },
+  "breakpoints": {
+    "xs": 480,
+    "sm": 768,
+    "md": 1024,
+    "lg": 1200
+  }
+}
