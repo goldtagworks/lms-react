@@ -1,6 +1,6 @@
 -- =============================
 -- RLS policies for LMS v3.4 (single domain; roles: admin|instructor|learner)
--- Includes: sections, reviews, Q&A, wishlist, coupons, categories, subscriptions
+-- Includes: sections, reviews, Q&A, wishlist, coupons, categories (subscriptions DEPRECATED: 정기 구독 비사용)
 -- Ownership: instructors can CUD only on their own courses/lessons/sections
 -- =============================
 
@@ -16,10 +16,7 @@ alter table if exists exams                   enable row level security;
 alter table if exists exam_questions          enable row level security;
 alter table if exists exam_attempts           enable row level security;
 alter table if exists certificates            enable row level security;
-alter table if exists subscription_plans      enable row level security;
-alter table if exists plan_features           enable row level security;
-alter table if exists user_subscriptions      enable row level security;
-alter table if exists subscription_invoices   enable row level security;
+-- DEPRECATED subscription tables (남겨두되 RLS enable 유지: 접근 시도 식별 목적)
 alter table if exists course_reviews          enable row level security;
 alter table if exists course_questions        enable row level security;
 alter table if exists course_answers          enable row level security;
@@ -248,43 +245,7 @@ for select using (is_staff());
 create policy if not exists cert_write_staff on certificates
 for all using (is_staff()) with check (is_staff());
 
--- =============================
--- subscriptions (site-wide plans)
--- =============================
-create policy if not exists plans_read_public on subscription_plans
-for select using (is_active = true or is_admin());
-
-create policy if not exists plans_write_admin on subscription_plans
-for all using (is_admin()) with check (is_admin());
-
-create policy if not exists pf_read_public on plan_features
-for select using (
-  exists (
-    select 1 from subscription_plans p where p.id = plan_features.plan_id and (p.is_active = true or is_admin())
-  )
-);
-
-create policy if not exists pf_write_admin on plan_features
-for all using (is_admin()) with check (is_admin());
-
-create policy if not exists us_read_owner on user_subscriptions
-for select using (user_id = auth.uid() or is_admin());
-
-create policy if not exists us_insert_owner on user_subscriptions
-for insert with check (user_id = auth.uid() or is_admin());
-
-create policy if not exists us_update_owner on user_subscriptions
-for update using (user_id = auth.uid() or is_admin()) with check (user_id = auth.uid() or is_admin());
-
-create policy if not exists si_read_owner on subscription_invoices
-for select using (
-  exists (
-    select 1 from user_subscriptions s where s.id = subscription_invoices.user_subscription_id and (s.user_id = auth.uid() or is_admin())
-  )
-);
-
-create policy if not exists si_write_admin on subscription_invoices
-for all using (is_admin()) with check (is_admin());
+-- (구독 관련 subscription_plans / plan_features / user_subscriptions / subscription_invoices 정책 제거됨)
 
 -- =============================
 -- Reviews / Ratings

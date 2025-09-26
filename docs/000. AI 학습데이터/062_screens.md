@@ -129,32 +129,3 @@
 5. AC: admin만 접근 가능
 
 ────────────────────────────────────────────────────
-## 구독 플랜 목록 (/subscription/plans)
-
-1. 목적/행동: 제공되는 구독 플랜 확인 및 가입
-2. 접근: public
-3. 레이아웃: PlanCardGrid(name, price, sale, features), SubscribeButton
-4. 데이터: ['plans','active'], ['features',planId]
-5. 상태: loading / empty("구독 플랜이 없습니다") / error / ready
-6. 상호작용: [구독하기] 클릭 → PG 위젯 → subscriptions-webhook 처리 후 ENROLLED 가능
-7. AC: 플랜 가격/세일/세금 표시, 클릭 시 결제 플로우로 연결
-
-────────────────────────────────────────────────────
-## 내 구독 관리 (/my/subscription)
-
-1. 목적/행동: 현재 구독 상태 확인/해지
-2. 접근: auth
-3. 레이아웃: SubscriptionStatusCard(plan, period_start, period_end, status), CancelButton
-4. 데이터: ['userSubscription','me'], ['invoices','me']
-5. 상태: active / past_due / canceled / incomplete
-6. 상호작용: [해지하기] 클릭 시 cancel_at_period_end=true 반영
-7. AC: 상태별 안내문구 표시, 청구 내역 리스트 노출
-
-────────────────────────────────────────────────────
-## 구독 플랜 관리 (/admin/subscriptions)
-
-1. 목적/행동: 구독 플랜 CRUD
-2. 접근: admin
-3. 레이아웃: Table, Form
-4. 데이터: ['plans',filters,page]
-5. AC: admin만 접근 가능

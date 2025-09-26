@@ -7,13 +7,13 @@
 - 000_overview.md: 개요/범위/성공지표
 - 010_persona_journey.md: Persona & Journey(학습자/강사/관리자)
 - 020_architecture.md: 아키텍처/폴더/데이터 액세스/보안
-- 031_schema.sql, 032_rls.sql: DDL & RLS (섹션/리뷰/Q&A/위시/쿠폰/구독 포함)
-- 040_edgespec.md: Edge(결제/구독/쿠폰 검증/채점/수료증/알림)
+- 031_schema.sql, 032_rls.sql: DDL & RLS (섹션/리뷰/Q&A/위시/쿠폰 포함)
+- 040_edgespec.md: Edge(결제/쿠폰 검증/채점/수료증/알림)
 - 050_design_tokens.json: 디자인 토큰
-- 051_copy_catalog.json: 카피/i18n 카탈로그(가격/리뷰/Q&A/쿠폰/구독/카테고리)
-- 060_routes_and_components.md: 라우트/컴포넌트 계약(구독 플로우 포함)
+- 051_copy_catalog.json: 카피/i18n 카탈로그(가격/리뷰/Q&A/쿠폰/카테고리)
+- 060_routes_and_components.md: 라우트/컴포넌트 계약
 - 061_screen_template.md: 화면 템플릿(샘플: Course Detail v3.4)
-- 062_screens.md: 주요 화면 스토리보드(위시/리뷰/Q&A/쿠폰/구독)
+- 062_screens.md: 주요 화면 스토리보드(위시/리뷰/Q&A/쿠폰)
 - 070_payment_flow.md, 071_payment_errors.md: 결제 플로우/에러 매핑(세일/세금/통화/쿠폰)
 - 080_exam_certificate.md, 081_exam_rules.md: 시험/채점/수료증(시간 제한 설정 포함)
 - 090_quality_checklist.md: 품질 게이트/AC
@@ -25,7 +25,7 @@
    - 현황: `openapi/edges.openapi.json` 없음.
    - 영향: 클라이언트 SDK/계약 테스트 자동화 불가.
    - 조치: 모든 엔드포인트를 포함해 작성.
-     - 포함: `/payments/webhook`, `/subscriptions/webhook`, `/coupons/validate`, `/exams/grade`, `/certificates/issue`, `/qna/notify`
+      - 포함: `/payments/webhook`, `/coupons/validate`, `/exams/grade`, `/certificates/issue`, `/qna/notify`
      - 공통 Error Schema: `code`, `message` (071의 코드 집합 반영)
 
 2) **RLS 정책 테스트 부재**
@@ -41,7 +41,7 @@
 4) **데이터 마이그레이션/시드 스크립트 부재**
    - 현황: 031 스키마 확장(소유 강사/가격/세금/쿠폰 등) 후 마이그레이션/시드 명시 없음.
    - 영향: 기존 데이터 호환/초기 데모 구축 지연.
-   - 조치: `/db/migrations/2025-09-__-seed.sql`에 샘플 강사/코스/플랜/쿠폰/카테고리/섹션/레슨 추가. 기존 코스 `instructor_id`/통화/세금 기본값 보정 스크립트 포함.
+   - 조치: `/db/migrations/2025-09-__-seed.sql`에 샘플 강사/코스/쿠폰/카테고리/섹션/레슨 추가. 기존 코스 `instructor_id`/통화/세금 기본값 보정 스크립트 포함.
 
 5) **i18n 커버리지 점검 자동화 부재**
    - 현황: 051에 키 추가 완료. 커버리지 및 미사용 키 검증 도구 없음.
@@ -62,7 +62,7 @@
 
 9) **관리자 화면 스토리보드(운영)**
    - 현황: 학습자 중심 화면 위주.
-   - 조치: `/docs/000. AI 학습데이터/06b_screens_admin.md` 추가(코스/차시 CRUD, 기준% 설정, 진행 모니터링, 쿠폰/카테고리/구독 관리).
+   - 조치: `/docs/000. AI 학습데이터/06b_screens_admin.md` 추가(코스/차시 CRUD, 기준% 설정, 진행 모니터링, 쿠폰/카테고리 관리).
 
 10) **관측/알람 임계치 튜닝**
    - 현황: 기본 임계치만 기재.
@@ -78,7 +78,6 @@
 - exam.pass_score = **60**, retake.max_attempts = **3**, cooldown_hours = **24**, time_limit_minutes = **30**(미설정 시 기본)
 - courses.pricing: tax_included = **true**, currency_code = **"KRW"**, sale_price 유효기간 기본 **미지정(null)**
 - coupons: per_user_limit = **1**, max_redemptions = **null**, discount 우선순위 = percent → fixed
-- subscription: interval = **month**, plan 기본 통화 = **KRW**
 - storage.signed_url_ttl_hours = **2**
 - rate_limit: coupon.validate = **20/min/IP**, webhook = **60/min/provider**
 
@@ -92,9 +91,8 @@
 
 ────────────────────────────────────────────────────
 ## E. To-Do 체크리스트
-- [ ] **openapi/edges.openapi.json 생성** (결제/구독/쿠폰/채점/수료증/알림 포함)
+- [ ] **openapi/edges.openapi.json 생성** (결제/쿠폰/채점/수료증/알림 포함)
 - [ ] **tests/acceptance/payment_webhook.feature** 생성
-- [ ] **tests/acceptance/subscription_webhook.feature** 생성
 - [ ] **tests/acceptance/coupon_validate.feature** 생성
 - [ ] tests/acceptance/learning_progress.feature 생성
 - [ ] tests/acceptance/exam_certificate.feature 생성
@@ -113,7 +111,7 @@
 ## F. 배포 게이트(Go/No-Go)
 - No-Go 조건:
   - OpenAPI 스펙 미완료 또는 엔드포인트 누락
-  - 3대 핵심 플로우 Gherkin 미완료(결제/구독/쿠폰)
+   - 3대 핵심 플로우 Gherkin 미완료(결제/쿠폰)
   - RLS 테스트 미완료
   - 수료증 템플릿(083) 미완료
   - 환불정책(073) & 웹훅 보안(093) 미완료

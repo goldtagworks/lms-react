@@ -83,7 +83,7 @@ AI 또는 신규 참여자가 프로젝트를 이해하고 구현할 때, 어떤
   - 주요 컴포넌트 스텁 생성  
     - SectionList, ReviewList, QnaList  
     - WishlistButton, CouponInput  
-    - PlanCard, SubscriptionStatusCard, PriceBadge  
+    - PriceBadge  
 
 ---
 
@@ -133,6 +133,6 @@ AI 또는 신규 참여자가 프로젝트를 이해하고 구현할 때, 어떤
   - 099_spec_audit.md  
 - Tasks:  
   - OpenAPI 스펙(`openapi/edges.openapi.json`) 생성  
-  - Gherkin 테스트 3종(결제/구독/쿠폰) 추가  
+  - Gherkin 테스트 2종(결제/쿠폰) 추가  
   - To-Do 체크리스트 기반 산출물 보강  
   - 최종 Go/No-Go 배포 판정  

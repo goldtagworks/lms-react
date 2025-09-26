@@ -130,8 +130,7 @@
   "price": {
     "free": "무료",
     "original": "정가 {{price}}원",
-    "sale": "할인가 {{price}}원",
-    "subscriptionIncluded": "구독 포함"
+    "sale": "할인가 {{price}}원"
   },
   "filter": {
     "category": "카테고리",
@@ -168,13 +167,7 @@
     "expired": "만료된 쿠폰입니다",
     "applied": "쿠폰이 적용되었습니다"
   },
-  "subscription": {
-    "subscribe": "구독하기",
-    "manage": "구독 관리",
-    "active": "구독 중",
-    "expired": "구독 만료",
-    "plan": "구독 플랜"
-  },
+  
   "category": {
     "manage": "카테고리 관리",
     "empty": "등록된 카테고리가 없습니다"

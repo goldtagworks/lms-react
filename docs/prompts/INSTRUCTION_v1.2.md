@@ -17,7 +17,7 @@ next_release_target: v1.3
 | A11y | axe serious/critical | 0 |
 | i18n | missing/duplicate keys | 0 |
 | Coverage | statements % | ≥70% (점진 80%) |
-| Payment Success | success/total | ≥98% |
+| Payment Success | success/total | ≥98% (국내 PG 기준) |
 | Webhook Invalid Sig | 5분 내 건수 | <3 |
 | Exam Focus AutoSubmit | focus 이유 비율 | <10% |
 | Edge p95 Latency | ms | <1500 |
@@ -26,7 +26,6 @@ next_release_target: v1.3
 ## 2. OpenAPI 계약 (요약)
 파일: `docs/openapi/edges.openapi.json` (v1.2). Paths:
 - POST /payments/webhook
-- POST /subscriptions/webhook
 - POST /coupons/validate
 - POST /exams/grade
 - POST /certificates/issue
@@ -40,10 +39,10 @@ Components:
 
 ## 3. Gherkin 핵심 시나리오 (초안)
 1) payment_webhook.feature: 결제 → ENROLLED, 금액 불일치 에러
-2) subscription_webhook.feature: 구독 갱신/만료 경계
-3) coupon_validate.feature: 유효/만료/중복/통화 불일치
-4) exam_certificate.feature: 합격/불합격/자동제출/수료증 멱등
-(추가 후보) learning_progress.feature, refund_policy.feature
+2) coupon_validate.feature: 유효/만료/중복/통화 불일치
+3) exam_certificate.feature: 합격/불합격/자동제출/수료증 멱등
+4) refund_course.feature: 미 수강(진도 0%) 환불 승인/거절 경계
+(추가 후보) learning_progress.feature
 
 ## 4. Idempotency 통합 전략
 테이블: `idempotency_keys`
@@ -70,7 +69,8 @@ counter lms_payment_invalid_sig_total
 histogram lms_edge_latency_ms{fn}
 counter lms_exam_auto_submit_total{reason}
 counter lms_certificate_issue_fail_total{type}
-gauge lms_subscription_past_due_ratio
+counter lms_refund_request_total{reason}
+counter lms_refund_approved_total
 counter lms_i18n_missing_key_total
 ```
 로그 샘플 규약: 필드 snake_case, timestamp ISO8601, error_code null 허용.
@@ -112,7 +112,7 @@ Replay 방지: (ts,signature) 최근 10분 내 재사용 시 거절.
 | 항목 | 타입 | 상태 |
 |------|------|------|
 | edges.openapi.json | 문서 | 스켈레톤 생성 | 
-| 4 Gherkin feature | 테스트 | 스켈레톤 | 
+| 4 Gherkin feature | 테스트 | 스켈레톤 (refund 포함) | 
 | i18n-lint.mjs | 스크립트 | 설계(미구현) |
 | idempotency_keys ddl | DB | 설계만 |
 | metrics 명세 | 문서 | 본 문서 포함 |

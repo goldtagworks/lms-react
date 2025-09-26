@@ -12,10 +12,9 @@ create extension if not exists pgcrypto; -- for gen_random_uuid()
 drop type if exists role_lms cascade;
 create type role_lms as enum ('admin','instructor','learner');
 
-create type course_pricing_mode as enum ('free','paid','subscription');
-create type billing_interval as enum ('month','year');
-create type subscription_status as enum ('active','past_due','canceled','incomplete');
-create type enrollment_source as enum ('purchase','admin','subscription','free');
+create type course_pricing_mode as enum ('free','paid');
+-- subscription billing/interval enums 제거
+create type enrollment_source as enum ('purchase','admin','free');
 
 -- new enums
 do $$ begin
@@ -277,78 +276,7 @@ create table if not exists certificates (
 );
 create index if not exists idx_cert_enroll on certificates(enrollment_id);
 
--- ====================================================
--- Subscriptions (site-wide learner plans) with pricing/tax/currency
--- ====================================================
-
-create table if not exists subscription_plans (
-  id uuid primary key default gen_random_uuid(),
-  code text not null unique, -- e.g., BASIC_MONTHLY
-  name text not null,
-  description text,
-  interval billing_interval not null default 'month',
-  -- pricing
-  list_price_cents int not null default 0 check (list_price_cents >= 0),
-  sale_price_cents int check (sale_price_cents >= 0),
-  sale_ends_at timestamptz,
-  currency_code text not null default 'KRW' check (currency_code ~ '^[A-Z]{3}$'),
-  -- tax
-  tax_included boolean not null default true,
-  tax_rate_percent numeric(5,2) check (tax_rate_percent >= 0 and tax_rate_percent <= 100),
-  tax_country_code char(2) check (tax_country_code ~ '^[A-Z]{2}$'),
-  is_active boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  check (sale_price_cents is null or sale_price_cents <= list_price_cents)
-);
-create index if not exists idx_plan_active on subscription_plans(is_active);
-create index if not exists idx_plan_currency on subscription_plans(currency_code);
-create trigger if not exists trg_plans_updated before update on subscription_plans
-for each row execute function set_updated_at();
-
-create table if not exists plan_features (
-  id uuid primary key default gen_random_uuid(),
-  plan_id uuid not null references subscription_plans(id) on delete cascade,
-  feature_key text not null,
-  feature_value text,
-  created_at timestamptz not null default now(),
-  unique (plan_id, feature_key)
-);
-create index if not exists idx_plan_features_plan on plan_features(plan_id);
-
-create table if not exists user_subscriptions (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  plan_id uuid not null references subscription_plans(id) on delete restrict,
-  status subscription_status not null default 'active',
-  current_period_start timestamptz not null default now(),
-  current_period_end timestamptz not null,
-  cancel_at_period_end boolean not null default false,
-  created_at timestamptz not null default now()
-);
-create index if not exists idx_user_subs_user on user_subscriptions(user_id);
-create index if not exists idx_user_subs_active on user_subscriptions(user_id, status) where status = 'active';
-
-create table if not exists subscription_invoices (
-  id uuid primary key default gen_random_uuid(),
-  user_subscription_id uuid not null references user_subscriptions(id) on delete cascade,
-  provider text not null,
-  provider_tx_id text not null,
-  amount_cents int not null check (amount_cents >= 0),
-  currency_code text not null default 'KRW' check (currency_code ~ '^[A-Z]{3}$'),
-  tax_amount_cents int not null default 0 check (tax_amount_cents >= 0),
-  tax_rate_percent numeric(5,2) check (tax_rate_percent >= 0 and tax_rate_percent <= 100),
-  tax_country_code char(2) check (tax_country_code ~ '^[A-Z]{2}$'),
-  status text not null check (status in ('PAID','FAILED','REFUNDED')),
-  billed_at timestamptz,
-  raw jsonb,
-  created_at timestamptz not null default now(),
-  unique (provider, provider_tx_id)
-);
-create index if not exists idx_subinv_sub on subscription_invoices(user_subscription_id);
-create index if not exists idx_subinv_currency on subscription_invoices(currency_code);
-
--- Convenience: does user have an active subscription now?
+-- (구독 도메인 완전 제거: 관련 enum 및 테이블 삭제. 재도입 시 별도 마이그레이션 필요.)
 
 -- ====================================================
 -- Reviews / Ratings

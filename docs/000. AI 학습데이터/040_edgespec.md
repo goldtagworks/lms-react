@@ -9,72 +9,7 @@
 
 ---
 
-## 1) POST /payments/webhook
-- Summary: PG 서명 검증 후 **단건 결제** 반영 및 수강 활성화
-- Content-Type: application/json
-- Request(JSON):
-  ```json
-  {
-    "provider": "portone|toss|stripe",
-    "provider_tx_id": "string",
-    "amount_cents": 123400,
-    "currency_code": "KRW",
-    "tax_amount_cents": 0,
-    "enrollment_id": "uuid",
-    "status": "paid|failed|refunded",
-    "raw": { "...": "provider payload" }
-  }
-  ```
-- Steps:
-  1) 서명 검증 실패 → 400 `E_WEBHOOK_INVALID_SIG`
-  2) payload 필수 필드/타입 검사 → 실패 시 422
-  3) `payments` **upsert**(provider, provider_tx_id unique), raw 저장
-  4) `status='paid'`이면 `enrollments.status='ENROLLED'`, `source='purchase'`
-  5) 쿠폰 사용건이면 `coupon_redemptions` 기록(멱등)
-  6) 200 반환(기처리건은 no-op)
-- Responses:
-  - 200 ok | 400 invalid signature | 422 invalid payload | 404 enrollment not found
-- Error Codes: `E_DUP_TX`, `E_ENROLL_NOT_FOUND`, `E_WEBHOOK_INVALID_SIG`
-
----
-
-## 2) POST /subscriptions/webhook
-- Summary: 결제대행사 구독 이벤트 동기화(정액제)
-- Content-Type: application/json
-- Request(JSON):
-  ```json
-  {
-    "provider": "stripe|toss|portone",
-    "event_id": "string",
-    "type": "invoice.paid|invoice.payment_failed|customer.subscription.updated|customer.subscription.deleted",
-    "user_id": "uuid",
-    "plan_code": "string",
-    "current_period_start": "2025-09-01T00:00:00Z",
-    "current_period_end": "2025-10-01T00:00:00Z",
-    "status": "active|past_due|canceled|incomplete",
-    "invoice": {
-      "provider_tx_id": "string",
-      "amount_cents": 9900,
-      "currency_code": "KRW",
-      "tax_amount_cents": 0,
-      "billed_at": "2025-09-01T00:00:00Z"
-    },
-    "raw": { "...": "provider payload" }
-  }
-  ```
-- Steps:
-  1) 서명/HMAC 검증 → 실패 400
-  2) `event_id` 멱등 체크 → 기처리면 200 no-op
-  3) `subscription_plans.code=plan_code` 조회 → 없으면 422 `E_PLAN_NOT_FOUND`
-  4) `user_subscriptions` upsert(user_id, plan_id): 기간/상태 반영
-  5) 이벤트가 인보이스를 포함하면 `subscription_invoices` upsert(provider_tx_id unique)
-  6) 상태가 `canceled`면 `cancel_at_period_end=true` 또는 status 반영
-  7) 200 ok
-- Error Codes: `E_WEBHOOK_INVALID_SIG`, `E_PLAN_NOT_FOUND`
-
----
-
-## 3) POST /coupons/validate
+## 1) POST /coupons/validate
 - Summary: 결제 전에 쿠폰 코드 검증/적용 금액 계산(읽기 전용)
 - Auth: Backend-to-backend(HMAC) 또는 사용자 세션 + 서버 재검증
 - Request(JSON):
@@ -108,7 +43,7 @@
 
 ---
 
-## 4) POST /exams/grade
+## 2) POST /exams/grade
 - Summary: 시험 응시 채점 및 합격 판정
 - Request(JSON): `{ "attempt_id": "uuid" }`
 - Steps:
@@ -121,7 +56,7 @@
 
 ---
 
-## 5) POST /certificates/issue
+## 3) POST /certificates/issue
 - Summary: 합격 시 수료증 PDF 생성/저장/메일 발송
 - Request(JSON): `{ "enrollment_id": "uuid", "attempt_id": "uuid" }`
 - Preconditions: `attempt.passed = true`
@@ -135,7 +70,7 @@
 
 ---
 
-## 6) POST /qna/notify
+## 4) POST /qna/notify
 - Summary: Q&A 생성/답변 시 알림 발송(강사/질문자)
 - Auth: service_role + 내부 이벤트 트리거
 - Request(JSON):
@@ -156,9 +91,9 @@
 
 ---
 
-## 7) 유틸/보안 공통
+## 5) 유틸/보안 공통
 - **서명 검증 예시**: `base64(hmac_sha256(secret, rawBody))` → `X-Signature` 와 비교
-- **멱등 처리**: `payments.provider_tx_id`, `subscription_invoices.provider_tx_id`, `event_id`에 **unique** 제약
+- **멱등 처리**: `payments.provider_tx_id`, `event_id`에 **unique** 제약
 - **시간 동기화**: 모든 시간은 UTC 저장, 프런트에서 타임존 변환
 - **레이트 리밋**: IP+provider 조합으로 1분당 N회 제한(429)
 
@@ -169,4 +104,4 @@
 - 알람 룰:
   - 5분 내 `E_WEBHOOK_INVALID_SIG` 3건 이상 → 경보
   - `E_STORAGE_FAIL`/`E_MAIL_FAIL` 누적 5건 이상 → 경보
-  - 구독 `past_due` 비율이 5% 초과 → 경보
+  

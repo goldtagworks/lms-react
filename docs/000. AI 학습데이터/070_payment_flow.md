@@ -1,6 +1,6 @@
 # 070_payment_flow — 결제 플로우 & 상태머신 (v3.4)
 
-본 문서는 결제 시작부터 수강 활성화(ENROLLED)까지의 **상태 전이, 시퀀스, 예외 처리, 멱등성, 금액검증(세일/쿠폰/세금/통화), 구독 플로우, UX 가드, 모니터링, 테스트 수용 기준**을 명시한다. 이 계약을 준수하지 않으면 배포 불가.
+본 문서는 결제 시작부터 수강 활성화(ENROLLED)까지의 **상태 전이, 시퀀스, 예외 처리, 멱등성, 금액검증(세일/쿠폰/세금/통화), UX 가드, 모니터링, 테스트 수용 기준**을 명시한다.
 
 ────────────────────────────────────────────────────
 ## 1) 용어 및 역할
@@ -8,9 +8,8 @@
 - Frontend: React 클라이언트(위젯 호출/상태 안내)
 - PG: 결제 게이트웨이(PortOne/Toss/Stripe 등)
 - Edge.payments-webhook: 단건 결제 웹훅 처리
-- Edge.subscriptions-webhook: 구독(정액제) 웹훅 처리
 - Edge.coupons-validate: 쿠폰 검증 API
-- DB: Supabase(courses/enrollments/payments/coupons/user_subscriptions)
+  
 
 ────────────────────────────────────────────────────
 ## 2) 상태머신 (enrollment)
@@ -20,7 +19,6 @@
 전이 규칙
 - `pay_succeeded_webhook`: PENDING → ENROLLED (웹훅만 허용, source='purchase')
 - `grant_free`: PENDING → ENROLLED (프런트/서버, 무료 코스에 한해, source='free')
-- `grant_subscription`: PENDING → ENROLLED (서버, 활성 구독 확인 시, source='subscription')
 - `cancel`: PENDING|ENROLLED → CANCELLED (운영 정책에 따라 제한)
 
 불변식(Invariants)
@@ -36,7 +34,6 @@
     "transitions": {
       "pay_succeeded_webhook": {"from": "PENDING", "to": "ENROLLED"},
       "grant_free": {"from": "PENDING", "to": "ENROLLED"},
-      "grant_subscription": {"from": "PENDING", "to": "ENROLLED"},
       "cancel": {"from": ["PENDING","ENROLLED"], "to": "CANCELLED"}
     },
     "invariants": ["FE cannot set ENROLLED directly"]
@@ -50,9 +47,6 @@
 ### A) 코스 가격 타입에 따른 분기
 - **free**: [수강하기] 클릭 → 서버 `grant_free` 호출 → ENROLLED → 학습 시작
 - **paid (one-time)**: [결제] 클릭 → PG 위젯 → `payments-webhook` → ENROLLED
-- **subscription 포함**: 
-  - 활성 구독 **있음** → [바로 수강] → 서버 `grant_subscription` → ENROLLED
-  - 활성 구독 **없음** → [구독하기] → 구독 결제(플랜) → `subscriptions-webhook` 처리 후 학습 가능
 
 ### B) Paid Happy Path
 1. Student: 코스 상세에서 [결제] 클릭
@@ -125,11 +119,7 @@
 - 필수: request_id, provider, provider_tx_id, enrollment_id, course_id, user_id, currency_code, amount_cents, status, result
 
 ────────────────────────────────────────────────────
-## 6) 구독(정액제) 웹훅 계약 요약
-- 엔드포인트: `POST /subscriptions/webhook`
-- 이벤트: `invoice.paid`, `invoice.payment_failed`, `customer.subscription.updated|deleted`
-- 처리: `user_subscriptions` upsert + `subscription_invoices` upsert(멱등), 상태/기간 반영
-- 학습 접근: 코스가 `pricing_mode='subscription'`이고 사용자가 **활성 구독**이면 `grant_subscription`으로 ENROLLED 처리(또는 플레이어 접근시 실시간 체크)
+
 
 ────────────────────────────────────────────────────
 ## 7) 프런트엔드 UX 가드
@@ -137,7 +127,7 @@
 - 30초 경과 시: "결제 확인이 지연되고 있습니다. 잠시 후 마이페이지에서 상태를 확인해주세요." 안내(지연 배너)
 - ENROLLED 토글/버튼은 웹훅 완료 전까지 노출/활성화 금지.
 - 실패/취소 시: 원화면 유지 + 명확한 카피(i18n `pay.cancelled`/`pay.error`)
-- 구독 코스: 활성 구독 없을 때는 [구독하기]를 우선 노출, 결제 성공 후 자동 리다이렉트
+  
 
 ────────────────────────────────────────────────────
 ## 8) 에러/예외 매핑표(갱신)
@@ -174,7 +164,7 @@ E_PRICE_STALE | 세일 만료 등 가격 변경 | pay.priceChanged | 최신가 �
   - 5분 내 `E_WEBHOOK_INVALID_SIG` ≥ 3
   - 10분 내 `paid` 건 처리지연 > 5건
   - `E_AMOUNT_MISMATCH` 또는 `E_CURRENCY_MISMATCH` ≥ 1
-  - 구독 `past_due` 비율이 5% 초과
+  - 
 - 대시보드 항목: 결제 성공률, 평균 웹훅 지연, 멱등 no-op 비율, 쿠폰 실패율, 통화 불일치 비율
 
 ────────────────────────────────────────────────────
@@ -184,9 +174,8 @@ E_PRICE_STALE | 세일 만료 등 가격 변경 | pay.priceChanged | 최신가 �
 - AC3: 프런트는 ENROLLED를 직접 설정하지 않는다.
 - AC4: 중복 `provider_tx_id`가 와도 서버는 200 no-op, 상태는 정확히 한 번만 ENROLLED가 된다.
 - AC5: **세일/쿠폰/세금/통화**를 포함한 금액 검증에 불합격하면 4xx(또는 409)로 처리된다.
-- AC6: 구독 코스에서 활성 구독이 있으면 `grant_subscription`으로 ENROLLED가 된다.
-- AC7: 무료 코스는 서버 `grant_free` 호출로 ENROLLED가 된다.
-- AC8: 쿠폰 적용 전/후 금액이 UI에 정확히 반영된다(서버 재검증 포함).
+- AC6: 무료 코스는 서버 `grant_free` 호출로 ENROLLED가 된다.
+- AC7: 쿠폰 적용 전/후 금액이 UI에 정확히 반영된다(서버 재검증 포함).
 
 ────────────────────────────────────────────────────
 ## 13) 시드/데모 값(권장)
@@ -194,5 +183,4 @@ E_PRICE_STALE | 세일 만료 등 가격 변경 | pay.priceChanged | 최신가 �
 - provider_tx_id 샘플: TX-OK-1, TX-DUP-1, TX-BADSIG-1
 - 금액 검증용 코스: 
   - paid: 정가 10000, 세일 9000(오늘 23:59 만료), 쿠폰 10% / 1000원 고정 샘플
-  - subscription: plan BASIC_MONTHLY(9900 KRW)
   - free: 0원 코스

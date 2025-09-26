@@ -13,8 +13,6 @@
 `/login` | public | 로그인/회원가입 | 없음 | 로그인/회원가입/비번 재설정
 `/my` | auth | 나의 강의실(ENROLLED 목록/진도/시험/수료증) | `['enrollments','me']`, `['progress','batch']`, `['certs','me']` | 학습 시작, 시험 응시, 수료증 다운로드
 `/my/wishlist` | auth | 찜 목록 | `['wishlist','me']` | 찜 추가/제거
-`/subscription/plans` | public | 구독 플랜 목록 | `['plans','active']`, `['features',planId]` | 구독 시작
-`/my/subscription` | auth | 내 구독 상태/청구 내역 | `['userSubscription','me']`, `['invoices','me']` | 해지/관리
 `/learn/:enrollmentId` | auth | 레슨 플레이어(진도 저장) | `['enrollment',enrollmentId]`, `['lessons','byEnrollment',enrollmentId]`, `['progress',enrollmentId]` | 시청/세그먼트 저장, 완료 처리
 `/exam/:examId/attempt` | auth | 시험 응시(타이머/셔플/제출) | `['exam',examId]`, `['questions',examId]` | 임시저장, 제출, 재응시
 `/certificate/:certId` | auth | 수료증 보기/다운로드 | `['certificate',certId]` | PDF 다운로드/메일 재전송
@@ -25,14 +23,12 @@
 `/admin/certificates` | auth+role(admin) | 수료증 발급/재발급 관리 | `['certs',filters,page]` | 재발급, 메일 재전송
 `/admin/coupons` | auth+role(admin) | 쿠폰 관리 | `['coupons',filters,page]` | 생성, 수정, 삭제
 `/admin/categories` | auth+role(admin) | 카테고리 관리 | `['categories']` | 생성, 수정, 삭제
-`/admin/subscriptions` | auth+role(admin) | 구독 플랜 관리 | `['plans',filters,page]` | 생성, 수정, 비활성화
 
 가드 규칙:
 - **인증 라우트(auth)**는 미로그인 시 `/login`으로 리다이렉트.
 - **역할 가드**: `/instructor/*`는 `instructor|admin`만, `/admin/*`은 `admin`만 접근.
 - `/exam/:examId/attempt` 진입 전 `eligibility = progress >= required` 검사. 미달이면 `/learn/:enrollmentId`로 안내.
 - 결제 완료 전 ENROLLED 상태를 **프론트에서 변경 금지**. 웹훅 확정 시에만 반영.
-- 구독 화면: /subscription/plans 은 public, /my/subscription 은 auth, /admin/subscriptions 은 admin 전용.
 
 ────────────────────────────────────────────────────
 ## 2) 내비게이션/가드 흐름
@@ -118,20 +114,6 @@
 - 의존성: `['categories']`
 - 동작: 카테고리 생성, 수정, 삭제
 
-### 구독 플랜 목록(`/subscription/plans`)
-- 의존성: `['plans','active']`, `['features',planId]`
-- 상태: loading / empty / error / ready
-- 액션: [구독하기] 클릭 → 구독 결제 위젯 → 결과 처리(웹훅)
-
-### 내 구독 관리(`/my/subscription`)
-- 의존성: `['userSubscription','me']`, `['invoices','me']`
-- 상태: active / past_due / canceled / incomplete
-- 액션: [해지하기] → cancel_at_period_end=true 반영
-
-### 구독 플랜 관리(`/admin/subscriptions`)
-- 의존성: `['plans',filters,page]`
-- 동작: 플랜 생성/수정/비활성화
-- AC: admin만 접근 가능
 
 ────────────────────────────────────────────────────
 ## 4) 컴포넌트 계약(Props/이벤트)
@@ -195,21 +177,16 @@
     props: { value: string, onChange: (code:string)=>void, onApply: () => void }
 
 - PriceBadge
-    props: { pricingMode: 'free'|'paid'|'subscription', listPriceCents?: number, salePriceCents?: number, currencyCode?: string, saleEndsAt?: string }
+     props: { pricingMode: 'free'|'paid', listPriceCents?: number, salePriceCents?: number, currencyCode?: string, saleEndsAt?: string }
 
-- PlanCard
-    props: { id:string, name:string, listPriceCents:number, salePriceCents?:number, currencyCode:string, features?: string[], onSubscribe: (id:string)=>void }
-
-- SubscriptionStatusCard
-    props: { planName:string, status:'active'|'past_due'|'canceled'|'incomplete', periodStart:string, periodEnd:string, invoices:Array<{id:string, amountCents:number, currencyCode:string, billedAt:string}> }
 
 ────────────────────────────────────────────────────
 ## 5) React Query 키 규약
 
 - 단건: ['course', id], ['exam', id], ['certificate', certId], ['instructor', id]
-- 리스트: ['courses', filters, page], ['enrollments','me'], ['users', page, q], ['certs', filters, page], ['coupons', filters, page], ['categories'], ['plans','active'], ['features', planId]
+- 리스트: ['courses', filters, page], ['enrollments','me'], ['users', page, q], ['certs', filters, page], ['coupons', filters, page], ['categories']
 - 종속: ['lessons', courseId], ['lessons','byEnrollment',enrollmentId], ['sections', courseId], ['reviews', courseId], ['qna', courseId], ['wishlist', 'me']
-- 파생: ['progress', enrollmentId], ['progress','batch'], ['metrics', courseId], ['userSubscription','me'], ['invoices','me']
+- 파생: ['progress', enrollmentId], ['progress','batch'], ['metrics', courseId]
 
 StaleTime 기본 60s, retry 1회, 실패 시 알림 + 재시도 버튼.
 
@@ -235,7 +212,6 @@ StaleTime 기본 60s, retry 1회, 실패 시 알림 + 재시도 버튼.
 - qna: { ask, answer, submit, noQuestions }
 - wishlist: { added, removed, empty }
 - coupon: { apply, invalid, expired, success, remove }
-- subscription: { subscribe, manage, active, expired, plan }
 
 ────────────────────────────────────────────────────
 ## 8) 접근성(A11y)
@@ -260,6 +236,3 @@ StaleTime 기본 60s, retry 1회, 실패 시 알림 + 재시도 버튼.
 - AC11: 찜(WishlistButton) 상태 동기화 및 목록(`/my/wishlist`) 정상 표시.
 - AC12: 쿠폰 입력(CouponInput) 후 유효성 검사 및 적용 정상 처리.
 - AC13: 필터 및 정렬(FilterBar) 변경 시 목록이 올바르게 갱신되고 URL에 반영된다.
-- AC14: /subscription/plans에서 활성 플랜이 표시되고, [구독하기]를 누르면 결제 플로우로 연결된다.
-- AC15: /my/subscription에서 현재 구독 상태와 청구 내역이 정확히 표시된다.
-- AC16: /admin/subscriptions는 admin만 접근 가능하다.
