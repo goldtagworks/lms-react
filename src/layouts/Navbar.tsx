@@ -1,6 +1,6 @@
 import { Box } from '@mantine/core';
 
-import { LinkButton } from '../components/LinkButton';
+import { LinkButton } from '@main/components/LinkButton';
 
 const Navbar = () => (
     <Box aria-label="모바일 메뉴" component="nav" display="flex" style={{ flexDirection: 'column', gap: 8 }}>

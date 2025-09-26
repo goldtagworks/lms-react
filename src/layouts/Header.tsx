@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Group, Title, Burger } from '@mantine/core';
 
-import { LinkButton } from '../components/LinkButton';
+import { LinkButton } from '@main/components/LinkButton';
 
 interface HeaderProps {
     navOpened: boolean;
