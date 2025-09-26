@@ -1,10 +1,8 @@
 import React from 'react';
-import { Container, Group, Title, Text, SimpleGrid, Card, Select, TextInput, Box } from '@mantine/core';
-
-import { LinkButton } from '../components/LinkButton';
-import { CourseCard } from '../components/CourseCard';
-import { AppButton } from '../components/AppButton';
-import MainLayout from '../layouts/MainLayout';
+import { Container, Group, Title, Text, SimpleGrid, Card, Select, TextInput, Box, Button } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import { AppButton } from '@main/components/AppButton';
+import { LinkButton } from '@main/components/LinkButton';
 
 const courses = [
     {
@@ -41,9 +39,9 @@ const courses = [
     }
 ];
 
-function HomePage() {
+const HomePage = () => {
     return (
-        <MainLayout>
+        <>
             {/* Hero */}
             <Container py="xl" size="lg">
                 <Title lh={1.15} mb="md" order={1} size={40}>
@@ -55,8 +53,12 @@ function HomePage() {
                     입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요. 강의별 응시 기준(%)을 명확히 안내합니다.
                 </Text>
                 <Group gap="md" wrap="wrap">
-                    <LinkButton color="primary" href="#courses" label="코스 둘러보기" size="md" />
-                    <LinkButton color="accent" href="#guide" label="이용 가이드" size="md" variant="light" />
+                    <Button color="primary" component={Link} size="md" to="/courses" variant="filled">
+                        코스 둘러보기
+                    </Button>
+                    <Button color="accent" component={Link} size="md" to="/guide" variant="light">
+                        이용 가이드
+                    </Button>
                 </Group>
             </Container>
             {/* Courses */}
@@ -74,12 +76,27 @@ function HomePage() {
                         </Group>
                     </Group>
                     <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} mt="lg" spacing="lg">
-                        {courses.map((c) => (
-                            <CourseCard key={c.title} lessons={c.lessons} level={c.level} percent={c.percent} price={c.price} title={c.title} weeks={c.weeks} />
+                        {courses.map((c, idx) => (
+                            <Card key={c.title} withBorder radius="md" shadow="md">
+                                <Title mb="xs" order={4} size={18}>
+                                    {c.title}
+                                </Title>
+                                <Text c="dimmed" mb="xs" size="sm">
+                                    {c.level} · {c.price}
+                                </Text>
+                                <Text c="dimmed" size="sm">
+                                    {c.weeks}주 · {c.lessons}차시
+                                </Text>
+                                <Button fullWidth component={Link} mt="md" size="xs" to={`/course/${idx + 1}`} variant="light">
+                                    자세히
+                                </Button>
+                            </Card>
                         ))}
                     </SimpleGrid>
                     <Box mt="xl" ta="center">
-                        <LinkButton href="#all" label="View All" size="md" variant="subtle" />
+                        <Button component={Link} size="md" to="/courses" variant="subtle">
+                            View All
+                        </Button>
                     </Box>
                 </Container>
             </Box>
@@ -124,8 +141,8 @@ function HomePage() {
                     </Card>
                 </Container>
             </Box>
-        </MainLayout>
+        </>
     );
-}
+};
 
 export default HomePage;
