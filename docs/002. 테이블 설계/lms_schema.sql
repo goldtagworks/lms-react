@@ -1,0 +1,291 @@
+-- =============================
+-- LMS schema v1.0 (single domain; roles: admin|instructor|learner)
+-- =============================
+
+-- [코스] 강의/클래스의 기본 정보 테이블
+DROP TABLE IF EXISTS courses CASCADE;
+CREATE TABLE IF NOT EXISTS courses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 코스 고유 ID
+  title text NOT NULL, -- 코스명
+  description text, -- 코스 설명
+  instructor_id uuid NOT NULL REFERENCES profiles(user_id), -- 강사(프로필) ID
+  pricing_mode course_pricing_mode NOT NULL DEFAULT 'free', -- 가격 정책(free/fixed)
+  price_cents integer NOT NULL DEFAULT 0, -- 정가(원)
+  sale_price_cents integer, -- 세일가(원)
+  sale_ends_at timestamptz, -- 세일 종료일
+  tax_included boolean NOT NULL DEFAULT true, -- 세금 포함 여부
+  currency char(3) NOT NULL DEFAULT 'KRW', -- 통화
+  level text, -- 난이도
+  category_id uuid REFERENCES categories(id), -- 카테고리 ID
+  thumbnail_url text, -- 썸네일 이미지
+  published boolean NOT NULL DEFAULT false, -- 공개 여부
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_courses_instructor_id ON courses(instructor_id);
+CREATE INDEX IF NOT EXISTS idx_courses_category_id ON courses(category_id);
+
+-- [레슨] 강의 내 개별 학습 단위(구버전)
+DROP TABLE IF EXISTS lessons CASCADE;
+CREATE TABLE IF NOT EXISTS lessons (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 레슨 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  section_id uuid REFERENCES sections(id), -- 섹션 ID
+  title text NOT NULL, -- 레슨명
+  content text, -- 레슨 본문
+  order_no integer NOT NULL DEFAULT 1, -- 순서
+  is_preview boolean NOT NULL DEFAULT false, -- 미리보기 여부
+  video_url text, -- 동영상 URL
+  duration_seconds integer, -- 영상 길이(초)
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_lessons_course_id ON lessons(course_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_section_id ON lessons(section_id);
+
+-- [수강신청] 사용자의 강의 등록/수강 상태(구버전)
+DROP TABLE IF EXISTS enrollments CASCADE;
+CREATE TABLE IF NOT EXISTS enrollments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 수강신청 고유 ID
+  user_id uuid NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE, -- 사용자 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  status text NOT NULL DEFAULT 'PENDING', -- 상태(PENDING|ENROLLED|CANCELLED)
+  source enrollment_source NOT NULL DEFAULT 'purchase', -- 신청 경로
+  payment_id uuid REFERENCES payments(id), -- 결제 ID
+  started_at timestamptz, -- 수강 시작일
+  completed_at timestamptz, -- 수강 완료일
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_enrollments_user_id ON enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
+
+-- [코스 섹션] 강의 내 목차/단원
+DROP TABLE IF EXISTS course_sections CASCADE;
+CREATE TABLE IF NOT EXISTS course_sections (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 섹션 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  title text NOT NULL, -- 섹션명
+  order_index int NOT NULL, -- 순서
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  UNIQUE(course_id, order_index)
+);
+CREATE INDEX IF NOT EXISTS idx_sections_course ON course_sections(course_id);
+
+-- [레슨] 강의 내 개별 학습 단위(신버전)
+DROP TABLE IF EXISTS lessons CASCADE;
+CREATE TABLE IF NOT EXISTS lessons (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 레슨 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  title text NOT NULL, -- 레슨명
+  outline jsonb, -- 목차/개요
+  content_md text, -- 본문(Markdown)
+  content_url text, -- 외부 본문 URL
+  attachments jsonb, -- 첨부파일
+  duration_seconds int NOT NULL CHECK (duration_seconds >= 0), -- 영상 길이(초)
+  order_index int NOT NULL, -- 순서
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now(), -- 수정일
+  section_id uuid REFERENCES course_sections(id) ON DELETE SET NULL, -- 섹션 ID
+  is_preview boolean NOT NULL DEFAULT false, -- 미리보기 여부
+  UNIQUE (course_id, order_index)
+);
+CREATE INDEX IF NOT EXISTS idx_lessons_course ON lessons(course_id);
+
+-- [수강신청] 사용자의 강의 등록/수강 상태(신버전)
+DROP TABLE IF EXISTS enrollments CASCADE;
+CREATE TABLE IF NOT EXISTS enrollments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 수강신청 고유 ID
+  user_id uuid NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE, -- 사용자 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  status text NOT NULL CHECK (status IN ('PENDING','ENROLLED','CANCELLED')) DEFAULT 'PENDING', -- 상태
+  source enrollment_source NOT NULL DEFAULT 'free', -- 신청 경로
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  UNIQUE (user_id, course_id)
+);
+CREATE INDEX IF NOT EXISTS idx_enroll_user ON enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_enroll_course ON enrollments(course_id);
+CREATE INDEX IF NOT EXISTS idx_enroll_active ON enrollments(status) WHERE status = 'ENROLLED';
+
+-- [결제] 수강신청 결제 내역
+DROP TABLE IF EXISTS payments CASCADE;
+CREATE TABLE IF NOT EXISTS payments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 결제 고유 ID
+  enrollment_id uuid NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, -- 수강신청 ID
+  provider text NOT NULL, -- 결제 PG/수단
+  provider_tx_id text NOT NULL, -- PG 거래 ID
+  amount_cents int NOT NULL CHECK (amount_cents >= 0), -- 결제 금액(원)
+  currency_code text NOT NULL DEFAULT 'KRW' CHECK (currency_code ~ '^[A-Z]{3}$'), -- 통화
+  tax_amount_cents int NOT NULL DEFAULT 0 CHECK (tax_amount_cents >= 0), -- 세금액(원)
+  tax_rate_percent numeric(5,2) CHECK (tax_rate_percent >= 0 AND tax_rate_percent <= 100), -- 세율(%)
+  tax_country_code char(2) CHECK (tax_country_code ~ '^[A-Z]{2}$'), -- 과세국가
+  status text NOT NULL CHECK (status IN ('PAID','FAILED','REFUNDED')), -- 결제 상태
+  paid_at timestamptz, -- 결제 완료일
+  raw jsonb, -- 원본 응답
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  UNIQUE (provider, provider_tx_id)
+);
+
+-- [시험 시도] 수강생의 시험 응시 기록 (n회 시도 가능)
+DROP TABLE IF EXISTS exam_attempts CASCADE;
+CREATE TABLE IF NOT EXISTS exam_attempts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 시험 시도 고유 ID
+  exam_id uuid NOT NULL REFERENCES exams(id) ON DELETE CASCADE, -- 시험 ID
+  enrollment_id uuid NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, -- 수강신청 ID
+  started_at timestamptz NOT NULL DEFAULT now(), -- 시험 시작 시각
+  submitted_at timestamptz, -- 제출 시각
+  score int CHECK (score BETWEEN 0 AND 100), -- 점수
+  passed boolean, -- 합격 여부
+  answers jsonb, -- 응답(답안) 데이터
+  created_at timestamptz NOT NULL DEFAULT now() -- 생성일
+);
+CREATE INDEX IF NOT EXISTS idx_attempts_exam ON exam_attempts(exam_id);
+CREATE INDEX IF NOT EXISTS idx_attempts_enroll ON exam_attempts(enrollment_id);
+
+-- [수료증] 각 수강신청별 1개 발급, 시험 합격 시 생성
+DROP TABLE IF EXISTS certificates CASCADE;
+CREATE TABLE IF NOT EXISTS certificates (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 수료증 고유 ID
+  enrollment_id uuid NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, -- 수강신청 ID
+  exam_attempt_id uuid NOT NULL REFERENCES exam_attempts(id) ON DELETE CASCADE, -- 합격 시험 시도 ID
+  issued_at timestamptz NOT NULL DEFAULT now(), -- 발급일
+  pdf_path text NOT NULL, -- PDF 파일 경로
+  serial_no text NOT NULL, -- 일련번호
+  UNIQUE (serial_no),
+  UNIQUE (enrollment_id)
+);
+CREATE INDEX IF NOT EXISTS idx_cert_enroll ON certificates(enrollment_id);
+
+-- [코스 리뷰] 수강생의 강의 평가 및 코멘트
+DROP TABLE IF EXISTS course_reviews CASCADE;
+CREATE TABLE IF NOT EXISTS course_reviews (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 리뷰 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 작성자(수강생) ID
+  rating int NOT NULL CHECK (rating BETWEEN 1 AND 5), -- 평점(1~5)
+  comment text, -- 코멘트
+  created_at timestamptz NOT NULL DEFAULT now(), -- 작성일
+  UNIQUE(course_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_course ON course_reviews(course_id);
+
+-- [코스 평점 뷰] 코스별 평균 평점/리뷰수 집계 뷰
+CREATE OR REPLACE VIEW v_course_ratings AS
+SELECT course_id,
+       avg(rating)::numeric(3,2) AS avg_rating,
+       count(*) AS review_count
+FROM course_reviews
+GROUP BY course_id;
+
+-- [Q&A 질문] 강의별 질문(수강생)
+DROP TABLE IF EXISTS course_questions CASCADE;
+CREATE TABLE IF NOT EXISTS course_questions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 질문 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 작성자(수강생) ID
+  title text NOT NULL, -- 질문 제목
+  body text NOT NULL, -- 질문 본문
+  is_resolved boolean NOT NULL DEFAULT false, -- 해결 여부
+  created_at timestamptz NOT NULL DEFAULT now() -- 작성일
+);
+CREATE INDEX IF NOT EXISTS idx_questions_course ON course_questions(course_id);
+
+-- [Q&A 답변] 질문에 대한 답변(강사/수강생)
+DROP TABLE IF EXISTS course_answers CASCADE;
+CREATE TABLE IF NOT EXISTS course_answers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 답변 고유 ID
+  question_id uuid NOT NULL REFERENCES course_questions(id) ON DELETE CASCADE, -- 질문 ID
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 작성자 ID
+  body text NOT NULL, -- 답변 본문
+  is_instructor_answer boolean NOT NULL DEFAULT false, -- 강사 답변 여부
+  created_at timestamptz NOT NULL DEFAULT now() -- 작성일
+);
+CREATE INDEX IF NOT EXISTS idx_answers_question ON course_answers(question_id);
+
+-- [위시리스트] 즐겨찾기/찜한 강의
+DROP TABLE IF EXISTS wishlists CASCADE;
+CREATE TABLE IF NOT EXISTS wishlists (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 사용자 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  created_at timestamptz NOT NULL DEFAULT now(), -- 추가일
+  PRIMARY KEY(user_id, course_id)
+);
+CREATE INDEX IF NOT EXISTS idx_wishlist_user ON wishlists(user_id);
+
+-- [쿠폰] 할인 코드 및 정책
+DROP TABLE IF EXISTS coupons CASCADE;
+CREATE TABLE IF NOT EXISTS coupons (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 쿠폰 고유 ID
+  code text NOT NULL UNIQUE, -- 쿠폰 코드
+  discount_type coupon_discount_type NOT NULL, -- 할인 유형(enum)
+  percent numeric(5,2) CHECK (percent >= 0 AND percent <= 100), -- 퍼센트 할인율
+  amount_cents int CHECK (amount_cents >= 0), -- 정액 할인액(원)
+  starts_at timestamptz, -- 시작일
+  ends_at timestamptz, -- 종료일
+  max_redemptions int, -- 전체 사용 한도
+  per_user_limit int DEFAULT 1, -- 1인당 사용 한도
+  is_active boolean NOT NULL DEFAULT true, -- 활성화 여부
+  created_at timestamptz NOT NULL DEFAULT now() -- 생성일
+);
+
+-- [쿠폰 사용 내역] 쿠폰별/사용자별 사용 기록
+DROP TABLE IF EXISTS coupon_redemptions CASCADE;
+CREATE TABLE IF NOT EXISTS coupon_redemptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 사용 내역 고유 ID
+  coupon_id uuid NOT NULL REFERENCES coupons(id) ON DELETE CASCADE, -- 쿠폰 ID
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 사용자 ID
+  enrollment_id uuid REFERENCES enrollments(id) ON DELETE SET NULL, -- 수강신청 ID(옵션)
+  redeemed_at timestamptz NOT NULL DEFAULT now() -- 사용일
+);
+CREATE INDEX IF NOT EXISTS idx_redemptions_coupon ON coupon_redemptions(coupon_id);
+CREATE INDEX IF NOT EXISTS idx_redemptions_user ON coupon_redemptions(user_id);
+
+-- [카테고리] 강의 분류 정보
+DROP TABLE IF EXISTS categories CASCADE;
+CREATE TABLE IF NOT EXISTS categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 카테고리 고유 ID
+  slug text NOT NULL UNIQUE, -- 슬러그(영문)
+  name text NOT NULL -- 카테고리명
+);
+
+-- [코스-카테고리 매핑] N:M 관계
+DROP TABLE IF EXISTS course_categories CASCADE;
+CREATE TABLE IF NOT EXISTS course_categories (
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  category_id uuid NOT NULL REFERENCES categories(id) ON DELETE CASCADE, -- 카테고리 ID
+  PRIMARY KEY (course_id, category_id)
+);
+
+-- [코스 난이도 enum] beginner/intermediate/advanced
+DO $$ BEGIN
+  IF NOT EXISTS(SELECT 1 FROM pg_type WHERE typname='course_levels') THEN
+    CREATE TYPE course_levels AS ENUM ('beginner','intermediate','advanced');
+  END IF;
+END $$;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS level course_levels;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS language_code text CHECK (language_code ~ '^[a-z]{2}(-[A-Z]{2})?$');
+
+-- [코스 메트릭 뷰] 강의별 학생수/평점/리뷰수 등 집계
+CREATE OR REPLACE VIEW v_course_metrics AS
+WITH s AS (
+  SELECT course_id, count(*) AS lesson_count, coalesce(sum(duration_seconds),0) AS total_duration_seconds
+  FROM lessons GROUP BY course_id
+),
+E AS (
+  SELECT course_id, count(*) FILTER (WHERE status='ENROLLED') AS student_count
+  FROM enrollments GROUP BY course_id
+),
+R AS (
+  SELECT course_id, avg(rating)::numeric(3,2) AS avg_rating, count(*) AS review_count
+  FROM course_reviews GROUP BY course_id
+)
+SELECT c.id AS course_id,
+       coalesce(E.student_count,0) AS student_count,
+       coalesce(s.lesson_count,0) AS lesson_count,
+       coalesce(s.total_duration_seconds,0) AS total_duration_seconds,
+       coalesce(R.avg_rating,0)::numeric(3,2) AS avg_rating,
+       coalesce(R.review_count,0) AS review_count
+FROM courses c
+LEFT JOIN s ON s.course_id = c.id
+LEFT JOIN E ON E.course_id = c.id
+LEFT JOIN R ON R.course_id = c.id;

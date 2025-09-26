@@ -1,11 +1,12 @@
 ---
-purpose: "AI & dev 실행용 최소 규칙 (LMS v3.4)"
-scope: "사실 기반; 미래 계획 금지; 변경 시 PR에 근거 문서 링크 필수"
+purpose: 'AI & dev 실행용 최소 규칙 (LMS v1.0)'
+scope: '사실 기반; 미래 계획 금지; 변경 시 PR에 근거 문서 링크 필수'
 updated: 2025-09-26
 ---
+
 # Copilot Instructions (LMS)
 
-1. 구현 순서(초기): Data(마이그레이션/타입) → Edge 공통(HMAC, 멱등 스텁) → Core Types/Query Keys → Router & Guards → Feature Hooks → UI Components → 테스트(결제/쿠폰/시험/수료증/환불 조건).  
+1. 구현 순서(초기): Data(마이그레이션/타입) → Edge 공통(HMAC, 멱등 스텁) → Core Types/Query Keys → Router & Guards → Feature Hooks → UI Components → 테스트(결제/쿠폰/시험/수료증/환불 조건).
 2. React Query Key 패턴 고정: ['course',id], ['lessons',courseId], ['enrollment',id], ['progress',enrollmentId], ['exam',id], ['reviews',{courseId,page}], ['qna',{courseId,page}], ['wishlist','me'], ['coupons',filters,page], ['categories'], ['metrics',courseId]. 새 키는 이 규칙 재사용.
 3. 금지: 클라이언트가 ENROLLED 직접 설정/변경 불가. 결제 금액 신뢰 금지(서버 EPP 재계산 우선).
 4. Edge 함수 에러 응답 형식 통일: { code: string, message: string } + 적절한 4xx/5xx. code는 상수화.
@@ -29,5 +30,4 @@ updated: 2025-09-26
 국내 결제 초점: 초기 PG 연동은 국내(예: Toss, PortOne 등) 우선. 다국가/정기 결제 관련 코드는 생성 지양(명시 요구 전 만들지 말 것).
 환불 정책(초기): '미 수강(진도 0%) + 일정 기간 내' 조건 충족 시 결제 취소/환불 처리; 로직/정책 상수는 별도 config 파일 도입 예정.
 
-문의: 문서 출처는 README 및 docs/000.* 스펙 파일. 불일치 발견 시 먼저 해당 스펙 갱신 → 본 파일 수정.
-
+문의: 문서 출처는 README 및 docs/000.\* 스펙 파일. 불일치 발견 시 먼저 해당 스펙 갱신 → 본 파일 수정.
