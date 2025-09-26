@@ -1,0 +1,23 @@
+@import '@mantine/core/styles.css';
+@import '@mantine/notifications/styles.css';
+
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Light mode styles */
+:root[data-mantine-color-scheme='light'] {
+    --main-background: #ffffff;
+    --main-navbar-background: #f5f5f5;
+    --main-card-background: #ffffff;
+}
+
+/* Dark mode styles */
+:root[data-mantine-color-scheme='dark'] {
+    --main-background: #1e1e1e;
+    --main-navbar-background: #252526;
+    --main-card-background: #252526;
+}

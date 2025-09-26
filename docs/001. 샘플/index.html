@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LMS — KSI Style</title>
+  <meta name="description" content="React+Supabase 기반 LMS 시안(iksi 스타일 레이아웃)">
+  <style>
+    :root{
+      --primary-50:#DBEAFE; --primary-600:#2563EB; --primary-700:#1D4ED8;
+      --accent:#06B6D4; --green:#22C55E;
+      --bg:#ffffff; --bg-soft:#F9FAFB; --text:#111827; --muted:#6B7280;
+      --border:#E5E7EB; --radius:12px; --shadow:0 6px 16px rgba(0,0,0,.06);
+      --container:1200px;
+      --gap:24px;
+      --font: Inter, Pretendard, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:var(--font); color:var(--text); background:var(--bg); line-height:1.5;}
+    img{max-width:100%; display:block}
+    a{color:var(--primary-600); text-decoration:none}
+    a:hover{color:var(--primary-700)}
+    .container{max-width:var(--container); margin:0 auto; padding:0 16px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
+         padding:10px 16px; border-radius:10px; border:1px solid transparent;
+         font-weight:600; cursor:pointer; text-decoration:none;}
+    .btn.primary{background:var(--primary-600); color:#fff;}
+    .btn.primary:hover{background:var(--primary-700)}
+    .btn.light{background:var(--primary-50); color:var(--primary-700); border-color:transparent;}
+    .btn.subtle{background:transparent; border:1px solid var(--border); color:var(--text)}
+    .badge{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; background:var(--bg-soft); color:var(--muted); border:1px solid var(--border)}
+    /* Header */
+    header{position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border);}
+    .header-inner{height:64px; display:flex; align-items:center; justify-content:space-between;}
+    .brand{font-weight:800; letter-spacing:.2px;}
+    nav{display:flex; gap:16px; align-items:center}
+    .burger{display:none; width:40px; height:40px; border-radius:8px; border:1px solid var(--border); background:#fff}
+    /* Hero */
+    .hero{padding:64px 0}
+    .hero h1{font-size:40px; line-height:1.15; margin:0 0 12px}
+    .hero p{color:var(--muted); font-size:18px; margin:0 0 16px}
+    .hero .actions{display:flex; gap:12px; flex-wrap:wrap}
+    /* Sections */
+    section{padding:40px 0}
+    .section-title{font-size:24px; font-weight:700; margin:0 0 16px}
+    /* Filters */
+    .filters{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:flex-end}
+    .input, .select{
+      height:40px; padding:0 12px; border:1px solid var(--border); border-radius:10px; background:#fff; color:var(--text);
+    }
+    /* Grid */
+    .grid{display:grid; gap:var(--gap)}
+    .grid.cards{grid-template-columns:repeat(4,1fr)}
+    @media (max-width:1024px){ .grid.cards{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width:768px){ .grid.cards{grid-template-columns:repeat(2,1fr)} .hero h1{font-size:32px} .burger{display:inline-block} nav.primary{display:none} }
+    @media (max-width:480px){ .grid.cards{grid-template-columns:1fr} .hero h1{font-size:28px} }
+    /* Card */
+    .card{border:1px solid var(--border); border-radius:var(--radius); padding:16px; background:#fff; box-shadow:var(--shadow)}
+    .card .title{font-weight:700; margin-bottom:4px}
+    .card .meta{font-size:14px; color:var(--muted)}
+    .card .footer{display:flex; align-items:center; justify-content:space-between; margin-top:12px}
+    /* Guide list */
+    .list{padding-left:18px; color:var(--muted)}
+    /* Footer */
+    footer{background:var(--bg-soft); border-top:1px solid var(--border); margin-top:40px}
+    .footer-top{display:flex; flex-wrap:wrap; gap:16px; padding-top:16px}
+    .muted{color:var(--muted)}
+    /* Util */
+    .row{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .divider{height:1px; background:var(--border); margin:16px 0}
+    .center{text-align:center}
+    .mt-sm{margin-top:8px} .mt-md{margin-top:16px} .mt-lg{margin-top:24px}
+    .hidden{display:none}
+    /* Skip link for a11y */
+    .skip{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;}
+    .skip:focus{position:static; width:auto; height:auto; background:var(--primary-600); color:#fff; padding:8px 12px; border-radius:8px}
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip">본문 바로가기</a>
+  <!-- Header -->
+  <header aria-label="주요 메뉴">
+    <div class="container header-inner">
+      <div class="row">
+        <button class="burger" aria-label="메뉴 열기" onclick="document.getElementById('mobileNav').classList.toggle('hidden')">☰</button>
+        <a class="brand" href="/">KSI Style LMS</a>
+      </div>
+      <nav class="primary" aria-label="상단 메뉴">
+        <a href="#courses">코스</a>
+        <a href="#guide">가이드</a>
+        <a href="#support">고객센터</a>
+        <a class="btn subtle" href="#login">로그인</a>
+      </nav>
+    </div>
+    <nav id="mobileNav" class="container hidden" aria-label="모바일 메뉴">
+      <div class="divider"></div>
+      <div style="display:flex; gap:12px; padding:8px 0; flex-wrap:wrap">
+        <a class="btn subtle" href="#courses">코스</a>
+        <a class="btn subtle" href="#guide">가이드</a>
+        <a class="btn subtle" href="#support">고객센터</a>
+        <a class="btn primary" href="#login">로그인</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero container" id="main">
+    <h1>Whenever, wherever,<br />배움은 계속됩니다</h1>
+    <p>입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요. 강의별 응시 기준(%)을 명확히 안내합니다.</p>
+    <div class="actions">
+      <a class="btn primary" href="#courses">코스 둘러보기</a>
+      <a class="btn light" href="#guide">이용 가이드</a>
+    </div>
+  </section>
+
+  <!-- Courses (filters + grid) -->
+  <section id="courses">
+    <div class="container">
+      <div class="row">
+        <h2 class="section-title" style="margin:0">코스 목록</h2>
+        <div class="filters" role="group" aria-label="코스 필터">
+          <select class="select" aria-label="레벨">
+            <option selected disabled>레벨</option>
+            <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+          </select>
+          <select class="select" aria-label="유형">
+            <option selected disabled>유형</option>
+            <option>Korean</option><option>Conversation</option><option>Special</option>
+          </select>
+          <input class="input" type="search" placeholder="검색(제목/키워드)" aria-label="코스 검색" />
+          <button class="btn subtle" type="button">검색</button>
+        </div>
+      </div>
+
+      <div class="grid cards mt-md" role="list">
+        <!-- Card 1 -->
+        <article class="card" role="listitem" aria-label="Korean 1">
+          <div class="title">Korean 1</div>
+          <div class="badge">Beginner</div>
+          <div class="meta mt-sm">응시 기준 <strong>60%</strong> · 무료</div>
+          <div class="footer">
+            <span class="muted">4주 · 12차시</span>
+            <a class="btn primary" href="#detail">자세히</a>
+          </div>
+        </article>
+        <!-- Card 2 -->
+        <article class="card" role="listitem" aria-label="Conversation 3">
+          <div class="title">Conversation 3</div>
+          <div class="badge">Intermediate</div>
+          <div class="meta mt-sm">응시 기준 <strong>70%</strong> · 유료</div>
+          <div class="footer">
+            <span class="muted">6주 · 16차시</span>
+            <a class="btn primary" href="#detail">자세히</a>
+          </div>
+        </article>
+        <!-- Card 3 -->
+        <article class="card" role="listitem" aria-label="Business Korean">
+          <div class="title">Business Korean</div>
+          <div class="badge">Advanced</div>
+          <div class="meta mt-sm">응시 기준 <strong>80%</strong> · 유료</div>
+          <div class="footer">
+            <span class="muted">8주 · 20차시</span>
+            <a class="btn primary" href="#detail">자세히</a>
+          </div>
+        </article>
+        <!-- Card 4 -->
+        <article class="card" role="listitem" aria-label="K-WAVE Korean">
+          <div class="title">K-WAVE Korean</div>
+          <div class="badge">Intermediate</div>
+          <div class="meta mt-sm">응시 기준 <strong>60%</strong> · 무료</div>
+          <div class="footer">
+            <span class="muted">4주 · 8차시</span>
+            <a class="btn primary" href="#detail">자세히</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="center mt-lg">
+        <a class="btn subtle" href="#all">View All</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guide -->
+  <section id="guide" style="background:var(--bg-soft)">
+    <div class="container">
+      <h2 class="section-title">이용 가이드</h2>
+      <p class="muted">수강 절차, 자료 다운로드, 뷰어 설치 안내를 확인하세요.</p>
+      <ul class="list">
+        <li><a href="#" aria-label="학습자 가이드 PDF로 이동">학습자 가이드 PDF</a></li>
+        <li><a href="#">자료실 바로가기</a></li>
+        <li><a href="#">파일 뷰어 다운로드</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Support / CTA -->
+  <section id="support">
+    <div class="container">
+      <div class="card">
+        <div class="row">
+          <div>
+            <h3 style="margin:0 0 8px">도움이 필요하신가요?</h3>
+            <div class="muted">운영시간 평일 09:00–18:00 · help@example.com · 02-0000-0000</div>
+          </div>
+          <div>
+            <a class="btn light" href="#faq">FAQ</a>
+            <a class="btn primary" href="#contact">1:1 문의</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <div class="container">
+      <div class="footer-top">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+        <a href="#">이메일무단수집거부</a>
+      </div>
+      <div class="muted" style="padding-bottom:16px">
+        COPYRIGHT © YOUR FOUNDATION · System Inquiries: +82-2-0000-0000
+      </div>
+    </div>
+  </footer>
+
+  <!-- (옵션) 간단 스크립트: 데모용 알림 -->
+  <script>
+    // 여기에 추후 React로 교체할 때, 컴포넌트와 상태를 연결하세요.
+    // 현재는 정적 데모 템플릿입니다.
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.validate.enable": true,
+    "typescript.suggestionActions.enabled": true,
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "scss.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore",
+    "css.lint.unknownAtRules": "ignore",
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        { "text": "Concisely summarize the code changes using the Conventional Commits format." },
+        { "text": "Write the summary line in Korean, imperative mood, max 50 characters, no punctuation." },
+        { "text": "If necessary, add a Korean body explaining what changed and why, wrapping lines at 72 characters." },
+        { "text": "If an issue/JIRA ID is found in the diff or comments, include it as the last line; omit if absent." },
+        { "text": "No emojis, no Markdown, no code blocks. Output only the commit message, starting with the summary line." }
+    ],
+    "liveServer.settings.root": "/apps/www",
+    "liveServer.settings.port": 5500
+}

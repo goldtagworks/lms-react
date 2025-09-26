@@ -1,0 +1,27 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import { ModalsProvider } from '@mantine/modals';
+
+import App from './App';
+import '@main/styles/app.css';
+
+const rootElement = document.getElementById('root');
+
+if (!rootElement) throw new Error('[main.tsx] Failed to find root element (#root)');
+
+ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+        <ColorSchemeScript />
+        <MantineProvider defaultColorScheme="auto">
+            <Notifications />
+            <ModalsProvider>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </ModalsProvider>
+        </MantineProvider>
+    </React.StrictMode>
+);

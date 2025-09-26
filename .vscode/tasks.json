@@ -1,0 +1,43 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "command": "yarn dev:admin",
+            "label": "dev:admin",
+            "group": "test",
+            "detail": "관리자 앱 개발 서버"
+        },
+        {
+            "type": "shell",
+            "command": "yarn dev:teacher",
+            "label": "dev:teacher",
+            "group": "test",
+            "detail": "강사 앱 개발 서버"
+        },
+        {
+            "type": "shell",
+            "command": "yarn dev:student",
+            "label": "dev:student",
+            "group": "test",
+            "detail": "수강생 앱 개발 서버"
+        },
+        {
+            "type": "shell",
+            "command": "yarn data:test",
+            "label": "data:test",
+            "group": "test",
+            "detail": "테스트 데이터 시드"
+        },
+        {
+            "type": "shell",
+            "command": "yarn build",
+            "label": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "모노레포 전체 빌드"
+        }
+    ]
+}
