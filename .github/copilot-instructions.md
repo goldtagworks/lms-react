@@ -31,3 +31,28 @@ updated: 2025-09-26
 환불 정책(초기): '미 수강(진도 0%) + 일정 기간 내' 조건 충족 시 결제 취소/환불 처리; 로직/정책 상수는 별도 config 파일 도입 예정.
 
 문의: 문서 출처는 README 및 docs/000.\* 스펙 파일. 불일치 발견 시 먼저 해당 스펙 갱신 → 본 파일 수정.
+
+---
+
+## Schema Priming (필수)
+
+데이터/타입/목데이터/쿼리 키/가격 표시 관련 작업 전에 반드시 아래 절차를 수행한다.
+
+1. Canonical schema 파일: `docs/002. 테이블 설계/lms_schema.sql` 전체 열람 (최근 열람 시각 기록).
+2. 다른 schema 스냅샷(예: 031_schema.sql 등)과 충돌/불일치 여부 확인. 발견 시 사용자 확인 전 구현 중단.
+3. 가격/할인/세금 필드(list_price_cents, sale_price_cents, sale_ends_at, currency, tax_included 등) 재계산 금지. 파생 표시 필드(effectivePriceCents 등)는 "서버 계산 값" 주석 표기.
+4. ViewModel 네이밍: 테이블 그대로 매핑은 *Row (선택), UI 조합/카드형은 *VM (예: CourseCardVM, EnrollmentProgressVM).
+5. 새 타입/목데이터/쿼리 키 관련 커밋/PR 제목 Prefix: `[schema-sync]` (없으면 리뷰 거부 규칙 적용).
+6. 스키마 변경 의심(필드 추가/삭제/의미 변경) 즉시 태스크 중단 후 schema 재확인.
+7. Coupon/Payment/Enrollment 로직 작성 전 결제 규칙(#5) 재확인 → diff 없음 서술.
+8. 누락 적발 시 해당 변경 revert 후 Priming 재수행 뒤 재커밋.
+
+Pre-Commit Checklist:
+
+- [ ] lms_schema.sql 열람 (Timestamp 기록)
+- [ ] schema diff 없음 또는 PR 본문에 diff 요약
+- [ ] 파생 필드(effective\*) 모두 서버 계산 주석
+- [ ] 커밋 제목 `[schema-sync]` Prefix 포함
+- [ ] 금지 패턴(클라이언트 가격 재계산, ENUM 오타) 없음
+
+본 절차는 Data/Types/Mock/Refactor 범주 전부에 적용한다.
