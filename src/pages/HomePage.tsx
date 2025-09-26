@@ -2,7 +2,20 @@ import React from 'react';
 import { Container, Group, Title, Text, SimpleGrid, Card, Select, TextInput, Box, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { AppButton } from '@main/components/AppButton';
-import { LinkButton } from '@main/components/LinkButton';
+
+import { HeroSection } from '../features/home/components/HeroSection';
+import { CategoryChips } from '../features/home/components/CategoryChips';
+import { CoursesSection } from '../features/home/components/CoursesSection';
+import { ReviewsSection } from '../features/home/components/ReviewsSection';
+import { InstructorsSection } from '../features/home/components/InstructorsSection';
+import { PromoBannerSection } from '../features/home/components/PromoBannerSection';
+import { GuideSection } from '../features/home/components/GuideSection';
+import { SupportSection } from '../features/home/components/SupportSection';
+import { homeData } from '../mocks/homeData';
+import { useHomeDataMock } from '../features/home/hooks/useHomeDataMock';
+import { CourseCardSkeleton } from '../features/home/components/skeletons/CourseCardSkeleton';
+import { InstructorCardSkeleton } from '../features/home/components/skeletons/InstructorCardSkeleton';
+import { PromoBannerSkeleton } from '../features/home/components/skeletons/PromoBannerSkeleton';
 
 const courses = [
     {
@@ -39,29 +52,86 @@ const courses = [
     }
 ];
 
+// TODO: 위 추천 강의/배너 데이터는 homeData bundle 기반 컴포넌트 추출 후 제거 예정
+
+// 기존 정적 homeData는 훅 로딩 완료 후 fallback
+// (실제 구현 시 react-query 대체 예정)
+const fallback = homeData;
+
 const HomePage = () => {
+    const { data, isLoading } = useHomeDataMock();
+    const categories = data?.categories || fallback.categories;
+    const popular = data?.popular || fallback.popular;
+    const newCourses = data?.newCourses || fallback.newCourses;
+    const bestReviews = data?.bestReviews || fallback.bestReviews;
+    const instructors = data?.instructors || fallback.instructors;
+    const promoBanners = data?.promoBanners || fallback.promoBanners;
+
     return (
         <>
-            {/* Hero */}
-            <Container py="xl" size="lg">
-                <Title lh={1.15} mb="md" order={1} size={40}>
-                    Whenever, wherever,
-                    <br />
-                    배움은 계속됩니다
-                </Title>
-                <Text c="dimmed" mb="md" size="lg">
-                    입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요. 강의별 응시 기준(%)을 명확히 안내합니다.
-                </Text>
-                <Group gap="md" wrap="wrap">
-                    <Button color="primary" component={Link} size="md" to="/courses" variant="filled">
-                        코스 둘러보기
-                    </Button>
-                    <Button color="accent" component={Link} size="md" to="/guide" variant="light">
-                        이용 가이드
-                    </Button>
-                </Group>
+            <HeroSection />
+
+            <Container py={32} size="lg">
+                <CategoryChips categories={categories} />
             </Container>
-            {/* Courses */}
+
+            {isLoading ? (
+                <Container aria-busy="true" aria-live="polite" py={40} size="lg">
+                    <Group justify="space-between" mb="md">
+                        <Title order={2} size={28}>
+                            인기 강의
+                        </Title>
+                    </Group>
+                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                            <CourseCardSkeleton key={i} />
+                        ))}
+                    </SimpleGrid>
+                </Container>
+            ) : (
+                <CoursesSection courses={popular} title="인기 강의" />
+            )}
+
+            {isLoading ? (
+                <Container aria-busy="true" aria-live="polite" py={40} size="lg">
+                    <Group justify="space-between" mb="md">
+                        <Title order={2} size={28}>
+                            신규 강의
+                        </Title>
+                    </Group>
+                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                            <CourseCardSkeleton key={i} />
+                        ))}
+                    </SimpleGrid>
+                </Container>
+            ) : (
+                <CoursesSection courses={newCourses} title="신규 강의" />
+            )}
+
+            {!isLoading && <ReviewsSection reviews={bestReviews} />}
+
+            {isLoading ? (
+                <Container aria-busy="true" py={32} size="lg">
+                    <Group gap={24}>
+                        {Array.from({ length: 2 }).map((_, i) => (
+                            <InstructorCardSkeleton key={i} />
+                        ))}
+                    </Group>
+                </Container>
+            ) : (
+                <InstructorsSection instructors={instructors} />
+            )}
+
+            {isLoading ? (
+                <Container aria-busy="true" py={32} size="lg">
+                    <PromoBannerSkeleton />
+                </Container>
+            ) : (
+                promoBanners[0] && <PromoBannerSection banner={promoBanners[0]} />
+            )}
+
+            {/* 기존 Courses 섹션 이하 생략... */}
             <Box bg="var(--mantine-color-body)" id="courses" py="xl">
                 <Container size="lg">
                     <Group align="center" justify="space-between">
@@ -100,47 +170,8 @@ const HomePage = () => {
                     </Box>
                 </Container>
             </Box>
-            {/* Guide */}
-            <Box bg="var(--mantine-color-body)" id="guide" py="xl">
-                <Container size="lg">
-                    <Title mb="md" order={2} size={24}>
-                        이용 가이드
-                    </Title>
-                    <Text c="dimmed" mb="md">
-                        수강 절차, 자료 다운로드, 뷰어 설치 안내를 확인하세요.
-                    </Text>
-                    <ul style={{ paddingLeft: 18, color: '#6B7280', margin: 0 }}>
-                        <li>
-                            <AppButton bg="none" h="auto" label="학습자 가이드 PDF" p={0} variant="subtle" />
-                        </li>
-                        <li>
-                            <AppButton bg="none" h="auto" label="자료실 바로가기" p={0} variant="subtle" />
-                        </li>
-                        <li>
-                            <AppButton bg="none" h="auto" label="파일 뷰어 다운로드" p={0} variant="subtle" />
-                        </li>
-                    </ul>
-                </Container>
-            </Box>
-            {/* Support */}
-            <Box id="support" py="xl">
-                <Container size="lg">
-                    <Card withBorder radius="md">
-                        <Group align="center" justify="space-between">
-                            <div>
-                                <Title mb="sm" order={3}>
-                                    도움이 필요하신가요?
-                                </Title>
-                                <Text c="dimmed">운영시간 평일 09:00–18:00 · help@example.com · 02-0000-0000</Text>
-                            </div>
-                            <Group gap="sm">
-                                <LinkButton color="accent" href="#faq" label="FAQ" size="md" variant="light" />
-                                <LinkButton color="primary" href="#contact" label="1:1 문의" size="md" />
-                            </Group>
-                        </Group>
-                    </Card>
-                </Container>
-            </Box>
+            <GuideSection />
+            <SupportSection />
         </>
     );
 };
