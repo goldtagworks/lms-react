@@ -1,175 +1,183 @@
 {
-  "common": {
-    "ok": "확인",
-    "cancel": "취소",
-    "retry": "다시 시도",
-    "loading": "불러오는 중",
-    "empty": "표시할 항목이 없습니다",
-    "error": "오류가 발생했습니다",
-    "viewAll": "전체 보기"
-  },
-  "nav": {
-    "home": "홈",
-    "courses": "코스",
-    "guide": "가이드",
-    "login": "로그인",
-    "logout": "로그아웃",
-    "my": "마이 강의실",
-    "admin": "관리자"
-  },
-  "auth": {
-    "email": "이메일",
-    "password": "비밀번호",
-    "signIn": "로그인",
-    "signUp": "회원가입",
-    "remember": "로그인 유지",
-    "forgot": "비밀번호 재설정",
-    "signinSuccess": "로그인되었습니다",
-    "signupSuccess": "회원가입이 완료되었습니다",
-    "signoutSuccess": "로그아웃되었습니다",
-    "error": "로그인 중 오류가 발생했습니다",
-    "invalid": "이메일 또는 비밀번호가 올바르지 않습니다"
-  },
-  "home": {
-    "heroTitle": "Whenever, wherever, 배움은 계속됩니다",
-    "heroSubtitle": "입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요.",
-    "browseCourses": "코스 둘러보기",
-    "seeGuide": "이용 가이드",
-    "featured": "추천 코스",
-    "noFeatured": "추천 강좌가 준비 중입니다"
-  },
-  "course": {
-    "listTitle": "코스 목록",
-    "searchPlaceholder": "검색(제목/키워드)",
-    "filterLevel": "레벨",
-    "filterType": "유형",
-    "eligibility": "응시 기준 {{percent}}%",
-    "lessons": "차시",
-    "weeks": "주",
-    "priceFree": "무료",
-    "price": "{{price}}원",
-    "learn": "학습하기",
-    "takeExam": "시험 응시",
-    "downloadCert": "수료증 다운로드",
-    "details": "자세히",
-    "notFound": "해당 코스를 찾을 수 없습니다"
-  },
-  "my": {
-    "title": "마이 강의실",
-    "noEnrollments": "수강 중인 강의가 없습니다",
-    "progressNow": "현재 진도 {{now}}% / 기준 {{req}}%"
-  },
-  "player": {
-    "nextLesson": "다음 차시",
-    "prevLesson": "이전 차시",
-    "completed": "완료됨",
-    "resume": "이어보기",
-    "saving": "진도 저장 중…",
-    "saved": "진도가 저장되었습니다",
-    "saveFailed": "진도 저장에 실패했습니다"
-  },
-  "pay": {
-    "start": "결제",
-    "processing": "결제를 처리하고 있습니다…",
-    "delayed": "결제 확인이 지연되고 있습니다. 잠시 후 마이페이지에서 상태를 확인해주세요.",
-    "cancelled": "결제가 취소되었습니다.",
-    "duplicate": "이미 결제가 처리된 주문입니다.",
-    "error": "결제 중 오류가 발생했습니다.",
-    "receipt": "영수증 보기"
-  },
-  "exam": {
-    "title": "시험",
-    "start": "시험 시작",
-    "timeLeft": "남은 시간 {{mm}}:{{ss}}",
-    "progress": "문항 {{n}} / {{total}}",
-    "save": "임시저장",
-    "submit": "제출",
-    "submitConfirm": "제출하시겠습니까?",
-    "unanswered": "미답안 {{n}}개",
-    "result": "결과",
-    "score": "점수 {{score}}점",
-    "passed": "합격했습니다",
-    "failed": "불합격했습니다",
-    "retakeAfter": "다음 응시는 {{hours}}시간 후 가능합니다",
-    "notEligible": "응시 자격을 충족하지 못했습니다"
-  },
-  "certificate": {
-    "title": "수료증",
-    "issuing": "수료증을 발급하고 있습니다…",
-    "issued": "수료증이 발급되었습니다",
-    "download": "PDF 다운로드",
-    "emailSent": "이메일로도 발송되었습니다",
-    "reissue": "재발급"
-  },
-  "errors": {
-    "notFound": "요청하신 페이지를 찾을 수 없습니다",
-    "forbidden": "접근 권한이 없습니다",
-    "network": "네트워크 오류가 발생했습니다",
-    "timeout": "요청 시간이 초과되었습니다",
-    "unknown": "알 수 없는 오류가 발생했습니다",
-    "E_PG_CANCEL": "결제가 취소되었습니다",
-    "E_PG_TIMEOUT": "결제 응답이 지연되고 있습니다",
-    "E_DUP_TX": "중복 결제가 감지되었습니다",
-    "E_WEBHOOK_INVALID_SIG": "결제 서명 검증에 실패했습니다",
-    "E_ENROLL_NOT_FOUND": "수강 정보가 올바르지 않습니다",
-    "E_AMOUNT_MISMATCH": "결제 금액이 일치하지 않습니다",
-    "E_ATTEMPT_NOT_FOUND": "시험 응시 내역을 찾을 수 없습니다",
-    "E_NOT_OWNER": "본인 내역이 아닙니다",
-    "E_ALREADY_GRADED": "이미 채점된 응시입니다",
-    "E_NOT_PASSED": "합격 이전에는 수료증을 발급할 수 없습니다",
-    "E_ALREADY_ISSUED": "이미 수료증이 발급되었습니다",
-    "E_STORAGE_FAIL": "파일 저장에 실패했습니다",
-    "E_MAIL_FAIL": "이메일 발송에 실패했습니다"
-  },
-  "a11y": {
-    "skipToContent": "본문 바로가기",
-    "mainNav": "주요 메뉴",
-    "mobileMenuOpen": "모바일 메뉴 열기",
-    "mobileMenuClose": "모바일 메뉴 닫기"
-  },
-  "price": {
-    "free": "무료",
-    "original": "정가 {{price}}원",
-    "sale": "할인가 {{price}}원"
-  },
-  "filter": {
-    "category": "카테고리",
-    "level": "레벨",
-    "rating": "평점",
-    "priceType": "가격 유형",
-    "sort": "정렬"
-  },
-  "sort": {
-    "recommended": "추천순",
-    "new": "신규순",
-    "rating": "평점순",
-    "students": "수강생순"
-  },
-  "review": {
-    "write": "리뷰 작성",
-    "count": "리뷰 {{count}}개",
-    "rating": "평점 {{rating}} / 5"
-  },
-  "qna": {
-    "ask": "질문하기",
-    "answer": "답변하기",
-    "resolved": "해결됨",
-    "noQuestions": "아직 질문이 없습니다"
-  },
-  "wishlist": {
-    "add": "위시리스트 추가",
-    "remove": "위시리스트 제거",
-    "empty": "위시리스트에 담긴 코스가 없습니다"
-  },
-  "coupon": {
-    "apply": "쿠폰 적용",
-    "invalid": "유효하지 않은 쿠폰입니다",
-    "expired": "만료된 쿠폰입니다",
-    "applied": "쿠폰이 적용되었습니다"
-  },
-  
-  "category": {
-    "manage": "카테고리 관리",
-    "empty": "등록된 카테고리가 없습니다"
-  }
+    "common": {
+        "ok": "확인",
+        "cancel": "취소",
+        "retry": "다시 시도",
+        "loading": "불러오는 중",
+        "empty": "표시할 항목이 없습니다",
+        "error": "오류가 발생했습니다",
+        "viewAll": "전체 보기"
+    },
+    "nav": {
+        "home": "홈",
+        "courses": "코스",
+        "guide": "가이드",
+        "login": "로그인",
+        "logout": "로그아웃",
+        "my": "마이 강의실",
+        "admin": "관리자"
+    },
+    "auth": {
+        "email": "이메일",
+        "password": "비밀번호",
+        "signIn": "로그인",
+        "signUp": "회원가입",
+        "remember": "로그인 유지",
+        "forgot": "비밀번호 재설정",
+        "signinSuccess": "로그인되었습니다",
+        "signupSuccess": "회원가입이 완료되었습니다",
+        "signoutSuccess": "로그아웃되었습니다",
+        "error": "로그인 중 오류가 발생했습니다",
+        "invalid": "이메일 또는 비밀번호가 올바르지 않습니다"
+    },
+    "home": {
+        "heroTitle": "Whenever, wherever, 배움은 계속됩니다",
+        "heroSubtitle": "입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요.",
+        "browseCourses": "코스 둘러보기",
+        "seeGuide": "이용 가이드",
+        "featured": "추천 코스",
+        "noFeatured": "추천 강좌가 준비 중입니다"
+    },
+    "course": {
+        "listTitle": "코스 목록",
+        "searchPlaceholder": "검색(제목/키워드)",
+        "filterLevel": "레벨",
+        "filterType": "유형",
+        "eligibility": "응시 기준 {{percent}}%",
+        "lessons": "차시",
+        "weeks": "주",
+        "priceFree": "무료",
+        "price": "{{price}}원",
+        "learn": "학습하기",
+        "takeExam": "시험 응시",
+        "downloadCert": "수료증 다운로드",
+        "details": "자세히",
+        "notFound": "해당 코스를 찾을 수 없습니다"
+    },
+    "my": {
+        "title": "마이 강의실",
+        "noEnrollments": "수강 중인 강의가 없습니다",
+        "progressNow": "현재 진도 {{now}}% / 기준 {{req}}%"
+    },
+    "player": {
+        "nextLesson": "다음 차시",
+        "prevLesson": "이전 차시",
+        "completed": "완료됨",
+        "resume": "이어보기",
+        "saving": "진도 저장 중…",
+        "saved": "진도가 저장되었습니다",
+        "saveFailed": "진도 저장에 실패했습니다"
+    },
+    "pay": {
+        "start": "결제",
+        "processing": "결제를 처리하고 있습니다…",
+        "delayed": "결제 확인이 지연되고 있습니다. 잠시 후 마이페이지에서 상태를 확인해주세요.",
+        "cancelled": "결제가 취소되었습니다.",
+        "duplicate": "이미 결제가 처리된 주문입니다.",
+        "error": "결제 중 오류가 발생했습니다.",
+        "receipt": "영수증 보기"
+    },
+    "exam": {
+        "title": "시험",
+        "start": "시험 시작",
+        "timeLeft": "남은 시간 {{mm}}:{{ss}}",
+        "progress": "문항 {{n}} / {{total}}",
+        "save": "임시저장",
+        "submit": "제출",
+        "submitConfirm": "제출하시겠습니까?",
+        "unanswered": "미답안 {{n}}개",
+        "result": "결과",
+        "score": "점수 {{score}}점",
+        "passed": "합격했습니다",
+        "failed": "불합격했습니다",
+        "retakeAfter": "다음 응시는 {{hours}}시간 후 가능합니다",
+        "notEligible": "응시 자격을 충족하지 못했습니다"
+    },
+    "certificate": {
+        "title": "수료증",
+        "issuing": "수료증을 발급하고 있습니다…",
+        "issued": "수료증이 발급되었습니다",
+        "download": "PDF 다운로드",
+        "emailSent": "이메일로도 발송되었습니다",
+        "reissue": "재발급"
+    },
+    "errors": {
+        "notFound": "요청하신 페이지를 찾을 수 없습니다",
+        "forbidden": "접근 권한이 없습니다",
+        "network": "네트워크 오류가 발생했습니다",
+        "timeout": "요청 시간이 초과되었습니다",
+        "unknown": "알 수 없는 오류가 발생했습니다",
+        "E_PG_CANCEL": "결제가 취소되었습니다",
+        "E_PG_TIMEOUT": "결제 응답이 지연되고 있습니다",
+        "E_DUP_TX": "중복 결제가 감지되었습니다",
+        "E_WEBHOOK_INVALID_SIG": "결제 서명 검증에 실패했습니다",
+        "E_ENROLL_NOT_FOUND": "수강 정보가 올바르지 않습니다",
+        "E_AMOUNT_MISMATCH": "결제 금액이 일치하지 않습니다",
+        "E_ATTEMPT_NOT_FOUND": "시험 응시 내역을 찾을 수 없습니다",
+        "E_NOT_OWNER": "본인 내역이 아닙니다",
+        "E_ALREADY_GRADED": "이미 채점된 응시입니다",
+        "E_NOT_PASSED": "합격 이전에는 수료증을 발급할 수 없습니다",
+        "E_ALREADY_ISSUED": "이미 수료증이 발급되었습니다",
+        "E_STORAGE_FAIL": "파일 저장에 실패했습니다",
+        "E_MAIL_FAIL": "이메일 발송에 실패했습니다"
+    },
+    "a11y": {
+        "skipToContent": "본문 바로가기",
+        "mainNav": "주요 메뉴",
+        "mobileMenuOpen": "모바일 메뉴 열기",
+        "mobileMenuClose": "모바일 메뉴 닫기"
+    },
+    "price": {
+        "free": "무료",
+        "original": "정가 {{price}}원",
+        "sale": "할인가 {{price}}원"
+    },
+    "filter": {
+        "category": "카테고리",
+        "level": "레벨",
+        "rating": "평점",
+        "priceType": "가격 유형",
+        "sort": "정렬"
+    },
+    "sort": {
+        "recommended": "추천순",
+        "new": "신규순",
+        "rating": "평점순",
+        "students": "수강생순"
+    },
+    "review": {
+        "write": "리뷰 작성",
+        "count": "리뷰 {{count}}개",
+        "rating": "평점 {{rating}} / 5"
+    },
+    "qna": {
+        "ask": "질문하기",
+        "answer": "답변하기",
+        "resolved": "해결됨",
+        "noQuestions": "아직 질문이 없습니다"
+    },
+    "wishlist": {
+        "add": "위시리스트 추가",
+        "remove": "위시리스트 제거",
+        "empty": "위시리스트에 담긴 코스가 없습니다"
+    },
+    "instructor": {
+        "applyTitle": "강사 신청",
+        "applySubmitted": "승인 대기 중입니다",
+        "applyApproved": "이미 승인된 강사입니다",
+        "applyButton": "신청 제출",
+        "links": "관련 링크",
+        "badgeFeatured": "추천"
+    },
+    "coupon": {
+        "apply": "쿠폰 적용",
+        "invalid": "유효하지 않은 쿠폰입니다",
+        "expired": "만료된 쿠폰입니다",
+        "applied": "쿠폰이 적용되었습니다"
+    },
+
+    "category": {
+        "manage": "카테고리 관리",
+        "empty": "등록된 카테고리가 없습니다"
+    }
 }

@@ -1,4 +1,4 @@
-import { Card, SimpleGrid, Text, Button, Group, Select, TextInput, Badge } from '@mantine/core';
+import { Card, Text, Button, Group, Select, TextInput, Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { TagChip } from '@main/components/TagChip';
@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PageSection from '@main/components/layout/PageSection';
+import CourseGrid from '@main/components/layout/CourseGrid';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
 import { useCourses, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
@@ -33,7 +34,7 @@ const CourseListPage = () => {
     const [query, setQuery] = useState<string>('');
 
     const filtered = useMemo(() => {
-        return courses.filter((c) => {
+        const base = courses.filter((c) => {
             if (category !== 'all' && c.category !== category) return false;
             if (query.trim()) {
                 const q = query.trim().toLowerCase();
@@ -46,6 +47,23 @@ const CourseListPage = () => {
 
             return true;
         });
+
+        return base.slice().sort((a, b) => {
+            // featured 먼저, rank 오름차순
+            const af = a.is_featured ? 1 : 0;
+            const bf = b.is_featured ? 1 : 0;
+
+            if (af !== bf) return bf - af; // true 먼저
+
+            if (a.is_featured && b.is_featured) {
+                const ar = a.featured_rank ?? 999;
+                const br = b.featured_rank ?? 999;
+
+                if (ar !== br) return ar - br;
+            }
+
+            return 0;
+        });
     }, [courses, category, query]);
 
     const handleEnroll = (courseId: string, enrolled: boolean) => {
@@ -56,6 +74,11 @@ const CourseListPage = () => {
     const handleWishlist = (courseId: string) => {
         if (!userId) return;
         toggleWishlistAndNotify(userId, courseId);
+    };
+
+    const handleResetFilters = () => {
+        setCategory('all');
+        setQuery('');
     };
 
     return (
@@ -80,7 +103,7 @@ const CourseListPage = () => {
                         정렬(스텁)
                     </Button>
                 </Group>
-                <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="xl">
+                <CourseGrid>
                     {filtered.map((course) => {
                         const enrolled = userId ? isEnrolled(userId, course.id) : false;
                         const wish = userId ? isWishlisted(userId, course.id) : false;
@@ -106,6 +129,11 @@ const CourseListPage = () => {
                                     </Group>
                                 </Group>
                                 <Group gap={4} mb={4}>
+                                    {course.is_featured && (
+                                        <Badge color="teal" size="xs" variant="filled">
+                                            {course.featured_badge_text || '추천'}
+                                        </Badge>
+                                    )}
                                     {course.tags?.map((tag) => (
                                         <TagChip key={tag} label={tag} />
                                     ))}
@@ -139,17 +167,9 @@ const CourseListPage = () => {
                         );
                     })}
                     {filtered.length === 0 && (
-                        <EmptyState
-                            actionLabel="필터 초기화"
-                            message="검색어나 필터를 조정해 다시 시도해 주세요."
-                            title="코스를 찾을 수 없어요"
-                            onActionClick={() => {
-                                setCategory('all');
-                                setQuery('');
-                            }}
-                        />
+                        <EmptyState actionLabel="필터 초기화" message="검색어나 필터를 조정해 다시 시도해 주세요." title="코스를 찾을 수 없어요" onActionClick={handleResetFilters} />
                     )}
-                </SimpleGrid>
+                </CourseGrid>
             </PageSection>
         </PageContainer>
     );

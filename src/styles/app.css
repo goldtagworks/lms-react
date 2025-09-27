@@ -59,3 +59,36 @@
 .list-indent {
     padding-left: 18px;
 }
+
+/* Curriculum rows (CourseDetailPage) */
+.curriculum-row {
+    background: var(--mantine-color-body);
+    transition: background 120ms ease;
+}
+.curriculum-row:hover {
+    background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-gray-8));
+}
+@media (max-width: 640px) {
+    .curriculum-row {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+    /* 첫 번째 번호 span */
+    .curriculum-row > span[style*='width: 32px'] {
+        width: auto !important;
+        order: 1;
+        margin-right: 8px;
+    }
+    /* 길이 표시 span */
+    .curriculum-row > span[style*='width: 42px'] {
+        width: auto !important;
+        order: 3;
+        margin-left: auto;
+    }
+    /* 제목 span (두번째) */
+    .curriculum-row > span:nth-of-type(2) {
+        order: 2;
+        width: 100%;
+        margin-top: 4px;
+    }
+}

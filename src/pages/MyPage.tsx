@@ -1,12 +1,15 @@
-import { Container, Title, Text, Button, Group, SimpleGrid, Card, Badge } from '@mantine/core';
+import { Title, Text, Button, Group, Card, Badge } from '@mantine/core';
 import { List, Heart, Award, Home, ArrowRight } from 'lucide-react';
 import EmptyState from '@main/components/EmptyState';
+import PageContainer from '@main/components/layout/PageContainer';
+import PageHeader from '@main/components/layout/PageHeader';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
 import { useEnrollmentsState, useCourses, isEnrolled, isWishlisted } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import AppImage from '@main/components/AppImage';
 import { TagChip } from '@main/components/TagChip';
+import CourseGrid from '@main/components/layout/CourseGrid';
 import PriceText from '@main/components/price/PriceText';
 
 export default function MyPage() {
@@ -18,30 +21,34 @@ export default function MyPage() {
     const enrolledCourses = enrollments.map((e) => courses.find((c) => c.id === e.course_id)).filter((c): c is NonNullable<typeof c> => !!c);
 
     return (
-        <Container py="xl">
-            <Title order={2}>마이페이지</Title>
-            <Text mb="md">내 정보, 수강 내역, 수료증, 위시리스트 등</Text>
-            <Group gap="md" mb="xl">
-                <Button component={Link} leftSection={<List size={16} />} to="/courses" variant="light">
-                    코스 목록
-                </Button>
-                <Button component={Link} leftSection={<Heart size={16} />} to="/my/wishlist" variant="light">
-                    위시리스트
-                </Button>
-                <Button component={Link} leftSection={<Award size={16} />} to="/certificate/1" variant="light">
-                    수료증 예시
-                </Button>
-                <Button component={Link} leftSection={<Home size={16} />} to="/" variant="outline">
-                    홈으로
-                </Button>
-            </Group>
-            <Title mb="sm" order={3} size="lg">
+        <PageContainer roleMain>
+            <PageHeader
+                actions={
+                    <Group gap="xs">
+                        <Button component={Link} leftSection={<List size={16} />} to="/courses" variant="light">
+                            코스 목록
+                        </Button>
+                        <Button component={Link} leftSection={<Heart size={16} />} to="/my/wishlist" variant="light">
+                            위시리스트
+                        </Button>
+                        <Button component={Link} leftSection={<Award size={16} />} to="/my/certificates" variant="light">
+                            수료증
+                        </Button>
+                        <Button component={Link} leftSection={<Home size={16} />} to="/" variant="outline">
+                            홈으로
+                        </Button>
+                    </Group>
+                }
+                description="내 정보, 수강 내역, 수료증, 위시리스트 등을 관리할 수 있습니다."
+                title="마이페이지"
+            />
+            <Title mb="sm" order={2} size="lg">
                 수강중 강의
             </Title>
             {!userId && <EmptyState actionLabel="로그인" message="로그인 후 수강 내역을 확인할 수 있습니다." title="로그인 필요" to="/signin" />}
             {userId && enrolledCourses.length === 0 && <EmptyState actionLabel="강의 탐색" message="아직 수강중인 강의가 없습니다." title="수강중 강의 없음" to="/courses" />}
             {userId && enrolledCourses.length > 0 && (
-                <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} mt="md" spacing="xl">
+                <CourseGrid mt="md">
                     {enrolledCourses.map((course) => {
                         const wish = isWishlisted(userId!, course.id);
                         const enrolled = isEnrolled(userId!, course.id);
@@ -89,14 +96,14 @@ export default function MyPage() {
                                         /* MyPage에서 위시 토글 기능은 후속 필요 시 구현 */
                                     }}
                                 />
-                                <Button fullWidth component={Link} leftSection={<ArrowRight size={14} />} mt={8} radius="md" size="xs" to={`/course/${course.id}`} variant="subtle">
+                                <Button fullWidth color="orange" component={Link} leftSection={<ArrowRight size={14} />} mt={8} radius="md" size="xs" to={`/course/${course.id}`} variant="light">
                                     이어서 학습
                                 </Button>
                             </Card>
                         );
                     })}
-                </SimpleGrid>
+                </CourseGrid>
             )}
-        </Container>
+        </PageContainer>
     );
 }

@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { Box, Container, Group, Title, Text, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import AppImage from '@main/components/AppImage';
+import { useAuth } from '@main/lib/auth';
 
 interface HeroSectionProps {
     heading?: string;
@@ -25,6 +26,7 @@ function HeroSectionBase({
 }: HeroSectionProps) {
     // CSS 변수 기반(색상 모드 자동 전환). token fallback 포함.
     const heroBg = 'var(--gradient-hero, linear-gradient(90deg, #f5f7fa 60%, #e0e7ff 100%))';
+    const { user } = useAuth();
 
     return (
         <Box bg={heroBg} component="section" mih={420} px={0} py={0} style={{ alignItems: 'center', display: 'flex' }}>
@@ -41,9 +43,11 @@ function HeroSectionBase({
                             <Button color="primary" component={Link} radius="xl" size="lg" to={primaryCtaTo}>
                                 {primaryCtaLabel}
                             </Button>
-                            <Button component={Link} radius="xl" size="lg" to={secondaryCtaTo} variant="outline">
-                                {secondaryCtaLabel}
-                            </Button>
+                            {!user && (
+                                <Button component={Link} radius="xl" size="lg" to={secondaryCtaTo} variant="outline">
+                                    {secondaryCtaLabel}
+                                </Button>
+                            )}
                         </Group>
                     </Box>
                     <AppImage alt="메인 배너" height={260} radius={24} shadow="sm" src={imageUrl} style={{ boxShadow: '0 8px 32px rgba(80,120,200,0.08)', objectFit: 'cover' }} width={400} />

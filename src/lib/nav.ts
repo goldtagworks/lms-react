@@ -12,6 +12,8 @@ export interface NavItem {
     auth?: AuthVisibility; // 기본 public
     roles?: UserRole[]; // 비어있으면 모든 역할
     icon?: string; // 아이콘 식별자(향후 Mantine 아이콘 매핑)
+    // 추가 조건부 로직 (예: 학생이면서 아직 강사 아님, 승인 대기 등) 표현용
+    predicate?: (ctx: FilterContext) => boolean;
 }
 
 export interface NavGroup {
@@ -48,7 +50,8 @@ export const navGroups: NavGroup[] = [
         auth: 'auth',
         items: [
             { id: 'my', label: '내 학습', href: '/my', auth: 'auth' },
-            { id: 'wishlist', label: '위시리스트', href: '/my/wishlist', auth: 'auth' }
+            { id: 'wishlist', label: '위시 담기', href: '/my/wishlist', auth: 'auth' },
+            { id: 'certificates', label: '수료증', href: '/my/certificates', auth: 'auth' }
             // 수료증/시험 기록 등 향후 추가 가능
         ]
     },
@@ -57,10 +60,10 @@ export const navGroups: NavGroup[] = [
         label: '강사',
         order: 30,
         auth: 'auth',
-        roles: ['instructor', 'admin'],
+        roles: ['instructor'],
         items: [
-            { id: 'instructor-courses', label: '내 코스 관리', href: '/instructor/courses', auth: 'auth', roles: ['instructor', 'admin'] },
-            { id: 'instructor-profile', label: '프로필', href: '/instructor/123', auth: 'auth', roles: ['instructor', 'admin'] }
+            { id: 'instructor-courses', label: '내 코스 관리', href: '/instructor/courses', auth: 'auth', roles: ['instructor'] },
+            { id: 'instructor-profile', label: '프로필', href: '/instructor/123', auth: 'auth', roles: ['instructor'] }
             // TODO: 동적 ID 대체 필요
         ]
     },
@@ -74,8 +77,27 @@ export const navGroups: NavGroup[] = [
             { id: 'admin-users', label: '사용자', href: '/admin/users', roles: ['admin'], auth: 'auth' },
             { id: 'admin-categories', label: '카테고리', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
             { id: 'admin-coupons', label: '쿠폰', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-certificates', label: '수료증', href: '/admin/certificates', roles: ['admin'], auth: 'auth' }
+            { id: 'admin-certificates', label: '수료증', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
+            // 강사 신청 관리: 기존 Header/Navbar 하드코딩 제거 후 이곳으로 이동
+            { id: 'admin-instructor-apps', label: '강사 신청 관리', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
             // 공지 관리는 공용 NoticesPage 에서 role=admin 시 액션 노출
+        ]
+    },
+    // CTA (역할 전환/관리) 그룹: predicate 로 세밀 제어 가능
+    {
+        id: 'cta',
+        label: '전환',
+        order: 50,
+        items: [
+            // 학생만 노출 (instructor/admin 은 숨김)
+            {
+                id: 'apply-instructor',
+                label: '강사 신청',
+                href: '/instructor/apply',
+                auth: 'auth',
+                roles: ['student'],
+                predicate: ({ role }) => role === 'student'
+            }
         ]
     },
     {
@@ -98,7 +120,7 @@ export function filterNav(groups: NavGroup[], ctx: FilterContext): NavGroup[] {
         .filter((g) => matchAuth(g.auth, isAuthenticated) && matchRole(g.roles, role))
         .map((g) => ({
             ...g,
-            items: g.items.filter((it) => matchAuth(it.auth ?? g.auth, isAuthenticated) && matchRole(it.roles ?? g.roles, role))
+            items: g.items.filter((it) => matchAuth(it.auth ?? g.auth, isAuthenticated) && matchRole(it.roles ?? g.roles, role) && (typeof it.predicate === 'function' ? it.predicate(ctx) : true))
         }))
         .filter((g) => g.items.length > 0)
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));

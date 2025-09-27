@@ -69,7 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = useCallback(async (email: string, _password: string) => {
         await new Promise((r) => setTimeout(r, 300));
-        const fakeUser = { id: 'u-demo', name: email.split('@')[0] || '사용자', email, role: inferRoleFromEmail(email) || 'student' };
+        const namePart = email.split('@')[0];
+        let mapped: UserRole | null = inferRoleFromEmail(email);
+
+        if (!mapped) {
+            if (namePart === 'admin') mapped = 'admin';
+            else if (namePart === 'goldtag') mapped = 'instructor';
+        }
+        const fakeUser = { id: 'u-' + namePart, name: namePart || '사용자', email, role: mapped || 'student' };
 
         setUser(fakeUser);
         persist(fakeUser);
@@ -77,7 +84,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const register = useCallback(async (name: string, email: string, _password: string) => {
         await new Promise((r) => setTimeout(r, 400));
-        const newUser = { id: 'u-' + Date.now(), name: name || email.split('@')[0] || '사용자', email, role: inferRoleFromEmail(email) || 'student' };
+        const namePart = email.split('@')[0];
+        let mapped: UserRole | null = inferRoleFromEmail(email);
+
+        if (!mapped) {
+            if (namePart === 'admin') mapped = 'admin';
+            else if (namePart === 'goldtag') mapped = 'instructor';
+        }
+        const newUser = { id: 'u-' + Date.now(), name: name || namePart || '사용자', email, role: mapped || 'student' };
 
         setUser(newUser);
         persist(newUser);

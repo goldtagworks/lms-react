@@ -3,7 +3,7 @@ import { Burger, Container, Group, Title, Button, Menu, rem } from '@mantine/cor
 import { LinkButton } from '@main/components/LinkButton';
 import { useAuth } from '@main/lib/auth';
 import { filterNav, navGroups } from '@main/lib/nav';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
     navOpened: boolean;
@@ -12,6 +12,7 @@ interface HeaderProps {
 
 const Header = ({ navOpened, toggleNav }: HeaderProps) => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     const role = user?.role ?? null;
     const location = useLocation();
@@ -31,8 +32,18 @@ const Header = ({ navOpened, toggleNav }: HeaderProps) => {
                 </Group>
                 <Group gap="md" visibleFrom="sm">
                     {filtered.map((g) => {
-                        // 그룹 활성 판단: 그룹 내 어떤 item이 현재 경로 prefix 매칭
-                        const groupActive = g.items.some((it) => pathname === it.href || (it.href !== '/' && pathname.startsWith(it.href)));
+                        // 활성 로직 (정확/최장 경로 우선):
+                        // 1) 현재 pathname 과 일치하거나 세그먼트 경계(prefix + '/')로 시작하는 nav item 들 수집
+                        // 2) 그 중 href 길이가 가장 긴(=가장 구체적인) 하나만 active 로 표시
+                        // 예: pathname=/my/wishlist => 후보 [/my, /my/wishlist] 중 /my/wishlist 만 active
+                        const matchCandidates = g.items.filter((it) => {
+                            if (pathname === it.href) return true;
+                            if (it.href !== '/' && pathname.startsWith(it.href + '/')) return true;
+
+                            return false;
+                        });
+                        const activeItemHref = matchCandidates.length ? matchCandidates.reduce((longest, current) => (current.href.length > longest.href.length ? current : longest)).href : null;
+                        const groupActive = !!activeItemHref;
 
                         return (
                             <Menu key={g.id} withinPortal closeDelay={120} openDelay={80} position="bottom-start" shadow="md" trigger="hover" width={200}>
@@ -47,7 +58,7 @@ const Header = ({ navOpened, toggleNav }: HeaderProps) => {
                                 </Menu.Target>
                                 <Menu.Dropdown aria-label={`${g.label} 메뉴`}>
                                     {g.items.map((it) => {
-                                        const itemActive = pathname === it.href || (it.href !== '/' && pathname.startsWith(it.href));
+                                        const itemActive = it.href === activeItemHref; // 최장 매칭만 active
 
                                         return (
                                             <Menu.Item key={it.id} component={Link} style={itemActive ? { background: 'var(--mantine-color-blue-light)', fontWeight: 600 } : undefined} to={it.href}>
@@ -71,7 +82,14 @@ const Header = ({ navOpened, toggleNav }: HeaderProps) => {
                                 <Menu.Item component="a" href="/my">
                                     마이페이지
                                 </Menu.Item>
-                                <Menu.Item onClick={logout}>로그아웃</Menu.Item>
+                                <Menu.Item
+                                    onClick={() => {
+                                        logout();
+                                        navigate('/');
+                                    }}
+                                >
+                                    로그아웃
+                                </Menu.Item>
                             </Menu.Dropdown>
                         </Menu>
                     )}

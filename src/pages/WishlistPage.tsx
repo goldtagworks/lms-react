@@ -1,4 +1,4 @@
-import { Text, Card, Group, Button, SimpleGrid, Badge } from '@mantine/core';
+import { Text, Card, Group, Button, Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import EmptyState from '@main/components/EmptyState';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -10,6 +10,7 @@ import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
 import { Link } from 'react-router-dom';
 import { TagChip } from '@main/components/TagChip';
+import CourseGrid from '@main/components/layout/CourseGrid';
 
 export default function WishlistPage() {
     const { user } = useAuth();
@@ -35,7 +36,7 @@ export default function WishlistPage() {
             {!userId && <EmptyState actionLabel="로그인" message="로그인 후 위시리스트를 사용할 수 있습니다." title="위시리스트 이용 안내" to="/signin" />}
             {userId && wishlist.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="아직 찜한 강의가 없습니다." title="위시한 강의 없음" to="/courses" />}
             {userId && wishlist.length > 0 && (
-                <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} mt="md" spacing="xl">
+                <CourseGrid mt="md">
                     {wishCourses.map((course) => {
                         const enrolled = userId ? isEnrolled(userId, course.id) : false;
                         const wish = userId ? isWishlisted(userId, course.id) : false;
@@ -79,13 +80,13 @@ export default function WishlistPage() {
                                     onEnroll={() => handleEnroll(course.id)}
                                     onToggleWish={() => handleToggle(course.id)}
                                 />
-                                <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt={8} radius="md" size="xs" to={`/course/${course.id}`} variant="subtle">
+                                <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt={8} radius="md" size="xs" to={`/course/${course.id}`} variant="default">
                                     자세히 보기
                                 </Button>
                             </Card>
                         );
                     })}
-                </SimpleGrid>
+                </CourseGrid>
             )}
         </PageContainer>
     );

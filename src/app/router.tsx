@@ -17,6 +17,7 @@ import EnrollPage from '@main/pages/EnrollPage';
 import PaymentPage from '@main/pages/PaymentPage';
 import ExamPage from '@main/pages/ExamPage';
 import CertificatePage from '@main/pages/CertificatePage';
+import CertificatesListPage from '@main/pages/CertificatesListPage';
 import SignInPage from '@main/pages/SignInPage';
 import SignUpPage from '@main/pages/SignUpPage';
 import NotFoundPage from '@main/pages/NotFoundPage';
@@ -25,6 +26,9 @@ import TermsPage from '@main/pages/TermsPage';
 import PrivacyPage from '@main/pages/PrivacyPage';
 import NoticesPage from '@main/pages/NoticesPage';
 import NoticeDetailPage from '@main/pages/NoticeDetailPage';
+import InstructorApplyPage from '@main/pages/InstructorApplyPage';
+import AdminInstructorAppsPage from '@main/pages/AdminInstructorAppsPage';
+import RequireRole from '@main/components/RequireRole';
 
 function MainLayoutRoute() {
     return (
@@ -49,23 +53,98 @@ export default function AppRouter() {
                 <Route element={<NoticesPage />} path="/notices" />
                 <Route element={<NoticeDetailPage />} path="/notices/:id" />
                 <Route element={<SignInPage />} path="/signin" />
-                <Route element={<InstructorProfilePage />} path="/instructor/:id" />
+                <Route
+                    element={
+                        <RequireRole requiredRole="instructor">
+                            <InstructorProfilePage />
+                        </RequireRole>
+                    }
+                    path="/instructor/:id"
+                />
+                <Route element={<InstructorApplyPage />} path="/instructor/apply" />
                 <Route element={<MyPage />} path="/my" />
                 <Route element={<WishlistPage />} path="/my/wishlist" />
+                <Route element={<CertificatesListPage />} path="/my/certificates" />
                 <Route element={<LessonPlayerPage />} path="/learn/:enrollmentId" />
                 <Route element={<ExamAttemptPage />} path="/exam/:examId/attempt" />
                 <Route element={<CertificatePage />} path="/certificate/:certId" />
 
-                {/* instructor/admin */}
-                <Route element={<InstructorCoursesPage />} path="/instructor/courses" />
-                <Route element={<CourseEditPage />} path="/instructor/courses/new" />
-                <Route element={<CourseEditPage />} path="/instructor/courses/:id/edit" />
+                {/* instructor 전용 */}
+                <Route
+                    element={
+                        <RequireRole requiredRole="instructor">
+                            <InstructorCoursesPage />
+                        </RequireRole>
+                    }
+                    path="/instructor/courses"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="instructor">
+                            <CourseEditPage />
+                        </RequireRole>
+                    }
+                    path="/instructor/courses/new"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="instructor">
+                            <CourseEditPage />
+                        </RequireRole>
+                    }
+                    path="/instructor/courses/:id/edit"
+                />
+                {/* admin 강의 편집 (검수/수정) */}
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <CourseEditPage />
+                        </RequireRole>
+                    }
+                    path="/admin/courses/:id/edit"
+                />
 
-                {/* admin */}
-                <Route element={<AdminUsersPage />} path="/admin/users" />
-                <Route element={<AdminCertificatesPage />} path="/admin/certificates" />
-                <Route element={<AdminCouponsPage />} path="/admin/coupons" />
-                <Route element={<AdminCategoriesPage />} path="/admin/categories" />
+                {/* admin 전용 */}
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <AdminUsersPage />
+                        </RequireRole>
+                    }
+                    path="/admin/users"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <AdminCertificatesPage />
+                        </RequireRole>
+                    }
+                    path="/admin/certificates"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <AdminCouponsPage />
+                        </RequireRole>
+                    }
+                    path="/admin/coupons"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <AdminCategoriesPage />
+                        </RequireRole>
+                    }
+                    path="/admin/categories"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
+                            <AdminInstructorAppsPage />
+                        </RequireRole>
+                    }
+                    path="/admin/instructors/apps"
+                />
 
                 {/* LMS 주요 플로우 목업 */}
                 <Route element={<EnrollPage />} path="/enroll/:id" />

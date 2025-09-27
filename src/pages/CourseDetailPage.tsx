@@ -1,18 +1,33 @@
-import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, List, Badge, ActionIcon, Tooltip } from '@mantine/core';
+import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, Badge, ActionIcon, Tooltip, TextInput, Switch, Stack, Textarea } from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import { TagChip } from '@main/components/TagChip';
 import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageSection from '@main/components/layout/PageSection';
 import PageHeader from '@main/components/layout/PageHeader';
-import { Share2, Copy, Pencil, Plus } from 'lucide-react';
+import { Share2, Copy, Pencil, Plus, Trash2, Undo2 } from 'lucide-react';
 import useCopyLink from '@main/hooks/useCopyLink';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
-import { useCourse, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify, useLessons } from '@main/lib/repository';
+import {
+    useCourse,
+    enrollAndNotify,
+    isEnrolled,
+    isWishlisted,
+    toggleWishlistAndNotify,
+    useLessons,
+    toggleCourseActive,
+    updateCoursePartial,
+    useMarketingCopy,
+    upsertMarketingCopy
+} from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import EmptyState from '@main/components/EmptyState';
+import CourseReviewsSection from '@main/components/reviews/CourseReviewsSection';
+import CourseQnASection from '@main/components/qna/CourseQnASection';
 
 export default function CourseDetailPage() {
     const { id: rawId } = useParams();
@@ -24,11 +39,52 @@ export default function CourseDetailPage() {
     const enrolled = userId && course?.id ? isEnrolled(userId, course.id) : false;
     const wish = userId && course?.id ? isWishlisted(userId, course.id) : false;
     const lessons = useLessons(course?.id);
+    const marketingCopy = useMarketingCopy(course?.id);
+
+    // 섹션 그룹 (section_id 기준). 빈 값은 'default' 그룹
+    const sectionGroups = lessons.reduce<Record<string, typeof lessons>>((acc, l) => {
+        const sid = l.section_id || 'default';
+
+        if (!acc[sid]) acc[sid] = [];
+
+        acc[sid].push(l);
+
+        return acc;
+    }, {});
+    const orderedSectionIds = Object.keys(sectionGroups).sort();
 
     // 공유/복사 상태 공통 훅
     const { copied, copy } = useCopyLink(1200);
 
     const handleCopy = () => copy();
+
+    const handleToggleActive = () => {
+        if (!course?.id) return;
+        const willDeactivate = course.is_active;
+
+        modals.openConfirmModal({
+            title: willDeactivate ? '강의 비활성화' : '강의 활성화',
+            centered: true,
+            labels: { confirm: willDeactivate ? '비활성화' : '활성화', cancel: '취소' },
+            confirmProps: { color: willDeactivate ? 'red' : 'teal' },
+            children: (
+                <Text size="sm">
+                    {willDeactivate ? '이 강의는 학습자에게 더 이상 노출되지 않습니다. 진행중인 수강에는 영향이 없으며 언제든 다시 활성화할 수 있습니다.' : '강의를 다시 공개 상태로 전환합니다.'}
+                </Text>
+            ),
+            onConfirm: () => {
+                const updated = toggleCourseActive(course.id);
+
+                if (updated) {
+                    notifications.show({
+                        title: '강의 상태 변경',
+                        message: updated.is_active ? '강의가 활성화되었습니다.' : '강의가 비활성화되었습니다.',
+                        color: updated.is_active ? 'teal' : 'red'
+                    });
+                }
+            }
+        });
+    };
 
     const handleEnroll = () => {
         if (!userId || !course?.id) return; // 로그인 안됨
@@ -40,6 +96,138 @@ export default function CourseDetailPage() {
     const handleWishlist = () => {
         if (!userId || !course?.id) return;
         toggleWishlistAndNotify(userId, course.id);
+    };
+
+    const openFeaturedModal = () => {
+        if (!course) return;
+        let localFeatured = !!course.is_featured;
+        let localRank = course.featured_rank ? String(course.featured_rank) : '';
+        let localBadge = course.featured_badge_text || '';
+
+        modals.open({
+            title: '추천(Featured) 설정',
+            centered: true,
+            modalId: 'course-featured-modal',
+            children: (
+                <Stack gap="md" mt="sm">
+                    <Switch
+                        checked={localFeatured}
+                        description="메인/목록에서 상단 강조"
+                        label="추천 강조 활성화"
+                        onChange={(e) => {
+                            localFeatured = e.currentTarget.checked;
+                        }}
+                    />
+                    {localFeatured && (
+                        <Group grow>
+                            <TextInput
+                                defaultValue={localRank}
+                                label="추천 순위"
+                                placeholder="1"
+                                onChange={(e) => {
+                                    localRank = e.currentTarget.value;
+                                }}
+                            />
+                            <TextInput
+                                defaultValue={localBadge}
+                                label="배지 텍스트"
+                                placeholder="추천"
+                                onChange={(e) => {
+                                    localBadge = e.currentTarget.value;
+                                }}
+                            />
+                        </Group>
+                    )}
+                    <Group justify="flex-end" mt="sm">
+                        <Button variant="default" onClick={() => modals.close('course-featured-modal')}>
+                            취소
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                if (!course.id) return;
+                                const patch = localFeatured
+                                    ? {
+                                          is_featured: true,
+                                          featured_rank: localRank ? Number(localRank) || 1 : 1,
+                                          featured_badge_text: localBadge.trim() || '추천'
+                                      }
+                                    : { is_featured: false, featured_rank: undefined, featured_badge_text: undefined };
+                                const updated = updateCoursePartial(course.id, patch);
+
+                                if (updated) {
+                                    notifications.show({ color: 'teal', title: '저장 완료', message: '추천 설정이 업데이트되었습니다.' });
+                                } else {
+                                    notifications.show({ color: 'red', title: '오류', message: '업데이트 실패' });
+                                }
+                                modals.close('course-featured-modal');
+                            }}
+                        >
+                            저장
+                        </Button>
+                    </Group>
+                </Stack>
+            )
+        });
+    };
+
+    const openMarketingModal = () => {
+        if (!course) return;
+        let localHeadline = marketingCopy?.headline || '';
+        let localBody = marketingCopy?.body_md || '';
+
+        modals.open({
+            title: '마케팅 추천 카피',
+            centered: true,
+            modalId: 'course-marketing-modal',
+            size: '800px',
+            children: (
+                <Stack gap="lg" mt="sm" style={{ maxWidth: 760 }}>
+                    <Group grow style={{ alignItems: 'flex-start' }} wrap="nowrap">
+                        <TextInput
+                            defaultValue={localHeadline}
+                            label="헤드라인"
+                            maxLength={120}
+                            placeholder="(최대 120자) 강의의 핵심 가치를 한 줄로 강조"
+                            onChange={(e) => {
+                                localHeadline = e.currentTarget.value;
+                            }}
+                        />
+                    </Group>
+                    <Textarea
+                        autosize
+                        defaultValue={localBody}
+                        label="상세 추천 문구"
+                        maxLength={1200}
+                        minRows={10}
+                        placeholder={`(최대 1200자) 구매 전환을 유도할 내용을 작성하세요.\n• 문제 인식\n• 해결 관점\n• 학습 후 기대 가치\n• 차별 요소`}
+                        onChange={(e) => {
+                            localBody = e.currentTarget.value;
+                        }}
+                    />
+                    <Group justify="space-between" mt="sm">
+                        <Text c="dimmed" size="xs">
+                            {`헤드라인 ${localHeadline.length}/120 · 본문 ${localBody.length}/1200`}
+                        </Text>
+                        <Group gap="xs">
+                            <Button variant="default" onClick={() => modals.close('course-marketing-modal')}>
+                                취소
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    if (!course.id) return;
+                                    const saved = upsertMarketingCopy(course.id, { headline: localHeadline.trim() || undefined, body_md: localBody.trim() || undefined });
+
+                                    notifications.show({ color: 'teal', message: saved.headline ? '마케팅 카피가 업데이트되었습니다.' : '카피가 비워져 제거되었습니다.', title: '저장 완료' });
+                                    modals.close('course-marketing-modal');
+                                }}
+                            >
+                                저장
+                            </Button>
+                        </Group>
+                    </Group>
+                </Stack>
+            )
+        });
     };
 
     if (!course) {
@@ -54,19 +242,65 @@ export default function CourseDetailPage() {
         <PageContainer roleMain>
             <Group align="flex-start" justify="space-between" mb="md" wrap="nowrap">
                 <Box style={{ flex: 1 }}>
-                    <PageHeader description={course.summary || ''} descriptionSize="md" title={course.title} titleSize="xl" />
+                    <Group align="center" gap="sm">
+                        <PageHeader description={course.summary || ''} descriptionSize="md" title={course.title} titleSize="xl" />
+                        {course.is_featured && (
+                            <Badge color="teal" size="sm" variant="filled">
+                                {course.featured_badge_text || 'FEATURED'}
+                            </Badge>
+                        )}
+                    </Group>
                 </Box>
                 <Group gap={4} mt={8} wrap="nowrap">
-                    <Tooltip withArrow label="강의 수정">
-                        <ActionIcon aria-label="강의 수정" component={Link} to={`/instructor/courses/${course.id}/edit`} variant="subtle">
-                            <Pencil size={18} />
-                        </ActionIcon>
-                    </Tooltip>
-                    <Tooltip withArrow label="새 강의 작성">
-                        <ActionIcon aria-label="새 강의 작성" component={Link} to="/instructor/courses/new" variant="subtle">
-                            <Plus size={18} />
-                        </ActionIcon>
-                    </Tooltip>
+                    {!course.is_active && (
+                        <Badge color="red" mr={4} size="sm" variant="light">
+                            비활성
+                        </Badge>
+                    )}
+                    {user?.role === 'admin' && (
+                        <Tooltip withArrow label="추천(Featured) 설정">
+                            <ActionIcon aria-label="추천 설정" variant="subtle" onClick={openFeaturedModal}>
+                                <Badge color="teal" size="xs" variant={course.is_featured ? 'filled' : 'outline'}>
+                                    Feat
+                                </Badge>
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                    {user?.role === 'admin' && (
+                        <Tooltip withArrow label="마케팅 추천 카피">
+                            <ActionIcon aria-label="마케팅 추천 카피" variant="subtle" onClick={openMarketingModal}>
+                                <Badge color="grape" size="xs" variant={marketingCopy?.headline ? 'filled' : 'outline'}>
+                                    Mkt
+                                </Badge>
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                    {user && (user.role === 'instructor' || user.role === 'admin') && (
+                        <Tooltip withArrow label="강의 수정">
+                            <ActionIcon
+                                aria-label="강의 수정"
+                                component={Link}
+                                to={user.role === 'admin' ? `/admin/courses/${course.id}/edit` : `/instructor/courses/${course.id}/edit`}
+                                variant="subtle"
+                            >
+                                <Pencil size={18} />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                    {user?.role === 'admin' && (
+                        <Tooltip withArrow label={course.is_active ? '강의 비활성화' : '강의 활성화'}>
+                            <ActionIcon aria-label={course.is_active ? '강의 비활성화' : '강의 활성화'} color={course.is_active ? 'red' : 'teal'} variant="subtle" onClick={handleToggleActive}>
+                                {course.is_active ? <Trash2 size={18} /> : <Undo2 size={18} />}
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                    {user && user.role === 'instructor' && (
+                        <Tooltip withArrow label="새 강의 작성">
+                            <ActionIcon aria-label="새 강의 작성" component={Link} to="/instructor/courses/new" variant="subtle">
+                                <Plus size={18} />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
                     <Tooltip withArrow label={copied ? '복사됨' : '링크 복사'}>
                         <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : undefined} variant="subtle" onClick={handleCopy}>
                             {copied ? <Copy size={18} /> : <Share2 size={18} />}
@@ -118,7 +352,7 @@ export default function CourseDetailPage() {
                             onEnroll={handleEnroll}
                             onToggleWish={handleWishlist}
                         />
-                        <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="outline">
+                        <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="default">
                             목록으로
                         </Button>
                     </Card>
@@ -162,48 +396,112 @@ export default function CourseDetailPage() {
                                 </Text>
                             )}
                             {lessons.length > 0 && (
-                                <List center size="sm" spacing="xs">
-                                    {lessons.map((l) => (
-                                        <List.Item
-                                            key={l.id}
-                                            icon={
-                                                l.is_preview ? (
-                                                    <Badge color="blue" size="xs" variant="light">
-                                                        P
-                                                    </Badge>
-                                                ) : undefined
-                                            }
-                                        >
-                                            <Group gap={6} wrap="nowrap">
-                                                <Text size="sm" style={{ flex: 1 }}>
-                                                    {l.order_index}. {l.title}
-                                                </Text>
-                                                <Text c="dimmed" size="xs">
-                                                    {(l.duration_seconds / 60).toFixed(0)}분
-                                                </Text>
-                                            </Group>
-                                        </List.Item>
-                                    ))}
-                                </List>
+                                <Box>
+                                    {orderedSectionIds.map((sid, sIndex) => {
+                                        const list = sectionGroups[sid];
+
+                                        return (
+                                            <Box key={sid} mb={sIndex === orderedSectionIds.length - 1 ? 0 : 24}>
+                                                {sid !== 'default' && (
+                                                    <Text c="blue.6" fw={600} mb={6} size="sm">
+                                                        섹션 {sIndex + 1}
+                                                    </Text>
+                                                )}
+                                                <Box
+                                                    aria-label={`섹션 ${sIndex + 1} 레슨 목록`}
+                                                    component="ul"
+                                                    style={{
+                                                        listStyle: 'none',
+                                                        margin: 0,
+                                                        padding: 0,
+                                                        border: '1px solid var(--mantine-color-default-border)',
+                                                        borderRadius: 8,
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    {list.map((l, idx) => {
+                                                        const mins = Math.max(1, Math.round(l.duration_seconds / 60));
+                                                        const isLast = idx === list.length - 1;
+                                                        const clickable = l.is_preview; // 데모: 미리보기만 클릭 가능
+
+                                                        return (
+                                                            <Box
+                                                                key={l.id}
+                                                                className="curriculum-row"
+                                                                component="li"
+                                                                style={{
+                                                                    alignItems: 'center',
+                                                                    borderBottom: isLast ? 'none' : '1px solid var(--mantine-color-default-border)',
+                                                                    cursor: clickable ? 'pointer' : 'default',
+                                                                    display: 'flex',
+                                                                    fontSize: 14,
+                                                                    gap: 12,
+                                                                    padding: '8px 12px',
+                                                                    transition: 'background 120ms ease'
+                                                                }}
+                                                                onClick={() => {
+                                                                    if (clickable) {
+                                                                        window.alert(`미리보기 재생: ${l.title}`);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <Text c="dimmed" size="xs" style={{ width: 32 }} ta="right">
+                                                                    {l.order_index}
+                                                                </Text>
+                                                                <Text lineClamp={1} size="sm" style={{ flex: 1, lineHeight: 1.35 }}>
+                                                                    {l.title}
+                                                                    {l.is_preview && (
+                                                                        <Badge color="blue" ml={8} size="xs" variant="light">
+                                                                            미리보기
+                                                                        </Badge>
+                                                                    )}
+                                                                </Text>
+                                                                <Text c="dimmed" size="xs" style={{ width: 42 }} ta="right">
+                                                                    {mins}분
+                                                                </Text>
+                                                            </Box>
+                                                        );
+                                                    })}
+                                                </Box>
+                                            </Box>
+                                        );
+                                    })}
+                                </Box>
                             )}
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="reviews">
-                            <Text c="dimmed" size="sm">
-                                후기 기능은 추후 구현 예정입니다.
-                            </Text>
+                            {course.id && <CourseReviewsSection courseId={course.id} enrolled={!!enrolled} userId={userId} />}
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="qna">
-                            <Text c="dimmed" size="sm">
-                                Q&A 기능은 추후 구현 예정입니다.
-                            </Text>
+                            {course.id && <CourseQnASection courseId={course.id} enrolled={!!enrolled} isInstructor={user?.role === 'instructor'} userId={userId} userRole={user?.role} />}
                         </Tabs.Panel>
                     </Tabs>
                 </Box>
             </SimpleGrid>
             <PageSection withGapTop headingOrder={2} title="강의 소개 더 보기">
-                <Text c="dimmed" size="sm">
-                    이 영역은 추가 마케팅/추천 또는 관련 코스 리스트가 들어갈 자리(placeholder) 입니다.
-                </Text>
+                {marketingCopy?.headline || marketingCopy?.body_md ? (
+                    <Card withBorder p="lg" radius="md" shadow="sm">
+                        {marketingCopy?.headline && (
+                            <Text fw={700} mb={8} size="lg">
+                                {marketingCopy.headline}
+                            </Text>
+                        )}
+                        {marketingCopy?.body_md && (
+                            <Text c="dimmed" lh={1.6} size="sm" style={{ whiteSpace: 'pre-line' }}>
+                                {marketingCopy.body_md}
+                            </Text>
+                        )}
+                        {!marketingCopy?.headline && !marketingCopy?.body_md && (
+                            <Text c="dimmed" size="sm">
+                                마케팅 카피가 아직 없습니다.
+                            </Text>
+                        )}
+                    </Card>
+                ) : (
+                    <Text c="dimmed" size="sm">
+                        이 영역은 추가 마케팅/추천 또는 관련 코스 리스트가 들어갈 자리(placeholder) 입니다.
+                    </Text>
+                )}
             </PageSection>
         </PageContainer>
     );

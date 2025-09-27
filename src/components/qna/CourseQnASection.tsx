@@ -1,0 +1,270 @@
+import { useState } from 'react';
+import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Pagination, Stack, Switch, Text, Textarea, TextInput } from '@mantine/core';
+import { useAnswerQuestion, useAskQuestion, useCourseQuestions, useQuestionAnswers, useResolveQuestion, useUpdateQuestion, useQuestionPrivacy } from '@main/hooks/useCourseQnA';
+import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+
+interface Props {
+    courseId: string;
+    userId?: string;
+    userRole?: string;
+    enrolled: boolean;
+    isInstructor: boolean;
+}
+
+export default function CourseQnASection({ courseId, userId, userRole, enrolled, isInstructor }: Props) {
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
+    const { questions, pageCount, total } = useCourseQuestions(courseId, { page, pageSize, viewerId: userId });
+    const [title, setTitle] = useState('');
+    const [body, setBody] = useState('');
+    const [isPrivate, setIsPrivate] = useState(false);
+    const { mutate: ask, error: askError } = useAskQuestion(courseId, userId);
+    const { mutate: resolveQ } = useResolveQuestion(userRole);
+    const [expanded, setExpanded] = useState<string | null>(null);
+
+    const canAsk = enrolled && !!userId;
+    const canResolve = userRole === 'instructor' || userRole === 'admin';
+
+    const handleAsk = () => {
+        if (!canAsk) return;
+        const q = ask(title.trim(), body.trim(), isPrivate);
+
+        if (q) {
+            setTitle('');
+            setBody('');
+            setIsPrivate(false);
+
+            if (page !== 1) setPage(1); // 새 질문은 최신순 맨 앞 (단순 가정)
+        }
+    };
+
+    return (
+        <Stack gap="lg">
+            <Group justify="space-between">
+                <Text fw={600} size="sm">
+                    전체 질문 {total}개
+                </Text>
+                {pageCount > 1 && <Pagination size="xs" total={pageCount} value={page} onChange={setPage} />}
+            </Group>
+            <Box>
+                <Text fw={600} mb={6} size="sm">
+                    질문 작성
+                </Text>
+                {!canAsk && (
+                    <Text c="dimmed" size="xs">
+                        수강 중인 사용자만 질문을 작성할 수 있습니다.
+                    </Text>
+                )}
+                {canAsk && (
+                    <Card withBorder p="md" radius="md">
+                        <TextInput mb="xs" placeholder="제목" size="xs" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+                        <Textarea autosize minRows={3} placeholder="본문을 입력하세요" value={body} onChange={(e) => setBody(e.currentTarget.value)} />
+                        <Group justify="space-between" mt="xs">
+                            <Switch checked={isPrivate} label="비공개 (나만 보기)" size="xs" onChange={(e) => setIsPrivate(e.currentTarget.checked)} />
+                            <Group gap="xs">
+                                {askError && (
+                                    <Badge color="red" size="xs" variant="light">
+                                        {askError}
+                                    </Badge>
+                                )}
+                                <Button disabled={!title.trim() || !body.trim()} size="xs" onClick={handleAsk}>
+                                    등록
+                                </Button>
+                            </Group>
+                        </Group>
+                    </Card>
+                )}
+            </Box>
+            <Divider />
+            <Stack gap="sm">
+                {questions.length === 0 && (
+                    <Text c="dimmed" size="sm">
+                        아직 질문이 없습니다.
+                    </Text>
+                )}
+                {questions.map((q) => {
+                    return (
+                        <QuestionItem
+                            key={q.id}
+                            body={q.body}
+                            canResolve={canResolve}
+                            createdAt={q.created_at}
+                            expanded={expanded === q.id}
+                            isInstructor={isInstructor}
+                            isPrivate={(q as any).is_private}
+                            isResolved={q.is_resolved}
+                            questionId={q.id}
+                            title={q.title}
+                            userId={userId}
+                            onResolve={() => resolveQ(q.id)}
+                            onToggle={() => setExpanded(expanded === q.id ? null : q.id)}
+                        />
+                    );
+                })}
+            </Stack>
+        </Stack>
+    );
+}
+
+interface QuestionItemProps {
+    questionId: string;
+    title: string;
+    body: string;
+    createdAt: string;
+    isResolved: boolean;
+    canResolve: boolean;
+    onResolve: () => void;
+    userId?: string;
+    isInstructor: boolean;
+    expanded: boolean;
+    onToggle: () => void;
+    isPrivate?: boolean;
+}
+
+function QuestionItem({ questionId, title, body, createdAt, isResolved, canResolve, onResolve, userId, isInstructor, expanded, onToggle, isPrivate }: QuestionItemProps) {
+    const { answers } = useQuestionAnswers(expanded ? questionId : undefined);
+    const { mutate: answer, error } = useAnswerQuestion(questionId, userId, isInstructor);
+    const { mutate: updateQ, error: updateError } = useUpdateQuestion(userId);
+    const { mutate: togglePrivacy, error: privacyError } = useQuestionPrivacy(userId);
+    const [answerBody, setAnswerBody] = useState('');
+    const [editMode, setEditMode] = useState(false);
+    const [editTitle, setEditTitle] = useState(title);
+    const [editBody, setEditBody] = useState(body);
+    const [localPrivate, setLocalPrivate] = useState(!!isPrivate);
+
+    const canAnswer = !!userId; // 단순 정책: 로그인 사용자 모두 (향후 조건 강화 가능)
+    // owner check: based on question user (passed indirectly by inability to edit if answers exist) - simplified to user ownership handled server-side later
+
+    const startEdit = () => {
+        setEditMode(true);
+        setEditTitle(title);
+        setEditBody(body);
+        setLocalPrivate(!!isPrivate);
+    };
+
+    const cancelEdit = () => {
+        setEditMode(false);
+    };
+
+    const saveEdit = () => {
+        if (!userId) return;
+        const updated = updateQ(questionId, editTitle.trim(), editBody.trim());
+
+        if (updated) {
+            if (localPrivate !== !!isPrivate) togglePrivacy(questionId, localPrivate);
+
+            setEditMode(false);
+        }
+    };
+
+    const submitAnswer = () => {
+        if (!canAnswer || !answerBody.trim()) return;
+        const a = answer(answerBody.trim());
+
+        if (a) setAnswerBody('');
+    };
+
+    return (
+        <Card withBorder p="sm" radius="md">
+            <Group align="flex-start" justify="space-between" mb={4} wrap="nowrap">
+                <Box style={{ flex: 1 }}>
+                    <Group align="center" gap={6} mb={4} wrap="nowrap">
+                        {!editMode && (
+                            <Text fw={600} size="sm" style={{ lineHeight: 1.2 }}>
+                                {title}
+                            </Text>
+                        )}
+                        {editMode && <TextInput size="xs" value={editTitle} onChange={(e) => setEditTitle(e.currentTarget.value)} />}
+                        {isResolved && (
+                            <Badge color="green" leftSection={<CheckCircle2 size={12} />} size="xs" variant="light">
+                                해결됨
+                            </Badge>
+                        )}
+                        {isPrivate && !editMode && (
+                            <Badge color="gray" size="xs" variant="light">
+                                비공개
+                            </Badge>
+                        )}
+                        {editMode && <Switch checked={localPrivate} label="비공개" size="xs" onChange={(e) => setLocalPrivate(e.currentTarget.checked)} />}
+                    </Group>
+                    <Text c="dimmed" mb={6} size="xs">
+                        {new Date(createdAt).toLocaleDateString()}
+                    </Text>
+                    {!editMode && (
+                        <Text lh={1.5} size="sm" style={{ whiteSpace: 'pre-line' }}>
+                            {body}
+                        </Text>
+                    )}
+                    {editMode && <Textarea autosize minRows={3} size="xs" value={editBody} onChange={(e) => setEditBody(e.currentTarget.value)} />}
+                    {editMode && (updateError || privacyError) && (
+                        <Badge color="red" mt={4} size="xs" variant="light">
+                            {updateError || privacyError}
+                        </Badge>
+                    )}
+                </Box>
+                <Group gap={4} wrap="nowrap">
+                    {canResolve && !isResolved && (
+                        <Button size="xs" variant="light" onClick={onResolve}>
+                            해결
+                        </Button>
+                    )}
+                    {!isResolved && !editMode && isPrivate !== undefined && (
+                        <Button size="xs" variant="subtle" onClick={startEdit}>
+                            수정
+                        </Button>
+                    )}
+                    {editMode && (
+                        <Group gap={4} wrap="nowrap">
+                            <Button color="gray" size="xs" variant="subtle" onClick={cancelEdit}>
+                                취소
+                            </Button>
+                            <Button size="xs" variant="light" onClick={saveEdit}>
+                                저장
+                            </Button>
+                        </Group>
+                    )}
+                    <ActionIcon aria-label={expanded ? '접기' : '펼치기'} variant="subtle" onClick={onToggle}>
+                        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </ActionIcon>
+                </Group>
+            </Group>
+            <Collapse in={expanded}>
+                <Divider my={8} />
+                <Stack gap="xs">
+                    {answers.map((a) => (
+                        <Card key={a.id} withBorder p="xs" radius="sm">
+                            <Group align="center" gap={6} mb={4} wrap="nowrap">
+                                {a.is_instructor_answer && (
+                                    <Badge color="blue" size="xs" variant="light">
+                                        강사
+                                    </Badge>
+                                )}
+                                <Text c="dimmed" size="xs">
+                                    {new Date(a.created_at).toLocaleDateString()}
+                                </Text>
+                            </Group>
+                            <Text lh={1.4} size="sm">
+                                {a.body}
+                            </Text>
+                        </Card>
+                    ))}
+                    {canAnswer && (
+                        <Card withBorder p="xs" radius="sm">
+                            <Textarea autosize minRows={2} placeholder="답변을 입력하세요" value={answerBody} onChange={(e) => setAnswerBody(e.currentTarget.value)} />
+                            <Group gap="xs" justify="flex-end" mt={6}>
+                                {error && (
+                                    <Badge color="red" size="xs" variant="light">
+                                        {error}
+                                    </Badge>
+                                )}
+                                <Button disabled={!answerBody.trim()} size="xs" onClick={submitAnswer}>
+                                    등록
+                                </Button>
+                            </Group>
+                        </Card>
+                    )}
+                </Stack>
+            </Collapse>
+        </Card>
+    );
+}

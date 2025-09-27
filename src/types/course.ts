@@ -53,6 +53,12 @@ export interface Course {
     is_active: boolean;
     /** 공개 여부 */
     published: boolean;
+    /** 추천(메인 강조) 여부 */
+    is_featured?: boolean;
+    /** 추천 노출 정렬 우선순위 (작을수록 상단) */
+    featured_rank?: number;
+    /** 추천 배지 텍스트 (선택) */
+    featured_badge_text?: string;
     /** 생성일 */
     created_at: string;
     /** 수정일 */

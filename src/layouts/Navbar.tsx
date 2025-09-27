@@ -19,21 +19,34 @@ const Navbar = () => {
                             {g.label}
                         </Text>
                         <Stack gap={4} mb="xs">
-                            {g.items.map((it) => {
-                                const active = pathname === it.href || (it.href !== '/' && pathname.startsWith(it.href));
+                            {(() => {
+                                // 모바일에서도 동일한 최장 경로 우선 규칙 적용
+                                const matchCandidates = g.items.filter((it) => {
+                                    if (pathname === it.href) return true;
+                                    if (it.href !== '/' && pathname.startsWith(it.href + '/')) return true;
 
-                                return (
-                                    <LinkButton
-                                        key={it.id}
-                                        color={active ? 'primary' : 'gray'}
-                                        href={it.href}
-                                        justify="flex-start"
-                                        label={it.label}
-                                        style={active ? { fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
-                                        variant={active ? 'light' : 'subtle'}
-                                    />
-                                );
-                            })}
+                                    return false;
+                                });
+                                const activeItemHref = matchCandidates.length
+                                    ? matchCandidates.reduce((longest, current) => (current.href.length > longest.href.length ? current : longest)).href
+                                    : null;
+
+                                return g.items.map((it) => {
+                                    const active = it.href === activeItemHref;
+
+                                    return (
+                                        <LinkButton
+                                            key={it.id}
+                                            color={active ? 'primary' : 'gray'}
+                                            href={it.href}
+                                            justify="flex-start"
+                                            label={it.label}
+                                            style={active ? { fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
+                                            variant={active ? 'light' : 'subtle'}
+                                        />
+                                    );
+                                });
+                            })()}
                         </Stack>
                         {gi < filtered.length - 1 && <Divider my="sm" />}
                     </Box>

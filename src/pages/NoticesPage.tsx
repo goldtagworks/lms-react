@@ -1,73 +1,43 @@
-import { Card, Group, Badge, Text, Stack, Button, TextInput, Textarea } from '@mantine/core';
+import { Card, Group, Badge, Text, Stack, Button } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { listNotices, addNotice, updateNotice, togglePin, deleteNotice } from '@main/lib/noticeRepo';
+import { listNotices, togglePin, deleteNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
 import { formatDate } from '@main/utils/format';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@main/lib/auth';
+import NoticeEditor from '@main/components/notices/NoticeEditor';
 
 export default function NoticesPage() {
     const notices = listNotices();
     const navigate = useNavigate();
 
-    useAuth(); // 로그인 컨텍스트 초기화만 (현재 테스트 강제 관리자 노출)
-    const [refresh, setRefresh] = useState(0);
-    const [draft, setDraft] = useState<{ id?: string; title: string; body: string; pinned: boolean } | null>(null);
-
-    useEffect(() => {
-        // refresh trigger only
-    }, [refresh]);
+    const { user } = useAuth(); // 사용자 컨텍스트 (admin 여부 판단)
+    const isAdmin = user?.role === 'admin';
+    const [editorState, setEditorState] = useState<{ open: boolean; id?: string } | null>(null);
 
     function openCreate() {
-        const d = { title: '', body: '', pinned: false };
-
-        setDraft(d);
-        // state 반영 후 모달 띄우기 (동일 tick 보장 위해 microtask)
-        queueMicrotask(() => openDraftModal(d));
+        if (!isAdmin) return;
+        setEditorState({ open: true });
     }
 
     function openEdit(id: string) {
-        const n = notices.find((x) => x.id === id);
-
-        if (!n) return;
-
-        const d = { id, title: n.title, body: n.body, pinned: !!n.pinned };
-
-        setDraft(d);
-        queueMicrotask(() => openDraftModal(d));
+        if (!isAdmin) return;
+        setEditorState({ open: true, id });
     }
 
-    function submitDraft() {
-        if (!draft) return;
-        if (!draft.title.trim()) {
-            notifications.show({ color: 'red', title: '검증 오류', message: '제목은 필수입니다' });
-
-            return;
-        }
-        try {
-            if (draft.id) {
-                updateNotice(draft.id, { title: draft.title.trim(), body: draft.body.trim(), pinned: draft.pinned });
-                notifications.show({ color: 'teal', title: '성공', message: '공지 수정 완료' });
-            } else {
-                addNotice({ title: draft.title.trim(), body: draft.body.trim(), pinned: draft.pinned });
-                notifications.show({ color: 'teal', title: '성공', message: '공지 생성 완료' });
-            }
-            setDraft(null);
-            modals.close('notice-draft-modal');
-            setRefresh((v) => v + 1);
-        } catch {
-            notifications.show({ color: 'red', title: '오류', message: '저장 실패' });
-        }
+    function closeEditor() {
+        setEditorState(null);
+        modals.close('notice-editor-modal');
     }
 
     function handleTogglePin(id: string) {
+        if (!isAdmin) return;
         try {
             togglePin(id);
-            setRefresh((v) => v + 1);
             notifications.show({ color: 'blue', title: '업데이트', message: '핀 상태 변경' });
         } catch {
             notifications.show({ color: 'red', title: '오류', message: '핀 상태 변경 실패' });
@@ -75,6 +45,7 @@ export default function NoticesPage() {
     }
 
     function handleDelete(id: string) {
+        if (!isAdmin) return;
         const n = notices.find((x) => x.id === id);
 
         modals.openConfirmModal({
@@ -86,7 +57,6 @@ export default function NoticesPage() {
             onConfirm: () => {
                 try {
                     deleteNotice(id);
-                    setRefresh((v) => v + 1);
                     notifications.show({ color: 'teal', title: '완료', message: '삭제되었습니다' });
                 } catch {
                     notifications.show({ color: 'red', title: '오류', message: '삭제 실패' });
@@ -94,49 +64,29 @@ export default function NoticesPage() {
             }
         });
     }
-
-    function openDraftModal(d: { id?: string; title: string; body: string; pinned: boolean }) {
-        const isEdit = !!d.id;
+    // 모달 열기 (create / edit 공용)
+    if (editorState?.open) {
+        const editing = editorState.id ? notices.find((n) => n.id === editorState.id) : undefined;
 
         modals.open({
-            modalId: 'notice-draft-modal',
-            title: isEdit ? '공지 수정' : '새 공지 작성',
+            modalId: 'notice-editor-modal',
+            title: editing ? '공지 수정' : '새 공지 작성',
             centered: true,
             size: '800px',
+            onClose: () => {
+                closeEditor();
+            },
             children: (
-                <Stack gap="md" mt="sm">
-                    <TextInput
-                        data-autofocus
-                        label="제목"
-                        placeholder="공지 제목"
-                        size="md"
-                        value={d.title}
-                        onChange={(e) => setDraft((prev) => (prev ? { ...prev, title: e.currentTarget.value } : prev))}
-                    />
-                    <Textarea
-                        autosize
-                        label="본문"
-                        maxRows={30}
-                        minRows={10}
-                        placeholder="공지 본문"
-                        size="md"
-                        styles={{ input: { fontFamily: 'inherit' } }}
-                        value={d.body}
-                        onChange={(e) => setDraft((prev) => (prev ? { ...prev, body: e.currentTarget.value } : prev))}
-                    />
-                    <Group justify="flex-end" mt="sm">
-                        <Button
-                            variant="default"
-                            onClick={() => {
-                                setDraft(null);
-                                modals.close('notice-draft-modal');
-                            }}
-                        >
-                            취소
-                        </Button>
-                        <Button onClick={submitDraft}>{isEdit ? '수정' : '생성'}</Button>
-                    </Group>
-                </Stack>
+                <NoticeEditor
+                    initialBody={editing?.body}
+                    initialPinned={!!editing?.pinned}
+                    initialTitle={editing?.title}
+                    noticeId={editing?.id}
+                    onCancel={closeEditor}
+                    onSaved={() => {
+                        closeEditor();
+                    }}
+                />
             )
         });
     }
@@ -145,9 +95,11 @@ export default function NoticesPage() {
         <PageContainer>
             <Group justify="space-between" mb="md">
                 <PageHeader description="서비스 업데이트 및 점검 안내" title="공지사항" />
-                <Button size="xs" variant="light" onClick={openCreate}>
-                    새 공지 작성
-                </Button>
+                {isAdmin && (
+                    <Button size="xs" variant="light" onClick={openCreate}>
+                        새 공지 작성
+                    </Button>
+                )}
             </Group>
             {notices.length === 0 && <EmptyState message="등록된 공지사항이 없습니다." />}
             <Stack gap="md">
@@ -172,17 +124,19 @@ export default function NoticesPage() {
                                     </Text>
                                 )}
                             </Stack>
-                            <Group gap={6} wrap="nowrap">
-                                <Button size="xs" variant="subtle" onClick={() => openEdit(n.id)}>
-                                    수정
-                                </Button>
-                                <Button size="xs" variant="outline" onClick={() => handleTogglePin(n.id)}>
-                                    {n.pinned ? '핀 해제' : '핀 고정'}
-                                </Button>
-                                <Button color="red" size="xs" variant="light" onClick={() => handleDelete(n.id)}>
-                                    삭제
-                                </Button>
-                            </Group>
+                            {isAdmin && (
+                                <Group gap={6} wrap="nowrap">
+                                    <Button size="xs" variant="subtle" onClick={() => openEdit(n.id)}>
+                                        수정
+                                    </Button>
+                                    <Button size="xs" variant="outline" onClick={() => handleTogglePin(n.id)}>
+                                        {n.pinned ? '핀 해제' : '핀 고정'}
+                                    </Button>
+                                    <Button color="red" size="xs" variant="light" onClick={() => handleDelete(n.id)}>
+                                        삭제
+                                    </Button>
+                                </Group>
+                            )}
                         </Group>
                     </Card>
                 ))}

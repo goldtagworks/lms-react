@@ -1,5 +1,5 @@
 import { Notice } from '@main/types/notice';
-
+import { useState, useEffect } from 'react';
 // In-memory demo seed (sessionStorage persistence optional later)
 const seed: Notice[] = [
     {
@@ -18,6 +18,17 @@ const seed: Notice[] = [
 ];
 
 let notices: Notice[] = [...seed];
+const noticeListeners = new Set<() => void>();
+
+function bumpNotices() {
+    noticeListeners.forEach((l) => {
+        try {
+            l();
+        } catch {
+            // swallow
+        }
+    });
+}
 
 export function listNotices(): Notice[] {
     return [...notices].sort((a, b) => Number(b.pinned || 0) - Number(a.pinned || 0) || b.created_at.localeCompare(a.created_at));
@@ -31,6 +42,8 @@ export function addNotice(input: Omit<Notice, 'id' | 'created_at'>): Notice {
     const n: Notice = { id: 'n' + (Date.now() + Math.floor(Math.random() * 1000)), created_at: new Date().toISOString(), ...input };
 
     notices = [n, ...notices];
+
+    bumpNotices();
 
     return n;
 }
@@ -48,6 +61,8 @@ export function updateNotice(id: string, patch: Partial<Omit<Notice, 'id' | 'cre
         return n;
     });
 
+    if (updated) bumpNotices();
+
     return updated;
 }
 
@@ -55,6 +70,8 @@ export function deleteNotice(id: string): boolean {
     const len = notices.length;
 
     notices = notices.filter((n) => n.id !== id);
+
+    if (notices.length !== len) bumpNotices();
 
     return notices.length !== len;
 }
@@ -69,4 +86,29 @@ export function togglePin(id: string): Notice | undefined {
 
 export function clearNotices() {
     notices = [];
+    bumpNotices();
+}
+
+// Hook for reactive single notice
+
+export function useNotice(id: string | undefined) {
+    const [notice, setNotice] = useState<Notice | undefined>(() => (id ? getNotice(id) : undefined));
+
+    useEffect(() => {
+        if (id) setNotice(getNotice(id));
+    }, [id]);
+
+    useEffect(() => {
+        const fn = () => {
+            if (id) setNotice(getNotice(id));
+        };
+
+        noticeListeners.add(fn);
+
+        return () => {
+            noticeListeners.delete(fn);
+        };
+    }, [id]);
+
+    return notice;
 }

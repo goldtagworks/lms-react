@@ -16,6 +16,10 @@ export interface CourseQuestion {
     is_resolved: boolean;
     /** 작성일 */
     created_at: string;
+    /** (in-memory only) 비공개 여부 - schema 미반영 */
+    is_private?: boolean;
+    /** (in-memory only) 수정일 - schema 미반영 */
+    updated_at?: string;
 }
 
 /**

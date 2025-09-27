@@ -51,30 +51,21 @@ export function EnrollWishlistActions({ enrolled, wish, userId, size = 'xs', onE
         );
     }
 
+    function handleEnrollClick() {
+        if (enrolled) return;
+        onEnroll();
+    }
+
+    function handleWishClick() {
+        onToggleWish();
+    }
+
     return (
         <Group grow gap={8}>
-            <Button
-                disabled={enrolled}
-                leftSection={<BookOpen size={14} />}
-                radius="md"
-                size={size}
-                variant="filled"
-                onClick={() => {
-                    if (enrolled) return;
-                    onEnroll();
-                }}
-            >
+            <Button disabled={enrolled} leftSection={<BookOpen size={14} />} radius="md" size={size} variant="filled" onClick={handleEnrollClick}>
                 {enrollLabel}
             </Button>
-            <Button
-                leftSection={wish ? <HeartOff size={14} /> : <Heart size={14} />}
-                radius="md"
-                size={size}
-                variant={wish ? 'light' : 'outline'}
-                onClick={() => {
-                    onToggleWish();
-                }}
-            >
+            <Button leftSection={wish ? <HeartOff size={14} /> : <Heart size={14} />} radius="md" size={size} variant={wish ? 'light' : 'outline'} onClick={handleWishClick}>
                 {wishLabel}
             </Button>
         </Group>

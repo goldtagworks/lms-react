@@ -3,16 +3,56 @@
  * - 실제 서버 API 대체 아님 (임시: sessionStorage)
  * - 가격/세금 재계산 금지 (서버 authoritative 원칙 유지)
  */
+import type { Certificate } from '@main/types/exam';
+import type { CourseReview } from '@main/types/review';
+import type { CourseQuestion, CourseAnswer } from '@main/types/qna';
+
 import { useEffect, useState } from 'react';
 import { Course } from '@main/types/course';
 import { Enrollment } from '@main/types/enrollment';
 import { Lesson } from '@main/types/lesson';
+import { UserRole } from '@main/lib/nav';
 
 // Storage Keys
 const K_COURSES = 'lms_courses_v1';
 const K_ENROLLMENTS = 'lms_enrollments_v1';
 const K_WISHLIST = 'lms_wishlist_v1'; // { [userId]: string[] }
 const K_LESSONS = 'lms_lessons_v1';
+const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
+const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (mock)
+const K_MARKETING_COPY = 'lms_marketing_copy_v1'; // courseId -> MarketingCopy
+
+interface StoredUser {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+}
+
+export interface InstructorApplication {
+    id: string;
+    user_id: string;
+    display_name: string;
+    bio_md?: string;
+    links?: { label: string; url: string }[];
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    created_at: string;
+    decided_at?: string;
+    rejection_reason?: string;
+}
+
+function loadInstructorApps(): InstructorApplication[] {
+    return ssGet<InstructorApplication[]>(K_INSTRUCTOR_APPS) || [];
+}
+function saveInstructorApps(list: InstructorApplication[]) {
+    ssSet(K_INSTRUCTOR_APPS, list);
+}
+function loadUsers(): StoredUser[] {
+    return ssGet<StoredUser[]>(K_USERS) || [];
+}
+function saveUsers(list: StoredUser[]) {
+    ssSet(K_USERS, list);
+}
 
 // 초기 샘플 코스 (운영 스키마 구조 따름)
 function seedCourses(): Course[] {
@@ -38,6 +78,9 @@ function seedCourses(): Course[] {
         progress_required_percent: 80,
         is_active: true,
         published: true,
+        is_featured: false,
+        featured_rank: undefined,
+        featured_badge_text: undefined,
         created_at: now,
         updated_at: now
     };
@@ -47,7 +90,10 @@ function seedCourses(): Course[] {
             ...base,
             id: 'c1',
             title: 'React 입문',
-            tags: ['React', '기초']
+            tags: ['React', '기초'],
+            is_featured: true,
+            featured_rank: 1,
+            featured_badge_text: '추천'
         },
         {
             ...base,
@@ -113,6 +159,59 @@ function ssSet<T>(key: string, value: T) {
     }
 }
 
+// ================= Marketing Copy (추가 메타) =================
+export interface MarketingCopy {
+    course_id: string;
+    headline?: string;
+    body_md?: string;
+    updated_at: string;
+}
+
+function loadMarketingCopyMap(): Record<string, MarketingCopy> {
+    return ssGet<Record<string, MarketingCopy>>(K_MARKETING_COPY) || {};
+}
+function saveMarketingCopyMap(map: Record<string, MarketingCopy>) {
+    ssSet(K_MARKETING_COPY, map);
+}
+
+export function upsertMarketingCopy(courseId: string, patch: { headline?: string; body_md?: string }) {
+    const map = loadMarketingCopyMap();
+    const now = new Date().toISOString();
+    const existing = map[courseId];
+
+    map[courseId] = { course_id: courseId, headline: patch.headline, body_md: patch.body_md, updated_at: now, ...(existing ? existing : {}) };
+    saveMarketingCopyMap(map);
+    bump();
+
+    return map[courseId];
+}
+
+export function getMarketingCopy(courseId: string): MarketingCopy | undefined {
+    return loadMarketingCopyMap()[courseId];
+}
+
+export function useMarketingCopy(courseId: string | undefined) {
+    const [mc, setMc] = useState<MarketingCopy | undefined>(() => (courseId ? getMarketingCopy(courseId) : undefined));
+
+    useEffect(() => {
+        if (courseId) setMc(getMarketingCopy(courseId));
+    }, [courseId]);
+
+    useEffect(() => {
+        const fn = () => {
+            if (courseId) setMc(getMarketingCopy(courseId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [courseId]);
+
+    return mc;
+}
+
 // Lessons seed (간단 mock: 각 코스 3개 레슨)
 function seedLessons(courses: Course[]): Lesson[] {
     const list: Lesson[] = [];
@@ -120,10 +219,13 @@ function seedLessons(courses: Course[]): Lesson[] {
 
     courses.forEach((c) => {
         for (let i = 1; i <= 3; i++) {
+            // 간단한 섹션 구분: 1~2 = s1, 3 = s2 (데모용)
+            const sectionId = i <= 2 ? `${c.id}-s1` : `${c.id}-s2`;
+
             list.push({
                 id: `${c.id}-l${i}`,
                 course_id: c.id,
-                section_id: undefined,
+                section_id: sectionId,
                 title: `${c.title} 레슨 ${i}`,
                 outline: undefined,
                 content_md: undefined,
@@ -175,6 +277,210 @@ export function listLessonsByCourse(courseId: string): Lesson[] {
 
 export function getCourse(id: string): Course | undefined {
     return loadCourses().find((c) => c.id === id);
+}
+
+// Mutations: Courses (단순 partial update - 서버 authoritative 아님, 데모용)
+function saveCourses(list: Course[]) {
+    ssSet(K_COURSES, list);
+}
+
+export function updateCoursePartial(courseId: string, patch: Partial<Course>): Course | undefined {
+    const list = loadCourses();
+    const idx = list.findIndex((c) => c.id === courseId);
+
+    if (idx < 0) return undefined;
+    const now = new Date().toISOString();
+    const updated: Course = { ...list[idx], ...patch, updated_at: now };
+
+    list[idx] = updated;
+    saveCourses(list);
+    bump();
+
+    return updated;
+}
+
+export function toggleCourseActive(courseId: string): Course | undefined {
+    const c = getCourse(courseId);
+
+    if (!c) return undefined;
+
+    return updateCoursePartial(courseId, { is_active: !c.is_active });
+}
+
+// Create or update a course (draft style) - simple local mock
+export function saveCourseDraft(input: { id?: string; title: string; summary: string; description: string; is_featured?: boolean; featured_rank?: number; featured_badge_text?: string }): {
+    created: boolean;
+    course?: Course;
+    error?: string;
+} {
+    const list = loadCourses();
+    const now = new Date().toISOString();
+    const { id, title, summary, description, is_featured, featured_rank, featured_badge_text } = input;
+
+    if (id) {
+        const idx = list.findIndex((c) => c.id === id);
+
+        if (idx < 0) {
+            return { created: false, error: 'NOT_FOUND' };
+        }
+
+        const updated: Course = {
+            ...list[idx],
+            title,
+            summary,
+            description,
+            is_featured: !!is_featured,
+            featured_rank: is_featured ? featured_rank : undefined,
+            featured_badge_text: is_featured ? featured_badge_text : undefined,
+            updated_at: now
+        };
+
+        list[idx] = updated;
+        saveCourses(list);
+        bump();
+
+        return { created: false, course: updated };
+    }
+
+    // new course: clone first as base (mock)
+    const base = list[0];
+
+    if (!base) {
+        return { created: false, error: 'NO_BASE' };
+    }
+
+    const newId = 'c' + (list.length + 1);
+    const createdCourse: Course = {
+        ...base,
+        id: newId,
+        title,
+        summary,
+        description,
+        is_featured: !!is_featured,
+        featured_rank: is_featured ? featured_rank : undefined,
+        featured_badge_text: is_featured ? featured_badge_text : undefined,
+        created_at: now,
+        updated_at: now
+    };
+
+    list.push(createdCourse);
+    saveCourses(list);
+    bump();
+
+    return { created: true, course: createdCourse };
+}
+
+// ---------------- Instructor Applications (mock) ----------------
+export function listInstructorApplications(status?: InstructorApplication['status']): InstructorApplication[] {
+    const list = loadInstructorApps();
+
+    return status ? list.filter((a) => a.status === status) : list;
+}
+
+export function getInstructorApplicationByUser(userId: string): InstructorApplication | undefined {
+    return loadInstructorApps().find((a) => a.user_id === userId && a.status !== 'REJECTED');
+}
+
+export function applyInstructor(user: StoredUser, data: { display_name: string; bio_md?: string; links?: { label: string; url: string }[] }) {
+    const apps = loadInstructorApps();
+    const existing = getInstructorApplicationByUser(user.id);
+
+    if (existing) return existing; // 이미 신청(대기/승인) 존재
+
+    const now = new Date().toISOString();
+    const app: InstructorApplication = {
+        id: 'app-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        user_id: user.id,
+        display_name: data.display_name,
+        bio_md: data.bio_md,
+        links: data.links,
+        status: 'PENDING',
+        created_at: now
+    };
+
+    apps.push(app);
+    saveInstructorApps(apps);
+    bump();
+
+    return app;
+}
+
+function promoteUserToInstructor(userId: string) {
+    const users = loadUsers();
+    const idx = users.findIndex((u) => u.id === userId);
+
+    if (idx >= 0) {
+        users[idx] = { ...users[idx], role: 'instructor' };
+        saveUsers(users);
+    } else {
+        // 로그인/등록 로직 밖에서 저장 안됐을 수 있으니 최소 엔트리 생성
+        users.push({ id: userId, name: '사용자', email: userId + '@unknown.local', role: 'instructor' });
+        saveUsers(users);
+    }
+}
+
+export function approveInstructorApplication(appId: string) {
+    const apps = loadInstructorApps();
+    const idx = apps.findIndex((a) => a.id === appId);
+
+    if (idx < 0) return undefined;
+
+    const now = new Date().toISOString();
+
+    apps[idx] = { ...apps[idx], status: 'APPROVED', decided_at: now };
+    promoteUserToInstructor(apps[idx].user_id);
+    saveInstructorApps(apps);
+    bump();
+
+    return apps[idx];
+}
+
+export function rejectInstructorApplication(appId: string, reason?: string) {
+    const apps = loadInstructorApps();
+    const idx = apps.findIndex((a) => a.id === appId);
+
+    if (idx < 0) return undefined;
+
+    const now = new Date().toISOString();
+
+    apps[idx] = { ...apps[idx], status: 'REJECTED', decided_at: now, rejection_reason: reason };
+    saveInstructorApps(apps);
+    bump();
+
+    return apps[idx];
+}
+
+// Hook-like helpers
+export function useInstructorApplications(status?: InstructorApplication['status']) {
+    const [list, setList] = useState<InstructorApplication[]>(() => listInstructorApplications(status));
+
+    useEffect(() => {
+        const fn = () => setList(listInstructorApplications(status));
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [status]);
+
+    return list;
+}
+
+export function useMyInstructorApplication(userId: string | undefined) {
+    const [app, setApp] = useState<InstructorApplication | undefined>(() => (userId ? getInstructorApplicationByUser(userId) : undefined));
+
+    useEffect(() => {
+        const fn = () => setApp(userId ? getInstructorApplicationByUser(userId) : undefined);
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [userId]);
+
+    return app;
 }
 
 // Enrollments
@@ -257,6 +563,110 @@ function bump() {
     listeners.forEach((l) => l());
 }
 
+// ================= Certificates (in-memory/sessionStorage mock) =================
+const K_CERTIFICATES = 'lms.certificates.v1';
+
+function loadCertificates(): Certificate[] {
+    return ssGet<Certificate[]>(K_CERTIFICATES) || [];
+}
+
+function saveCertificates(list: Certificate[]) {
+    ssSet(K_CERTIFICATES, list);
+}
+
+export function listCertificatesByUser(userId: string): Certificate[] {
+    // enrollment -> user 매핑이 없으므로 간단 목업: serial_no 안에 userId substring 이면 사용자 소유로 간주 (스텁)
+    return loadCertificates().filter((c) => c.serial_no.includes(userId.slice(0, 4)));
+}
+
+export function findCertificateById(id: string): Certificate | undefined {
+    return loadCertificates().find((c) => c.id === id);
+}
+
+export function issueCertificate(params: { enrollment_id: string; exam_attempt_id: string; user_id: string; course_id: string }): Certificate {
+    const list = loadCertificates();
+    const now = new Date().toISOString();
+    const serial = 'C-' + now.slice(0, 10).replace(/-/g, '') + '-' + params.user_id.slice(0, 4) + '-' + (1000 + list.length);
+    const existing = list.find((c) => c.enrollment_id === params.enrollment_id);
+
+    if (existing) return existing; // 멱등
+
+    const cert: Certificate = {
+        id: 'cert-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        enrollment_id: params.enrollment_id,
+        exam_attempt_id: params.exam_attempt_id,
+        issued_at: now,
+        pdf_path: '/mock/certs/' + serial + '.pdf',
+        serial_no: serial
+    };
+
+    list.push(cert);
+    saveCertificates(list);
+    bump();
+
+    return cert;
+}
+
+export function useCertificates(userId: string | undefined) {
+    const [, setV] = useState(0);
+
+    useEffect(() => {
+        const fn = () => setV((x) => x + 1);
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, []);
+
+    return userId ? listCertificatesByUser(userId) : [];
+}
+
+// 단일 수료증 구독 훅
+export function useCertificate(id: string | undefined) {
+    const [cert, setCert] = useState<Certificate | undefined>(() => (id ? findCertificateById(id) : undefined));
+
+    useEffect(() => {
+        if (id) setCert(findCertificateById(id));
+    }, [id]);
+
+    useEffect(() => {
+        const fn = () => {
+            if (id) setCert(findCertificateById(id));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [id]);
+
+    return cert;
+}
+
+// ================= Exam Attempt Score Mock (임시) =================
+// 실제 구현 전까지 exam_attempt_id -> { score, pass_score, passed, exam_title } 매핑 제공
+interface AttemptMeta {
+    score?: number;
+    pass_score?: number;
+    passed?: boolean;
+    exam_title?: string;
+}
+
+const attemptMetaMap: Record<string, AttemptMeta> = {};
+
+export function upsertAttemptMeta(attemptId: string, meta: AttemptMeta) {
+    attemptMetaMap[attemptId] = { ...attemptMetaMap[attemptId], ...meta };
+}
+
+export function getAttemptMeta(attemptId: string | undefined): AttemptMeta | undefined {
+    if (!attemptId) return undefined;
+
+    return attemptMetaMap[attemptId];
+}
+
 // Wrap mutating ops to notify
 export function enrollAndNotify(userId: string, courseId: string) {
     const res = enrollCourse(userId, courseId);
@@ -321,6 +731,19 @@ export function useCourse(id: string | undefined) {
         if (id) setC(getCourse(id));
     }, [id]);
 
+    // listen for global bumps so active 토글 반영
+    useEffect(() => {
+        const fn = () => {
+            if (id) setC(getCourse(id));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [id]);
+
     return c;
 }
 
@@ -338,4 +761,293 @@ export function isWishlisted(userId: string | undefined, courseId: string): bool
     if (!userId) return false;
 
     return getWishlist(userId).includes(courseId);
+}
+
+// ================= Reviews & Q&A (sessionStorage mock) =================
+
+const K_REVIEWS = 'lms_reviews_v1';
+const K_QNA_QUESTIONS = 'lms_qna_questions_v1';
+const K_QNA_ANSWERS = 'lms_qna_answers_v1';
+
+function loadReviews(): CourseReview[] {
+    return ssGet<CourseReview[]>(K_REVIEWS) || [];
+}
+function saveReviews(list: CourseReview[]) {
+    ssSet(K_REVIEWS, list);
+}
+function loadQuestions(): CourseQuestion[] {
+    return ssGet<CourseQuestion[]>(K_QNA_QUESTIONS) || [];
+}
+function saveQuestions(list: CourseQuestion[]) {
+    ssSet(K_QNA_QUESTIONS, list);
+}
+function loadAnswers(): CourseAnswer[] {
+    return ssGet<CourseAnswer[]>(K_QNA_ANSWERS) || [];
+}
+function saveAnswers(list: CourseAnswer[]) {
+    ssSet(K_QNA_ANSWERS, list);
+}
+
+// -------- Reviews CRUD --------
+export function upsertCourseReview(params: { course_id: string; user_id: string; rating: number; comment?: string }): CourseReview {
+    if (params.rating < 1 || params.rating > 5) throw new Error('INVALID_RATING');
+
+    const list = loadReviews();
+    const now = new Date().toISOString();
+    const idx = list.findIndex((r) => r.course_id === params.course_id && r.user_id === params.user_id);
+
+    if (idx >= 0) {
+        list[idx] = { ...list[idx], rating: params.rating, comment: params.comment, created_at: list[idx].created_at };
+        saveReviews(list);
+        bump();
+
+        return list[idx];
+    }
+
+    const created: CourseReview = {
+        id: 'rev-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        course_id: params.course_id,
+        user_id: params.user_id,
+        rating: params.rating,
+        comment: params.comment,
+        created_at: now
+    };
+
+    list.push(created);
+    saveReviews(list);
+    bump();
+
+    return created;
+}
+
+export function listCourseReviews(courseId: string): CourseReview[] {
+    return loadReviews()
+        .filter((r) => r.course_id === courseId)
+        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+}
+
+export function getCourseRatingSummary(courseId: string): { avg: number; count: number; distribution: Record<number, number> } {
+    const reviews = listCourseReviews(courseId);
+
+    if (reviews.length === 0) return { avg: 0, count: 0, distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+
+    const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let sum = 0;
+
+    reviews.forEach((r) => {
+        dist[r.rating] += 1;
+        sum += r.rating;
+    });
+
+    const avg = Number((sum / reviews.length).toFixed(2));
+
+    return { avg, count: reviews.length, distribution: dist };
+}
+
+// -------- Q&A CRUD --------
+// NOTE: is_private & updated_at are NOT in canonical schema (in-memory only placeholder for future schema extension)
+export function createQuestion(params: { course_id: string; user_id: string; title: string; body: string; is_private?: boolean }): CourseQuestion {
+    if (!params.title.trim()) throw new Error('TITLE_REQUIRED');
+    if (!params.body.trim()) throw new Error('BODY_REQUIRED');
+    const list = loadQuestions();
+    const now = new Date().toISOString();
+    const q: CourseQuestion = {
+        id: 'q-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        course_id: params.course_id,
+        user_id: params.user_id,
+        title: params.title,
+        body: params.body,
+        is_resolved: false,
+        created_at: now,
+        // in-memory extension fields (schema-sync caution)
+        // @ts-ignore
+        is_private: !!params.is_private,
+        // @ts-ignore
+        updated_at: now
+    };
+
+    list.push(q);
+    saveQuestions(list);
+    bump();
+
+    return q;
+}
+
+export function listQuestions(courseId: string): CourseQuestion[] {
+    return loadQuestions()
+        .filter((q) => q.course_id === courseId)
+        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+}
+
+export function updateQuestion(params: { question_id: string; user_id: string; title: string; body: string }): CourseQuestion {
+    const qs = loadQuestions();
+    const idx = qs.findIndex((q) => q.id === params.question_id);
+
+    if (idx < 0) throw new Error('QUESTION_NOT_FOUND');
+
+    const q = qs[idx] as any;
+
+    if (q.user_id !== params.user_id) throw new Error('NOT_OWNER');
+
+    // If any answers exist, disallow edit
+    const hasAnswer = loadAnswers().some((a) => a.question_id === q.id);
+
+    if (hasAnswer) throw new Error('HAS_ANSWER_IMMUTABLE');
+
+    if (!params.title.trim()) throw new Error('TITLE_REQUIRED');
+    if (!params.body.trim()) throw new Error('BODY_REQUIRED');
+    const now = new Date().toISOString();
+
+    qs[idx] = { ...(qs[idx] as any), title: params.title, body: params.body, updated_at: now } as CourseQuestion;
+    saveQuestions(qs);
+    bump();
+
+    return qs[idx];
+}
+
+export function setQuestionPrivacy(params: { question_id: string; user_id: string; is_private: boolean }): CourseQuestion {
+    const qs = loadQuestions();
+    const idx = qs.findIndex((q) => q.id === params.question_id);
+
+    if (idx < 0) throw new Error('QUESTION_NOT_FOUND');
+
+    const q = qs[idx] as any;
+
+    if (q.user_id !== params.user_id) throw new Error('NOT_OWNER');
+    // cannot toggle after answers exist (policy)
+    const hasAnswer = loadAnswers().some((a) => a.question_id === q.id);
+
+    if (hasAnswer) throw new Error('HAS_ANSWER_IMMUTABLE');
+    const now = new Date().toISOString();
+
+    qs[idx] = { ...(qs[idx] as any), is_private: params.is_private, updated_at: now } as CourseQuestion;
+    saveQuestions(qs);
+    bump();
+
+    return qs[idx];
+}
+
+export function createAnswer(params: { question_id: string; user_id: string; body: string; is_instructor_answer: boolean }): CourseAnswer {
+    if (!params.body.trim()) throw new Error('BODY_REQUIRED');
+    const list = loadAnswers();
+    const now = new Date().toISOString();
+    const ans: CourseAnswer = {
+        id: 'ans-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        question_id: params.question_id,
+        user_id: params.user_id,
+        body: params.body,
+        is_instructor_answer: params.is_instructor_answer,
+        created_at: now
+    };
+
+    list.push(ans);
+    saveAnswers(list);
+    bump();
+
+    return ans;
+}
+
+export function listAnswers(questionId: string): CourseAnswer[] {
+    return loadAnswers()
+        .filter((a) => a.question_id === questionId)
+        .sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
+}
+
+export function resolveQuestion(questionId: string) {
+    const qs = loadQuestions();
+    const idx = qs.findIndex((q) => q.id === questionId);
+
+    if (idx < 0) return undefined;
+    if (qs[idx].is_resolved) return qs[idx]; // idempotent
+
+    qs[idx] = { ...qs[idx], is_resolved: true };
+    saveQuestions(qs);
+    bump();
+
+    return qs[idx];
+}
+
+// Hook 형태 간단 구독 (필요시 React Query 교체 가능)
+export function useCourseReviewsState(courseId: string | undefined) {
+    const [list, setList] = useState<CourseReview[]>(() => (courseId ? listCourseReviews(courseId) : []));
+
+    useEffect(() => {
+        if (courseId) setList(listCourseReviews(courseId));
+    }, [courseId]);
+    useEffect(() => {
+        const fn = () => {
+            if (courseId) setList(listCourseReviews(courseId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [courseId]);
+
+    return list;
+}
+
+export function useCourseRatingSummaryState(courseId: string | undefined) {
+    const [summary, setSummary] = useState(() => (courseId ? getCourseRatingSummary(courseId) : { avg: 0, count: 0, distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } }));
+
+    useEffect(() => {
+        if (courseId) setSummary(getCourseRatingSummary(courseId));
+    }, [courseId]);
+    useEffect(() => {
+        const fn = () => {
+            if (courseId) setSummary(getCourseRatingSummary(courseId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [courseId]);
+
+    return summary;
+}
+
+export function useCourseQuestionsState(courseId: string | undefined) {
+    const [list, setList] = useState<CourseQuestion[]>(() => (courseId ? listQuestions(courseId) : []));
+
+    useEffect(() => {
+        if (courseId) setList(listQuestions(courseId));
+    }, [courseId]);
+    useEffect(() => {
+        const fn = () => {
+            if (courseId) setList(listQuestions(courseId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [courseId]);
+
+    return list;
+}
+
+export function useAnswersState(questionId: string | undefined) {
+    const [list, setList] = useState<CourseAnswer[]>(() => (questionId ? listAnswers(questionId) : []));
+
+    useEffect(() => {
+        if (questionId) setList(listAnswers(questionId));
+    }, [questionId]);
+    useEffect(() => {
+        const fn = () => {
+            if (questionId) setList(listAnswers(questionId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [questionId]);
+
+    return list;
 }
