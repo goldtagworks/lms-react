@@ -1,4 +1,5 @@
 import { Container, Title, TextInput, Textarea, Stack, Button, Group, Text } from '@mantine/core';
+import { Save, X } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -71,8 +72,11 @@ const CourseEditPage = () => {
                 <Textarea label="상세 설명" minRows={6} placeholder="코스 상세" value={desc} onChange={(e) => setDesc(e.currentTarget.value)} />
                 <Stack gap="xs">{/* Featured 필드는 여기서 제거 (관리자 전용 별도 UI) */}</Stack>
                 <Group justify="flex-end" mt="md">
-                    <Button disabled={!title.trim()} onClick={handleSave}>
+                    <Button disabled={!title.trim()} leftSection={<Save size={14} />} onClick={handleSave}>
                         저장(목업)
+                    </Button>
+                    <Button leftSection={<X size={14} />} variant="default" onClick={() => navigate(-1)}>
+                        취소
                     </Button>
                 </Group>
                 <Text c="dimmed" size="xs">

@@ -21,7 +21,7 @@ export default function NoticeDetailPage() {
 
     if (!notice) {
         return (
-            <PageContainer>
+            <PageContainer roleMain>
                 <EmptyState message="해당 공지사항을 찾을 수 없습니다." />
             </PageContainer>
         );
@@ -81,7 +81,7 @@ export default function NoticeDetailPage() {
     }
 
     return (
-        <PageContainer>
+        <PageContainer roleMain>
             <Stack gap="lg" mt="md">
                 {/* 상단 내비게이션 및 액션 */}
                 <Group justify="space-between" wrap="nowrap">

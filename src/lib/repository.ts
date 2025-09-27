@@ -35,10 +35,12 @@ export interface InstructorApplication {
     display_name: string;
     bio_md?: string;
     links?: { label: string; url: string }[];
-    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED'; // REVOKED: 승인 후 권한 회수 (Phase1)
     created_at: string;
     decided_at?: string;
     rejection_reason?: string;
+    revoked_at?: string; // 회수 시각
+    revoke_reason?: string; // 간단 텍스트 (코드/상세 통합 버전)
 }
 
 function loadInstructorApps(): InstructorApplication[] {
@@ -381,6 +383,10 @@ export function getInstructorApplicationByUser(userId: string): InstructorApplic
     return loadInstructorApps().find((a) => a.user_id === userId && a.status !== 'REJECTED');
 }
 
+export function getInstructorApplication(appId: string): InstructorApplication | undefined {
+    return loadInstructorApps().find((a) => a.id === appId);
+}
+
 export function applyInstructor(user: StoredUser, data: { display_name: string; bio_md?: string; links?: { label: string; url: string }[] }) {
     const apps = loadInstructorApps();
     const existing = getInstructorApplicationByUser(user.id);
@@ -450,6 +456,24 @@ export function rejectInstructorApplication(appId: string, reason?: string) {
     return apps[idx];
 }
 
+export function revokeInstructorApplication(appId: string, reason?: string) {
+    const apps = loadInstructorApps();
+    const idx = apps.findIndex((a) => a.id === appId);
+
+    if (idx < 0) return undefined;
+    const target = apps[idx];
+
+    if (target.status !== 'APPROVED') return target; // PENDING/REJECTED/이미 REVOKED 인 경우 변화 없음 (멱등)
+
+    const now = new Date().toISOString();
+
+    apps[idx] = { ...target, status: 'REVOKED', revoked_at: now, revoke_reason: reason };
+    saveInstructorApps(apps);
+    bump();
+
+    return apps[idx];
+}
+
 // Hook-like helpers
 export function useInstructorApplications(status?: InstructorApplication['status']) {
     const [list, setList] = useState<InstructorApplication[]>(() => listInstructorApplications(status));
@@ -479,6 +503,22 @@ export function useMyInstructorApplication(userId: string | undefined) {
             listeners.delete(fn);
         };
     }, [userId]);
+
+    return app;
+}
+
+export function useInstructorApplication(appId: string | null) {
+    const [app, setApp] = useState<InstructorApplication | undefined>(() => (appId ? getInstructorApplication(appId) : undefined));
+
+    useEffect(() => {
+        const fn = () => setApp(appId ? getInstructorApplication(appId) : undefined);
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [appId]);
 
     return app;
 }

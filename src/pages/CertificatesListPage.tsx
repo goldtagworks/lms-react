@@ -1,4 +1,4 @@
-import { Button, Group, Text } from '@mantine/core';
+import { Button, Group, Text, Card, Stack, Badge } from '@mantine/core';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
@@ -59,20 +59,34 @@ const CertificatesListPage = () => {
                 description="발급된 수료증을 모아보고 PDF로 저장하거나 검증 코드를 활용할 수 있습니다. 시험 합격 시 실제 발급 로직으로 대체됩니다."
                 title="내 수료증"
             />
-            {!userId && <EmptyState actionLabel="로그인" message="로그인 후 수료증을 확인할 수 있습니다." title="로그인 필요" to="/signin" />}
-            {userId && certs.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="합격한 시험이 아직 없어 수료증이 없습니다." title="수료증 없음" to="/courses" />}
-            {userId && certs.length > 0 && (
-                <CourseGrid mt="md">
-                    {certs.map((c) => (
-                        <CertificateCard key={c.id} courseTitle={c.courseTitle} id={c.id} issuedAt={c.issued_at} pdfPath={c.pdf_path} serialNo={c.serial_no} />
-                    ))}
-                </CourseGrid>
-            )}
-            {userId && (
-                <Text c="dimmed" mt="lg" size="xs">
-                    (목업) 발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
-                </Text>
-            )}
+            <Card withBorder p="lg" radius="md" shadow="sm">
+                <Stack gap="md">
+                    <Group align="center" justify="space-between">
+                        <Text fw={700} size="lg">
+                            발급된 수료증
+                        </Text>
+                        {userId && certs.length > 0 && (
+                            <Badge color="indigo" variant="light">
+                                {certs.length}개
+                            </Badge>
+                        )}
+                    </Group>
+                    {!userId && <EmptyState actionLabel="로그인" message="로그인 후 수료증을 확인할 수 있습니다." title="로그인 필요" to="/signin" />}
+                    {userId && certs.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="합격한 시험이 아직 없어 수료증이 없습니다." title="수료증 없음" to="/courses" />}
+                    {userId && certs.length > 0 && (
+                        <CourseGrid mt="md">
+                            {certs.map((c) => (
+                                <CertificateCard key={c.id} courseTitle={c.courseTitle} id={c.id} issuedAt={c.issued_at} pdfPath={c.pdf_path} serialNo={c.serial_no} />
+                            ))}
+                        </CourseGrid>
+                    )}
+                    {userId && (
+                        <Text c="dimmed" mt="sm" size="xs">
+                            (목업) 발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
+                        </Text>
+                    )}
+                </Stack>
+            </Card>
         </PageContainer>
     );
 };

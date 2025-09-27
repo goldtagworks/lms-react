@@ -92,7 +92,7 @@ export default function NoticesPage() {
     }
 
     return (
-        <PageContainer>
+        <PageContainer roleMain>
             <Group justify="space-between" mb="md">
                 <PageHeader description="서비스 업데이트 및 점검 안내" title="공지사항" />
                 {isAdmin && (

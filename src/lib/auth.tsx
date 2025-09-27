@@ -25,13 +25,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const raw = localStorage.getItem(LS_KEY);
 
             if (raw) {
-                setUser(JSON.parse(raw));
+                let parsed: User = JSON.parse(raw);
+                // 임시 강사 강제: goldtag 포함 시 instructor 고정
+
+                if (parsed && (parsed.email?.startsWith('goldtag') || parsed.email?.includes('goldtag') || parsed.name?.includes('goldtag'))) {
+                    parsed = { ...parsed, role: 'instructor' };
+                }
+                setUser(parsed);
             } else {
-                // DEV / TEST 전용 강제 역할 주입
-                // 사용 방법:
-                //   1) URL 파라미터: ?forceRole=admin | instructor | student
-                //   2) 혹은 sessionStorage.setItem('dev_force_role','admin'); 후 새로고침
-                // 실제 로그인 로직과 혼동되지 않도록 로컬 환경에서만 사용 (프로덕션 제거 대상)
+                // DEV / TEST 전용 강제 역할 주입 (forceRole 파라미터)
                 try {
                     const params = new URLSearchParams(window.location.search);
                     const forceRoleParam = params.get('forceRole');
@@ -39,13 +41,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     const forced = (forceRoleParam || stored) as UserRole | null;
 
                     if (forced && ['admin', 'instructor', 'student'].includes(forced)) {
-                        const devUser: User = {
-                            id: 'dev-' + forced,
-                            name: forced + ' tester',
-                            email: forced + '@dev.local',
-                            role: forced as UserRole
-                        };
+                        let devUser: User = { id: 'dev-' + forced, name: forced + ' tester', email: forced + '@dev.local', role: forced as UserRole };
 
+                        if (devUser.email.includes('goldtag') || devUser.name.includes('goldtag')) devUser = { ...devUser, role: 'instructor' };
                         setUser(devUser);
                     }
                 } catch {
@@ -74,10 +72,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (!mapped) {
             if (namePart === 'admin') mapped = 'admin';
-            else if (namePart === 'goldtag') mapped = 'instructor';
+            else if (namePart === 'goldtag' || email.includes('goldtag')) mapped = 'instructor';
         }
         const fakeUser = { id: 'u-' + namePart, name: namePart || '사용자', email, role: mapped || 'student' };
 
+        if (fakeUser.email.startsWith('goldtag') || fakeUser.email.includes('goldtag') || fakeUser.name.includes('goldtag')) fakeUser.role = 'instructor';
         setUser(fakeUser);
         persist(fakeUser);
     }, []);
@@ -89,10 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (!mapped) {
             if (namePart === 'admin') mapped = 'admin';
-            else if (namePart === 'goldtag') mapped = 'instructor';
+            else if (namePart === 'goldtag' || email.includes('goldtag')) mapped = 'instructor';
         }
-        const newUser = { id: 'u-' + Date.now(), name: name || namePart || '사용자', email, role: mapped || 'student' };
+        let newUser = { id: 'u-' + Date.now(), name: name || namePart || '사용자', email, role: mapped || 'student' };
 
+        if (newUser.email.startsWith('goldtag') || newUser.email.includes('goldtag') || newUser.name.includes('goldtag')) newUser = { ...newUser, role: 'instructor' };
         setUser(newUser);
         persist(newUser);
     }, []);
