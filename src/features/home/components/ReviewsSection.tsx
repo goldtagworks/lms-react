@@ -13,7 +13,7 @@ function ReviewsSectionBase({ reviews, title = '실제 수강생 후기', limit 
     const list = limit ? reviews.slice(0, limit) : reviews;
 
     return (
-        <Container py={32} size="lg">
+        <Container py="xl" size="lg">
             <Title mb="md" order={2} size={24}>
                 {title}
             </Title>

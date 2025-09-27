@@ -1,14 +1,52 @@
-import { Box } from '@mantine/core';
-
+import { Box, Divider, Stack, Text } from '@mantine/core';
 import { LinkButton } from '@main/components/LinkButton';
+import { filterNav, navGroups } from '@main/lib/nav';
+import { useAuth } from '@main/lib/auth';
+import { useLocation } from 'react-router-dom';
 
-const Navbar = () => (
-    <Box aria-label="모바일 메뉴" component="nav" display="flex" style={{ flexDirection: 'column', gap: 8 }}>
-        <LinkButton color="primary" href="#courses" justify="flex-start" label="코스" variant="subtle" />
-        <LinkButton color="primary" href="#guide" justify="flex-start" label="가이드" variant="subtle" />
-        <LinkButton color="primary" href="#support" justify="flex-start" label="고객센터" variant="subtle" />
-        <LinkButton color="primary" href="#login" justify="flex-start" label="로그인" variant="light" />
-    </Box>
-);
+const Navbar = () => {
+    const { user } = useAuth();
+    const role = user?.role ?? null;
+    const filtered = filterNav(navGroups, { isAuthenticated: !!user, role });
+    const { pathname } = useLocation();
+
+    return (
+        <Box aria-label="모바일 메뉴" component="nav">
+            <Stack gap="sm">
+                {filtered.map((g, gi) => (
+                    <Box key={g.id}>
+                        <Text c="dimmed" fw={600} mb={4} size="sm" style={{ letterSpacing: 0.5 }} tt="uppercase">
+                            {g.label}
+                        </Text>
+                        <Stack gap={4} mb="xs">
+                            {g.items.map((it) => {
+                                const active = pathname === it.href || (it.href !== '/' && pathname.startsWith(it.href));
+
+                                return (
+                                    <LinkButton
+                                        key={it.id}
+                                        color={active ? 'primary' : 'gray'}
+                                        href={it.href}
+                                        justify="flex-start"
+                                        label={it.label}
+                                        style={active ? { fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
+                                        variant={active ? 'light' : 'subtle'}
+                                    />
+                                );
+                            })}
+                        </Stack>
+                        {gi < filtered.length - 1 && <Divider my="sm" />}
+                    </Box>
+                ))}
+                {!user && (
+                    <Stack gap={6} pt="sm">
+                        <LinkButton color="primary" href="/signin" justify="flex-start" label="로그인" variant="light" />
+                        <LinkButton color="primary" href="/signup" justify="flex-start" label="회원가입" variant="filled" />
+                    </Stack>
+                )}
+            </Stack>
+        </Box>
+    );
+};
 
 export default Navbar;

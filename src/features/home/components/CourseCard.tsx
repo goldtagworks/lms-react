@@ -1,6 +1,9 @@
 import React, { memo } from 'react';
 import { Card, Title, Text, Group, Button } from '@mantine/core';
+import { Eye } from 'lucide-react';
+import { TagChip } from '@main/components/TagChip';
 import { Link } from 'react-router-dom';
+import { AppImage } from '@main/components/AppImage';
 
 import { CourseCardVM } from '../../../viewmodels/home';
 
@@ -15,8 +18,9 @@ function CourseCardBase({ course, to }: CourseCardProps) {
 
     return (
         <Card withBorder p="lg" radius="md" shadow="md">
-            {course.thumbnail_url && <img alt={course.title} src={course.thumbnail_url} style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 12, marginBottom: 16 }} />}
-            <Title mb={4} order={4} size={20}>
+            {course.thumbnail_url && <AppImage alt={course.title} height={160} mb="md" radius="lg" src={course.thumbnail_url || ''} width="100%" />}
+
+            <Title mb={4} order={4} size="md">
                 {course.title}
             </Title>
             {course.summary && (
@@ -26,9 +30,7 @@ function CourseCardBase({ course, to }: CourseCardProps) {
             )}
             <Group gap={4} mb={4}>
                 {course.tags?.map((tag) => (
-                    <Text key={tag} bg="#e0e7ff" c="blue.6" px={8} py={2} size="xs" style={{ borderRadius: 8 }}>
-                        {tag}
-                    </Text>
+                    <TagChip key={tag} label={tag} />
                 ))}
             </Group>
             <Group align="center" gap={8} mb={4}>
@@ -36,7 +38,7 @@ function CourseCardBase({ course, to }: CourseCardProps) {
                     {course.effectivePriceCents.toLocaleString()}원
                 </Text>
                 {hasDiscount && (
-                    <Text c="dimmed" size="sm" style={{ textDecoration: 'line-through' }}>
+                    <Text c="dimmed" className="text-strike" size="sm">
                         {course.list_price_cents.toLocaleString()}원
                     </Text>
                 )}
@@ -53,7 +55,7 @@ function CourseCardBase({ course, to }: CourseCardProps) {
                     </Text>
                 )}
             </Group>
-            <Button fullWidth component={Link} mt="sm" radius="md" to={finalLink} variant="light">
+            <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" to={finalLink} variant="light">
                 자세히 보기
             </Button>
         </Card>

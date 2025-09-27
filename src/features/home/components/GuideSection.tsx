@@ -5,6 +5,7 @@ import { AppButton } from '@main/components/AppButton';
 interface GuideSectionProps {
     title?: string;
     items?: { label: string; href?: string }[];
+    bare?: boolean; // true면 외부에서 PageSection/Container 래핑
 }
 
 const defaultItems: { label: string; href?: string }[] = [
@@ -13,10 +14,10 @@ const defaultItems: { label: string; href?: string }[] = [
     { label: '파일 뷰어 다운로드', href: '#' }
 ];
 
-function GuideSectionBase({ title = '이용 가이드', items = defaultItems }: GuideSectionProps) {
-    return (
-        <Container py="xl" size="lg">
-            <Title mb="md" order={2} size={24}>
+function GuideSectionBase({ title = '수강생 이용 가이드', items = defaultItems, bare }: GuideSectionProps) {
+    const content = (
+        <>
+            <Title mb="md" order={2} size="xl">
                 {title}
             </Title>
             <Text c="dimmed" mb="md">
@@ -29,6 +30,14 @@ function GuideSectionBase({ title = '이용 가이드', items = defaultItems }: 
                     </li>
                 ))}
             </ul>
+        </>
+    );
+
+    if (bare) return content;
+
+    return (
+        <Container py="xl" size="lg">
+            {content}
         </Container>
     );
 }

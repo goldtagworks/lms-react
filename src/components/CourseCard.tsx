@@ -13,7 +13,7 @@ interface CourseCardProps extends CardProps {
 const CourseCardComponent = ({ title, level, percent, price, weeks, lessons, ...cardProps }: CourseCardProps) => {
     return (
         <Card withBorder radius="md" shadow="md" {...cardProps}>
-            <Title mb="xs" order={4} size={18}>
+            <Title mb="xs" order={4} size="lg">
                 {title}
             </Title>
             <Badge color="gray" mb="xs" variant="light">

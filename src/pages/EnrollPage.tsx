@@ -1,35 +1,52 @@
-import { Button, Card, Container, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Stack, Text, Title } from '@mantine/core';
+import { CreditCard, Info } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
-
-const mockCourse = {
-    id: 1,
-    title: 'React 입문',
-    instructor: '홍길동',
-    price: 39000,
-    summary: 'React 기초부터 실전까지!'
-};
+import PageContainer from '@main/components/layout/PageContainer';
+import { getCourse } from '@main/lib/repository';
+import PriceText from '@main/components/price/PriceText';
+import EmptyState from '@main/components/EmptyState';
 
 export default function EnrollPage() {
-    const { id } = useParams();
+    const { id: rawId } = useParams();
+    const mappedId = !rawId ? undefined : rawId.startsWith('c') ? rawId : 'c' + rawId; // 상세 페이지와 동일 매핑 규칙
+    const course = mappedId ? getCourse(mappedId) : undefined;
 
-    // 실제로는 id로 데이터 fetch, 여기선 mock만 사용
+    if (!course) {
+        return (
+            <PageContainer roleMain size="sm">
+                <Title mb="sm" order={2}>
+                    수강신청
+                </Title>
+                <EmptyState actionLabel="코스 목록" message="이미 삭제되었거나 주소가 올바르지 않습니다." title="코스를 찾을 수 없어요" to="/courses" />
+            </PageContainer>
+        );
+    }
+
     return (
-        <Container py="xl" size="sm">
-            <Card withBorder padding="xl" radius="md" shadow="sm">
+        <PageContainer roleMain size="sm">
+            <Card withBorder p="xl" radius="md" shadow="sm">
                 <Stack>
                     <Title order={2}>수강신청</Title>
-                    <Text fw={700}>{mockCourse.title}</Text>
-                    <Text c="dimmed">강사: {mockCourse.instructor}</Text>
-                    <Text>{mockCourse.summary}</Text>
-                    <Text fw={700}>{mockCourse.price.toLocaleString()}원</Text>
-                    <Button color="primary" component={Link} size="md" to={`/payment/${mockCourse.id}`} variant="filled">
+                    <Text fw={700} size="lg">
+                        {course.title}
+                    </Text>
+                    <Text c="dimmed" size="sm">
+                        강사: (샘플) Instructor
+                    </Text>
+                    {course.summary && (
+                        <Text mb={4} size="sm">
+                            {course.summary}
+                        </Text>
+                    )}
+                    <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} size="md" />
+                    <Button color="blue" component={Link} leftSection={<CreditCard size={16} />} size="md" to={`/payment/${course.id}`} variant="filled">
                         결제하기
                     </Button>
-                    <Button component={Link} size="md" to={`/course/${mockCourse.id}`} variant="outline">
+                    <Button component={Link} leftSection={<Info size={16} />} size="md" to={`/course/${course.id}`} variant="outline">
                         코스 상세로
                     </Button>
                 </Stack>
             </Card>
-        </Container>
+        </PageContainer>
     );
 }

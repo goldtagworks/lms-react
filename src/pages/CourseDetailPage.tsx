@@ -1,84 +1,137 @@
-import { Button, Card, Container, Group, Text, Title, Box, SimpleGrid, Divider, Avatar, Tabs, List, Rating } from '@mantine/core';
-import { useParams, Link } from 'react-router-dom';
-
-const mockCourse = {
-    id: 1,
-    title: 'React 입문',
-    instructor: {
-        name: '홍길동',
-        bio: '프론트엔드 전문가, 10년 경력',
-        image: 'https://cdn.inflearn.com/public/instructors/1.png'
-    },
-    price: 39000,
-    discount: 29000,
-    rating: 4.8,
-    students: 1200,
-    summary: 'React 기초부터 실전까지! 실무에 바로 적용 가능한 프로젝트 중심 강의.',
-    image: 'https://cdn.inflearn.com/public/courses/1.png',
-    tags: ['프론트엔드', 'React', '실전'],
-    description: '이 강의는 React의 기초부터 실전 프로젝트까지 단계별로 학습할 수 있도록 구성되어 있습니다. 최신 개발 트렌드와 실무 노하우를 모두 담았습니다.',
-    curriculum: ['React 소개 및 개발환경 세팅', 'JSX와 컴포넌트 기초', '상태 관리와 이벤트', '라우팅과 네트워크', '실전 프로젝트 실습', '배포 및 마무리'],
-    reviews: [
-        { user: 'user01', rating: 5, comment: '실무에 바로 써먹을 수 있어요!', date: '2025-09-20' },
-        { user: 'user02', rating: 4, comment: '예제와 설명이 명확해서 좋았습니다.', date: '2025-09-18' }
-    ],
-    qna: [{ user: 'user03', question: '예제 코드는 어디서 받을 수 있나요?', answer: '강의 자료실에서 다운로드 가능합니다.', date: '2025-09-21' }]
-};
+import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, List, Badge, ActionIcon, Tooltip } from '@mantine/core';
+import { TagChip } from '@main/components/TagChip';
+import { Link } from 'react-router-dom';
+import PageContainer from '@main/components/layout/PageContainer';
+import PageSection from '@main/components/layout/PageSection';
+import PageHeader from '@main/components/layout/PageHeader';
+import { Share2, Copy, Pencil, Plus } from 'lucide-react';
+import useCopyLink from '@main/hooks/useCopyLink';
+import AppImage from '@main/components/AppImage';
+import PriceText from '@main/components/price/PriceText';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '@main/lib/auth';
+import { useCourse, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify, useLessons } from '@main/lib/repository';
+import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
+import EmptyState from '@main/components/EmptyState';
 
 export default function CourseDetailPage() {
-    const { id } = useParams();
+    const { id: rawId } = useParams();
+    // 라우터가 숫자 id (/course/1)로 들어오면 seed id(c1..) 매핑
+    const mappedId = !rawId ? undefined : rawId.startsWith('c') ? rawId : 'c' + rawId;
+    const course = useCourse(mappedId);
+    const { user } = useAuth();
+    const userId = user?.id;
+    const enrolled = userId && course?.id ? isEnrolled(userId, course.id) : false;
+    const wish = userId && course?.id ? isWishlisted(userId, course.id) : false;
+    const lessons = useLessons(course?.id);
 
-    // 실제로는 id로 데이터 fetch, 여기선 mock만 사용
+    // 공유/복사 상태 공통 훅
+    const { copied, copy } = useCopyLink(1200);
+
+    const handleCopy = () => copy();
+
+    const handleEnroll = () => {
+        if (!userId || !course?.id) return; // 로그인 안됨
+        if (!enrolled) {
+            enrollAndNotify(userId, course.id);
+        }
+    };
+
+    const handleWishlist = () => {
+        if (!userId || !course?.id) return;
+        toggleWishlistAndNotify(userId, course.id);
+    };
+
+    if (!course) {
+        return (
+            <PageContainer roleMain>
+                <EmptyState actionLabel="목록으로" message="존재하지 않거나 삭제된 강의입니다." title="강의를 찾을 수 없음" to="/courses" />
+            </PageContainer>
+        );
+    }
+
     return (
-        <Container py="xl" size="lg">
+        <PageContainer roleMain>
+            <Group align="flex-start" justify="space-between" mb="md" wrap="nowrap">
+                <Box style={{ flex: 1 }}>
+                    <PageHeader description={course.summary || ''} descriptionSize="md" title={course.title} titleSize="xl" />
+                </Box>
+                <Group gap={4} mt={8} wrap="nowrap">
+                    <Tooltip withArrow label="강의 수정">
+                        <ActionIcon aria-label="강의 수정" component={Link} to={`/instructor/courses/${course.id}/edit`} variant="subtle">
+                            <Pencil size={18} />
+                        </ActionIcon>
+                    </Tooltip>
+                    <Tooltip withArrow label="새 강의 작성">
+                        <ActionIcon aria-label="새 강의 작성" component={Link} to="/instructor/courses/new" variant="subtle">
+                            <Plus size={18} />
+                        </ActionIcon>
+                    </Tooltip>
+                    <Tooltip withArrow label={copied ? '복사됨' : '링크 복사'}>
+                        <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : undefined} variant="subtle" onClick={handleCopy}>
+                            {copied ? <Copy size={18} /> : <Share2 size={18} />}
+                        </ActionIcon>
+                    </Tooltip>
+                </Group>
+            </Group>
+            {/* content grid */}
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
                 {/* 좌측: 썸네일/가격/수강신청 */}
                 <Box>
-                    <Card withBorder p="xl" radius="md" shadow="md">
-                        <img alt={mockCourse.title} src={mockCourse.image} style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 12, marginBottom: 16 }} />
-                        <Title mb={8} order={2} size={28}>
-                            {mockCourse.title}
-                        </Title>
+                    <Card withBorder p="xl" radius="md" shadow="sm">
+                        <AppImage alt={course.title} height={220} mb={16} radius="lg" src={course.thumbnail_url || ''} />
                         <Group gap={4} mb={8}>
-                            {mockCourse.tags.map((tag) => (
-                                <Text key={tag} bg="#e0e7ff" c="blue.6" px={8} py={2} size="xs" style={{ borderRadius: 8 }}>
-                                    {tag}
-                                </Text>
+                            {course.tags?.map((tag) => (
+                                <TagChip key={tag} label={tag} />
                             ))}
                         </Group>
-                        <Group align="center" gap={8} mb={8}>
-                            <Text c={mockCourse.discount ? 'red.6' : 'dark'} fw={700} size="lg">
-                                {mockCourse.discount ? `${mockCourse.discount.toLocaleString()}원` : `${mockCourse.price.toLocaleString()}원`}
-                            </Text>
-                            {mockCourse.discount && (
-                                <Text c="dimmed" size="sm" style={{ textDecoration: 'line-through' }}>
-                                    {mockCourse.price.toLocaleString()}원
+                        <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} size="lg" />
+                        <Group align="center" gap={8} mb="lg">
+                            {enrolled && (
+                                <Badge color="green" size="sm">
+                                    수강중
+                                </Badge>
+                            )}
+                            {wish && (
+                                <Badge color="pink" size="sm">
+                                    위시
+                                </Badge>
+                            )}
+                            {!enrolled && !wish && (
+                                <Text c="dimmed" size="xs">
+                                    상태: 미수강
                                 </Text>
                             )}
-                        </Group>
-                        <Group align="center" gap={8} mb={8}>
-                            <Text c="yellow.7" size="sm">
-                                ★ {mockCourse.rating}
+                            <Text c="yellow.7" size="xs">
+                                ★ 4.8
                             </Text>
                             <Text c="dimmed" size="xs">
-                                수강생 {mockCourse.students.toLocaleString()}명
+                                수강생 1,200명
                             </Text>
                         </Group>
-                        <Button fullWidth component={Link} mb={8} radius="md" size="lg" to={`/enroll/${mockCourse.id}`} variant="filled">
-                            수강신청
-                        </Button>
-                        <Button fullWidth component={Link} radius="md" size="md" to="/courses" variant="outline">
+                        <EnrollWishlistActions
+                            enrolled={enrolled}
+                            labels={{ enroll: '수강신청', loginRequired: '로그인 필요', wishAdd: '위시 담기' }}
+                            size="sm"
+                            userId={userId}
+                            wish={wish}
+                            onEnroll={handleEnroll}
+                            onToggleWish={handleWishlist}
+                        />
+                        <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="outline">
                             목록으로
                         </Button>
                     </Card>
                     {/* 강사 정보 */}
                     <Card withBorder mt="lg" p="lg" radius="md" shadow="sm">
                         <Group align="center" gap={16}>
-                            <Avatar radius="xl" size={56} src={mockCourse.instructor.image} />
+                            <Avatar radius="xl" size={56} src={''} />
                             <Box>
-                                <Text fw={700}>{mockCourse.instructor.name}</Text>
+                                <Text fw={700} size="lg">
+                                    강사명(샘플)
+                                </Text>
                                 <Text c="dimmed" size="sm">
-                                    {mockCourse.instructor.bio}
+                                    강사 프로필은 별도 fetch 예정
                                 </Text>
                             </Box>
                         </Group>
@@ -94,60 +147,64 @@ export default function CourseDetailPage() {
                             <Tabs.Tab value="qna">Q&A</Tabs.Tab>
                         </Tabs.List>
                         <Tabs.Panel pt="md" value="desc">
-                            <Text mb={16} size="lg">
-                                {mockCourse.description}
+                            <Text lh={1.6} mb={16} size="md">
+                                {course.description}
                             </Text>
                             <Divider my="md" />
                             <Text c="dimmed" size="sm">
-                                {mockCourse.summary}
+                                {course.summary}
                             </Text>
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="curriculum">
-                            <List center size="md" spacing="sm">
-                                {mockCourse.curriculum.map((item, idx) => (
-                                    <List.Item key={idx}>{item}</List.Item>
-                                ))}
-                            </List>
+                            {lessons.length === 0 && (
+                                <Text c="dimmed" size="sm">
+                                    레슨이 아직 없습니다.
+                                </Text>
+                            )}
+                            {lessons.length > 0 && (
+                                <List center size="sm" spacing="xs">
+                                    {lessons.map((l) => (
+                                        <List.Item
+                                            key={l.id}
+                                            icon={
+                                                l.is_preview ? (
+                                                    <Badge color="blue" size="xs" variant="light">
+                                                        P
+                                                    </Badge>
+                                                ) : undefined
+                                            }
+                                        >
+                                            <Group gap={6} wrap="nowrap">
+                                                <Text size="sm" style={{ flex: 1 }}>
+                                                    {l.order_index}. {l.title}
+                                                </Text>
+                                                <Text c="dimmed" size="xs">
+                                                    {(l.duration_seconds / 60).toFixed(0)}분
+                                                </Text>
+                                            </Group>
+                                        </List.Item>
+                                    ))}
+                                </List>
+                            )}
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="reviews">
-                            {mockCourse.reviews.length === 0 ? (
-                                <Text c="dimmed">아직 후기가 없습니다.</Text>
-                            ) : (
-                                mockCourse.reviews.map((r, idx) => (
-                                    <Card key={idx} withBorder mb={12} p="md" radius="md" shadow="xs">
-                                        <Group align="center" gap={8} mb={4}>
-                                            <Text fw={700}>{r.user}</Text>
-                                            <Rating readOnly fractions={2} size="sm" value={r.rating} />
-                                            <Text c="dimmed" size="xs">
-                                                {r.date}
-                                            </Text>
-                                        </Group>
-                                        <Text>{r.comment}</Text>
-                                    </Card>
-                                ))
-                            )}
+                            <Text c="dimmed" size="sm">
+                                후기 기능은 추후 구현 예정입니다.
+                            </Text>
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="qna">
-                            {mockCourse.qna.length === 0 ? (
-                                <Text c="dimmed">등록된 Q&A가 없습니다.</Text>
-                            ) : (
-                                mockCourse.qna.map((q, idx) => (
-                                    <Card key={idx} withBorder mb={12} p="md" radius="md" shadow="xs">
-                                        <Text fw={700} mb={4}>
-                                            {q.user}
-                                        </Text>
-                                        <Text c="dimmed" mb={4} size="xs">
-                                            {q.date}
-                                        </Text>
-                                        <Text mb={8}>{q.question}</Text>
-                                        <Text c="blue.6">A. {q.answer}</Text>
-                                    </Card>
-                                ))
-                            )}
+                            <Text c="dimmed" size="sm">
+                                Q&A 기능은 추후 구현 예정입니다.
+                            </Text>
                         </Tabs.Panel>
                     </Tabs>
                 </Box>
             </SimpleGrid>
-        </Container>
+            <PageSection withGapTop headingOrder={2} title="강의 소개 더 보기">
+                <Text c="dimmed" size="sm">
+                    이 영역은 추가 마케팅/추천 또는 관련 코스 리스트가 들어갈 자리(placeholder) 입니다.
+                </Text>
+            </PageSection>
+        </PageContainer>
     );
 }

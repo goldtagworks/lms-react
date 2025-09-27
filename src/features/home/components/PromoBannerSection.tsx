@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Container, Card, Group, Title, Text } from '@mantine/core';
+import { AppImage } from '@main/components/AppImage';
 
 import { PromoBannerVM } from '../../../viewmodels/home';
 
@@ -8,9 +9,12 @@ interface PromoBannerSectionProps {
 }
 
 function PromoBannerSectionBase({ banner }: PromoBannerSectionProps) {
+    // CSS 변수 기반 배경 (다크/라이트 자동 전환)
+    const promoBg = 'var(--gradient-promo, linear-gradient(90deg, #e0e7ff 60%, #f5f7fa 100%))';
+
     return (
-        <Container py={32} size="lg">
-            <Card withBorder aria-labelledby={`promo-${banner.id}-title`} p="xl" radius="md" shadow="md" style={{ background: 'linear-gradient(90deg, #e0e7ff 60%, #f5f7fa 100%)' }}>
+        <Container py="xl" size="lg">
+            <Card withBorder aria-labelledby={`promo-${banner.id}-title`} p="xl" radius="md" shadow="md" style={{ background: promoBg }}>
                 <Group align="center" justify="space-between">
                     <div>
                         <Title id={`promo-${banner.id}-title`} mb={8} order={3}>
@@ -27,7 +31,7 @@ function PromoBannerSectionBase({ banner }: PromoBannerSectionProps) {
                             </Text>
                         )}
                     </div>
-                    {banner.image_url && <img alt={banner.title} src={banner.image_url} style={{ maxWidth: 320, borderRadius: 12 }} />}
+                    {banner.image_url && <AppImage loadingSkeleton alt={banner.title} height={180} radius={12} shadow="md" src={banner.image_url} width={320} />}
                 </Group>
             </Card>
         </Container>

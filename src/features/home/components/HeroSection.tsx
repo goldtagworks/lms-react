@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Box, Container, Group, Title, Text, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
+import AppImage from '@main/components/AppImage';
 
 interface HeroSectionProps {
     heading?: string;
@@ -22,15 +23,18 @@ function HeroSectionBase({
     secondaryCtaTo = '/signup',
     imageUrl = 'https://cdn.inflearn.com/public/main/hero@2x.png'
 }: HeroSectionProps) {
+    // CSS 변수 기반(색상 모드 자동 전환). token fallback 포함.
+    const heroBg = 'var(--gradient-hero, linear-gradient(90deg, #f5f7fa 60%, #e0e7ff 100%))';
+
     return (
-        <Box bg="linear-gradient(90deg, #f5f7fa 60%, #e0e7ff 100%)" px={0} py={64} style={{ minHeight: 340 }}>
-            <Container size="lg">
+        <Box bg={heroBg} component="section" mih={420} px={0} py={0} style={{ alignItems: 'center', display: 'flex' }}>
+            <Container size="lg" w="100%">
                 <Group align="center" justify="space-between" wrap="wrap">
-                    <Box style={{ maxWidth: 520 }}>
-                        <Title mb={16} order={1} size={40}>
+                    <Box maw={520}>
+                        <Title mb="xl" order={1} size="xl">
                             {heading}
                         </Title>
-                        <Text c="dimmed" mb={24} size="lg" style={{ whiteSpace: 'pre-line' }}>
+                        <Text c="dimmed" mb="xl" size="lg" style={{ whiteSpace: 'pre-line' }}>
                             {subHeading}
                         </Text>
                         <Group gap={12}>
@@ -42,7 +46,7 @@ function HeroSectionBase({
                             </Button>
                         </Group>
                     </Box>
-                    <img alt="메인 배너" src={imageUrl} style={{ maxWidth: 400, width: '100%', borderRadius: 24, boxShadow: '0 8px 32px rgba(80,120,200,0.08)' }} />
+                    <AppImage alt="메인 배너" height={260} radius={24} shadow="sm" src={imageUrl} style={{ boxShadow: '0 8px 32px rgba(80,120,200,0.08)', objectFit: 'cover' }} width={400} />
                 </Group>
             </Container>
         </Box>

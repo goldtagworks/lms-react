@@ -9,6 +9,7 @@ interface SupportSectionProps {
     hours?: string;
     faqHref?: string;
     contactHref?: string;
+    bare?: boolean;
 }
 
 function SupportSectionBase({
@@ -17,26 +18,33 @@ function SupportSectionBase({
     phone = '02-0000-0000',
     hours = '평일 09:00–18:00',
     faqHref = '#faq',
-    contactHref = '#contact'
+    contactHref = '#contact',
+    bare
 }: SupportSectionProps) {
+    const content = (
+        <Card withBorder radius="md">
+            <Group align="center" justify="space-between">
+                <div>
+                    <Title mb="sm" order={3}>
+                        {title}
+                    </Title>
+                    <Text c="dimmed">
+                        운영시간 {hours} · {email} · {phone}
+                    </Text>
+                </div>
+                <Group gap="sm">
+                    <LinkButton color="accent" href={faqHref} label="FAQ" size="md" variant="light" />
+                    <LinkButton color="primary" href={contactHref} label="1:1 문의" size="md" />
+                </Group>
+            </Group>
+        </Card>
+    );
+
+    if (bare) return content;
+
     return (
         <Container py="xl" size="lg">
-            <Card withBorder radius="md">
-                <Group align="center" justify="space-between">
-                    <div>
-                        <Title mb="sm" order={3}>
-                            {title}
-                        </Title>
-                        <Text c="dimmed">
-                            운영시간 {hours} · {email} · {phone}
-                        </Text>
-                    </div>
-                    <Group gap="sm">
-                        <LinkButton color="accent" href={faqHref} label="FAQ" size="md" variant="light" />
-                        <LinkButton color="primary" href={contactHref} label="1:1 문의" size="md" />
-                    </Group>
-                </Group>
-            </Card>
+            {content}
         </Container>
     );
 }

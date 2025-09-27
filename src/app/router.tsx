@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import InstructorProfilePage from '@main/pages/InstructorProfilePage';
 import MyPage from '@main/pages/MyPage';
 import WishlistPage from '@main/pages/WishlistPage';
@@ -17,12 +17,14 @@ import EnrollPage from '@main/pages/EnrollPage';
 import PaymentPage from '@main/pages/PaymentPage';
 import ExamPage from '@main/pages/ExamPage';
 import CertificatePage from '@main/pages/CertificatePage';
-import LoginPage from '@main/pages/LoginPage';
-import RegisterPage from '@main/pages/RegisterPage';
+import SignInPage from '@main/pages/SignInPage';
+import SignUpPage from '@main/pages/SignUpPage';
 import NotFoundPage from '@main/pages/NotFoundPage';
 import MainLayout from '@main/layouts/MainLayout';
 import TermsPage from '@main/pages/TermsPage';
 import PrivacyPage from '@main/pages/PrivacyPage';
+import NoticesPage from '@main/pages/NoticesPage';
+import NoticeDetailPage from '@main/pages/NoticeDetailPage';
 
 function MainLayoutRoute() {
     return (
@@ -44,7 +46,9 @@ export default function AppRouter() {
                 <Route element={<HomePage />} path="/" />
                 <Route element={<CourseListPage />} path="/courses" />
                 <Route element={<CourseDetailPage />} path="/course/:id" />
-                <Route element={<LoginPage />} path="/login" />
+                <Route element={<NoticesPage />} path="/notices" />
+                <Route element={<NoticeDetailPage />} path="/notices/:id" />
+                <Route element={<SignInPage />} path="/signin" />
                 <Route element={<InstructorProfilePage />} path="/instructor/:id" />
                 <Route element={<MyPage />} path="/my" />
                 <Route element={<WishlistPage />} path="/my/wishlist" />
@@ -54,6 +58,7 @@ export default function AppRouter() {
 
                 {/* instructor/admin */}
                 <Route element={<InstructorCoursesPage />} path="/instructor/courses" />
+                <Route element={<CourseEditPage />} path="/instructor/courses/new" />
                 <Route element={<CourseEditPage />} path="/instructor/courses/:id/edit" />
 
                 {/* admin */}
@@ -67,7 +72,10 @@ export default function AppRouter() {
                 <Route element={<PaymentPage />} path="/payment/:id" />
                 <Route element={<ExamPage />} path="/exam/:id" />
                 <Route element={<CertificatePage />} path="/certificate/:id" />
-                <Route element={<RegisterPage />} path="/register" />
+                <Route element={<SignUpPage />} path="/signup" />
+                {/* legacy redirects */}
+                <Route element={<Navigate replace to="/signin" />} path="/login" />
+                <Route element={<Navigate replace to="/signup" />} path="/register" />
 
                 {/* 약관/정책 */}
                 <Route element={<TermsPage />} path="/terms" />

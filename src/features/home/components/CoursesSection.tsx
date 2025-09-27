@@ -18,9 +18,9 @@ function CoursesSectionBase({ title, courses, viewAllTo = '/courses', limit, gri
     const list = limit ? courses.slice(0, limit) : courses;
 
     return (
-        <Container py={40} size="lg">
+        <Container py="xl" size="lg">
             <Group align="center" justify="space-between" mb="md">
-                <Title order={2} size={28}>
+                <Title order={2} size="xl">
                     {title}
                 </Title>
                 <Button component={Link} size="md" to={viewAllTo} variant="subtle">

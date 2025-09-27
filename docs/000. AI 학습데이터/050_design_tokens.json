@@ -1,3 +1,29 @@
 {
-  "fontFamily": "Inter, Pretendard, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    "fontFamily": "Inter, Pretendard, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "spacing": {
+        "none": 0,
+        "xs": 4,
+        "sm": 8,
+        "md": 16,
+        "lg": 24,
+        "xl": 32,
+        "xxl": 40,
+        "hero": 64,
+        "chipX": 8,
+        "chipY": 2
+    },
+    "letterSpacing": {
+        "tight": "0.2px",
+        "normal": "0",
+        "wide": "0.5px"
+    },
+    "gradients": {
+        "hero": "linear-gradient(90deg, #f5f7fa 60%, #e0e7ff 100%)",
+        "heroDark": "linear-gradient(90deg, #1f2330 55%, #2a3142 100%)",
+        "promo": "linear-gradient(90deg, #e0e7ff 60%, #f5f7fa 100%)",
+        "promoDark": "linear-gradient(90deg, #2a3142 55%, #1f2330 100%)"
+    },
+    "spacingExtra": {
+        "listIndent": 18
+    }
 }

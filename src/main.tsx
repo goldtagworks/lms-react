@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
+import { AuthProvider } from '@main/lib/auth';
 
 import App from './App';
 import '@main/styles/app.css';
@@ -16,10 +17,12 @@ ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
         <ColorSchemeScript />
         <MantineProvider defaultColorScheme="auto">
-            <Notifications />
+            <Notifications position="top-right" />
             <ModalsProvider>
                 <BrowserRouter>
-                    <App />
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
                 </BrowserRouter>
             </ModalsProvider>
         </MantineProvider>

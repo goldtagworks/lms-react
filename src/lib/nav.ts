@@ -1,0 +1,129 @@
+// 역할/인증 기반 단일 네비게이션 소스
+// i18n 적용 전이므로 labelKey 예약, 현재 label 직접 사용
+
+export type AuthVisibility = 'public' | 'guest' | 'auth';
+export type UserRole = 'student' | 'instructor' | 'admin';
+
+export interface NavItem {
+    id: string;
+    label: string; // TODO: i18n key 사용 예정 (051_copy_catalog.json)
+    labelKey?: string;
+    href: string;
+    auth?: AuthVisibility; // 기본 public
+    roles?: UserRole[]; // 비어있으면 모든 역할
+    icon?: string; // 아이콘 식별자(향후 Mantine 아이콘 매핑)
+}
+
+export interface NavGroup {
+    id: string;
+    label: string;
+    labelKey?: string;
+    items: NavItem[];
+    auth?: AuthVisibility; // 그룹 차원 필터(아이템 개별 auth 우선)
+    roles?: UserRole[];
+    collapsible?: boolean; // 모바일 아코디언 확장 여지
+    order?: number; // 정렬 제어
+}
+
+export interface FilterContext {
+    isAuthenticated: boolean;
+    role: UserRole | null;
+}
+
+// 그룹/아이템 정의
+export const navGroups: NavGroup[] = [
+    {
+        id: 'catalog',
+        label: '카탈로그',
+        order: 10,
+        items: [
+            { id: 'courses', label: '코스 탐색', href: '/courses' },
+            { id: 'notices', label: '공지사항', href: '/notices' }
+        ]
+    },
+    {
+        id: 'learn',
+        label: '학습',
+        order: 20,
+        auth: 'auth',
+        items: [
+            { id: 'my', label: '내 학습', href: '/my', auth: 'auth' },
+            { id: 'wishlist', label: '위시리스트', href: '/my/wishlist', auth: 'auth' }
+            // 수료증/시험 기록 등 향후 추가 가능
+        ]
+    },
+    {
+        id: 'instructor',
+        label: '강사',
+        order: 30,
+        auth: 'auth',
+        roles: ['instructor', 'admin'],
+        items: [
+            { id: 'instructor-courses', label: '내 코스 관리', href: '/instructor/courses', auth: 'auth', roles: ['instructor', 'admin'] },
+            { id: 'instructor-profile', label: '프로필', href: '/instructor/123', auth: 'auth', roles: ['instructor', 'admin'] }
+            // TODO: 동적 ID 대체 필요
+        ]
+    },
+    {
+        id: 'admin',
+        label: '관리자',
+        order: 40,
+        auth: 'auth',
+        roles: ['admin'],
+        items: [
+            { id: 'admin-users', label: '사용자', href: '/admin/users', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-categories', label: '카테고리', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-coupons', label: '쿠폰', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-certificates', label: '수료증', href: '/admin/certificates', roles: ['admin'], auth: 'auth' }
+            // 공지 관리는 공용 NoticesPage 에서 role=admin 시 액션 노출
+        ]
+    },
+    {
+        id: 'legal',
+        label: '정책',
+        order: 90,
+        items: [
+            { id: 'terms', label: '이용약관', href: '/terms' },
+            { id: 'privacy', label: '개인정보처리방침', href: '/privacy' }
+        ]
+    }
+];
+
+// 필터 함수 (컴포넌트에서 사용)
+export function filterNav(groups: NavGroup[], ctx: FilterContext): NavGroup[] {
+    const { isAuthenticated, role } = ctx;
+
+    return groups
+        .map((g) => ({ ...g }))
+        .filter((g) => matchAuth(g.auth, isAuthenticated) && matchRole(g.roles, role))
+        .map((g) => ({
+            ...g,
+            items: g.items.filter((it) => matchAuth(it.auth ?? g.auth, isAuthenticated) && matchRole(it.roles ?? g.roles, role))
+        }))
+        .filter((g) => g.items.length > 0)
+        .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+}
+
+function matchAuth(auth: AuthVisibility | undefined, isAuth: boolean): boolean {
+    if (!auth || auth === 'public') return true;
+    if (auth === 'guest') return !isAuth;
+    if (auth === 'auth') return isAuth;
+
+    return true;
+}
+
+function matchRole(roles: UserRole[] | undefined, role: UserRole | null): boolean {
+    if (!roles || roles.length === 0) return true;
+    if (!role) return false;
+
+    return roles.includes(role);
+}
+
+// 임시 역할 추론 유틸 (데모용)
+export function inferRoleFromEmail(email: string | undefined | null): UserRole | null {
+    if (!email) return null;
+    if (email.endsWith('@admin.local')) return 'admin';
+    if (email.endsWith('@instructor.local')) return 'instructor';
+
+    return 'student';
+}
