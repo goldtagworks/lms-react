@@ -20,10 +20,10 @@ const ExamPage = () => {
                     <Text fw={700}>{mockExam.courseTitle}</Text>
                     <Text>응시자: {mockExam.user}</Text>
                     <Text c="dimmed">상태: {mockExam.status}</Text>
-                    <Button color="primary" component={Link} size="md" to={`/certificate/1`} variant="filled">
+                    <Button color="primary" component={Link} size="sm" to={`/certificate/1`} variant="filled">
                         시험 완료(수료증 보기)
                     </Button>
-                    <Button component={Link} size="md" to={`/my`} variant="outline">
+                    <Button component={Link} size="sm" to={`/my`} variant="outline">
                         마이페이지로
                     </Button>
                 </Stack>

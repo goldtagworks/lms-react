@@ -9,7 +9,7 @@ import { useLessonsState } from '@main/features/lessons/useLessonsState';
 import { LessonRow, SectionRow } from '@main/features/lessons/LessonRows';
 import { notifications } from '@mantine/notifications';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getCourse, saveCourseDraft } from '@main/lib/repository';
 import PageContainer from '@main/components/layout/PageContainer';
 
@@ -29,7 +29,55 @@ const CourseEditPage = () => {
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
 
-    // (마이그레이션 제거됨)
+    // ----- Dirty Guard -----
+    // 초기 스냅샷 (코스 생성 전이면 빈 상태)
+    const initialSnapshotRef = useRef<string>('');
+    const [dirty, setDirty] = useState(false);
+
+    // snapshot 구성: course text fields + lessons JSON (id,title,is_section,order_index,content_md)
+    function computeSnapshot(): string {
+        const lessonShape = orderedLessons.map((l) => ({ id: l.id, title: l.title, is_section: !!l.is_section, order_index: l.order_index, content_md: l.content_md }));
+
+        return JSON.stringify({ title, summary, desc, lessons: lessonShape });
+    }
+
+    // 최초 진입 시 스냅샷 설정 (코스 있을 때만)
+    useEffect(() => {
+        if (course && initialSnapshotRef.current === '') {
+            initialSnapshotRef.current = computeSnapshot();
+        }
+    }, [course]);
+
+    // 변경 감지
+    useEffect(() => {
+        if (!course) return; // 새 코스 작성 중에는 저장 전 이동 자유
+        if (initialSnapshotRef.current === '') return; // 아직 초기 설정 안됨
+        const nowSnap = computeSnapshot();
+
+        setDirty(nowSnap !== initialSnapshotRef.current);
+    }, [title, summary, desc, orderedLessons, course]);
+
+    // beforeunload 브라우저 이탈 방지
+    useEffect(() => {
+        function handleBeforeUnload(e: BeforeUnloadEvent) {
+            if (!dirty) return;
+            e.preventDefault();
+            e.returnValue = '';
+        }
+        if (dirty) window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [dirty]);
+
+    // 라우터 내 네비게이션 가드 (간단 confirm) - navigate(-1) / Link 등에 공통 적용 위해 window.confirm 활용
+    const navigateRef = useRef(navigate);
+
+    navigateRef.current = navigate; // 최신 참조
+
+    function guardedNavigate(to: any) {
+        if (dirty && !window.confirm('변경사항이 저장되지 않았습니다. 이동하시겠습니까?')) return;
+        navigateRef.current(to);
+    }
 
     // ----- Course Save -----
     function handleSave() {
@@ -48,10 +96,19 @@ const CourseEditPage = () => {
             return;
         }
         if (created && saved) {
-            notifications.show({ color: 'teal', title: '코스 생성', message: '새 코스가 생성되었습니다.' });
-            navigate(`/course/${saved.id}/edit`);
+            notifications.show({
+                color: 'teal',
+                title: '코스 생성',
+                message: '새 코스가 생성되었습니다. 첫 레슨을 바로 추가해보세요.'
+            });
+            // 강사용 편집 경로로 이동 후 레슨 입력창 포커스 유도 쿼리 파라미터 추가
+            navigate(`/instructor/courses/${saved.id}/edit?focus=new-lesson`);
+            // 새 코스로 이동하면 초기 스냅샷 재설정 (다음 렌더에서 course 갱신 후 useEffect 처리)
         } else {
             notifications.show({ color: 'teal', title: '저장 완료', message: '코스가 저장되었습니다.' });
+            // 스냅샷 갱신
+            initialSnapshotRef.current = computeSnapshot();
+            setDirty(false);
         }
     }
 
@@ -65,11 +122,6 @@ const CourseEditPage = () => {
     function handleRemoveLesson(lessonId: string) {
         removeLesson(lessonId);
     }
-
-    // (이전 섹션 관련 CRUD 코드 제거됨)
-
-    // ----- Preview Toggle -----
-    // togglePreview moved into hook
 
     // ----- Lesson Edit Modal -----
     function openLessonEdit(l: Lesson) {
@@ -109,9 +161,9 @@ const CourseEditPage = () => {
                 )}
             </Group>
             <Stack gap="md">
-                <TextInput label="제목" placeholder="코스 제목" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
-                <TextInput label="요약" placeholder="간단 요약" value={summary} onChange={(e) => setSummary(e.currentTarget.value)} />
-                <Textarea label="상세 설명" minRows={6} placeholder="코스 상세" value={desc} onChange={(e) => setDesc(e.currentTarget.value)} />
+                <TextInput label="제목" placeholder="코스 제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+                <TextInput label="요약" placeholder="간단 요약" size="sm" value={summary} onChange={(e) => setSummary(e.currentTarget.value)} />
+                <Textarea label="상세 설명" minRows={6} placeholder="코스 상세" size="sm" value={desc} onChange={(e) => setDesc(e.currentTarget.value)} />
                 <Card withBorder p="md" radius="md" shadow="sm">
                     <Stack gap="sm">
                         <Group justify="space-between">
@@ -132,7 +184,15 @@ const CourseEditPage = () => {
                         {course && (
                             <>
                                 <Group align="flex-end" gap="xs">
-                                    <TextInput flex={1} label="새 레슨 제목" placeholder="예: 1. 소개" value={newLessonTitle} onChange={(e) => setNewLessonTitle(e.currentTarget.value)} />
+                                    <TextInput
+                                        flex={1}
+                                        id="new-lesson-input"
+                                        label="새 레슨 제목"
+                                        placeholder="예: 1. 소개"
+                                        size="sm"
+                                        value={newLessonTitle}
+                                        onChange={(e) => setNewLessonTitle(e.currentTarget.value)}
+                                    />
                                     <Button leftSection={<Plus size={14} />} variant="light" onClick={handleAddLesson}>
                                         레슨 추가
                                     </Button>
@@ -175,14 +235,14 @@ const CourseEditPage = () => {
                 </Card>
                 <Group justify="flex-end" mt="md">
                     <Button disabled={!title.trim()} leftSection={<Save size={14} />} onClick={handleSave}>
-                        저장(목업)
+                        {dirty ? '변경 저장' : '저장(목업)'}
                     </Button>
-                    <Button leftSection={<X size={14} />} variant="default" onClick={() => navigate(-1)}>
-                        취소
+                    <Button leftSection={<X size={14} />} variant="default" onClick={() => guardedNavigate(-1)}>
+                        {dirty ? '변경 취소' : '취소'}
                     </Button>
                 </Group>
                 <Text c="dimmed" size="xs">
-                    단순화된 목업: 섹션은 is_section 플래그를 가진 헤더 행입니다. (드래그 정렬 / 고급 필드 추후)
+                    단순화된 목업: 섹션은 is_section 플래그를 가진 헤더 행입니다. (드래그 정렬 / 고급 필드 추후) {dirty && ' · 미저장 변경 있음'}
                 </Text>
                 <LessonEditModal
                     lesson={editingLesson}

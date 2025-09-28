@@ -112,3 +112,20 @@ export function useNotice(id: string | undefined) {
 
     return notice;
 }
+
+// Reactive list hook
+export function useNotices() {
+    const [items, setItems] = useState<Notice[]>(() => listNotices());
+
+    useEffect(() => {
+        const fn = () => setItems(listNotices());
+
+        noticeListeners.add(fn);
+
+        return () => {
+            noticeListeners.delete(fn);
+        };
+    }, []);
+
+    return items;
+}

@@ -366,13 +366,13 @@ export default function CourseDetailPage() {
                     )}
                     {user && user.role === 'instructor' && (
                         <Tooltip withArrow label="새 강의 작성">
-                            <ActionIcon aria-label="새 강의 작성" component={Link} to="/instructor/courses/new" variant="subtle">
+                            <ActionIcon aria-label="새 강의 작성" color="green" component={Link} to="/instructor/courses/new" variant="subtle">
                                 <Plus size={16} />
                             </ActionIcon>
                         </Tooltip>
                     )}
                     <Tooltip withArrow label={copied ? '복사됨' : '링크 복사'}>
-                        <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : undefined} variant="subtle" onClick={handleCopy}>
+                        <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : 'yellow'} variant="subtle" onClick={handleCopy}>
                             {copied ? <Copy size={16} /> : <Share2 size={16} />}
                         </ActionIcon>
                     </Tooltip>

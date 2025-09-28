@@ -1,9 +1,14 @@
-import { Title, Text, Button, Group, Stack, Card } from '@mantine/core';
+import { Title, Text, Button, Group, Card, Badge } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Eye, Edit } from 'lucide-react';
 import { loadCoursesPaged } from '@main/lib/repository';
 import PaginationBar from '@main/components/PaginationBar';
 import PageContainer from '@main/components/layout/PageContainer';
+import CourseGrid from '@main/components/layout/CourseGrid';
+import AppImage from '@main/components/AppImage';
+import PriceText from '@main/components/price/PriceText';
+import { TagChip } from '@main/components/TagChip';
 
 const InstructorCoursesPage = () => {
     const PAGE_SIZE = 10;
@@ -26,25 +31,49 @@ const InstructorCoursesPage = () => {
             <Text c="dimmed" mb="md" size="sm">
                 내가 개설한 강의 목록 (목업)
             </Text>
-            <Stack gap="sm">
-                {pagedCourses.map((c) => (
-                    <Card key={c.id} withBorder radius="md" shadow="xs">
-                        <Group justify="space-between">
-                            <Text component={Link} fw={600} style={{ textDecoration: 'none' }} to={`/course/${c.id}`}>
-                                {c.title}
-                            </Text>
-                            <Button component={Link} size="xs" to={`/instructor/courses/${c.id}/edit`} variant="subtle">
-                                수정
-                            </Button>
-                        </Group>
-                    </Card>
-                ))}
-                {total === 0 && (
-                    <Text c="dimmed" size="sm">
-                        강의가 없습니다.
-                    </Text>
-                )}
-            </Stack>
+            {total === 0 && (
+                <Text c="dimmed" size="sm">
+                    강의가 없습니다.
+                </Text>
+            )}
+            {total > 0 && (
+                <CourseGrid mt="md">
+                    {pagedCourses.map((c) => (
+                        <Card key={c.id} withBorder p="lg" radius="md" shadow="sm">
+                            <AppImage alt={c.title} height={120} mb={12} radius="lg" src={c.thumbnail_url || ''} />
+                            <Group align="center" justify="space-between" mb={4} wrap="nowrap">
+                                <Text fw={600} lineClamp={1} size="sm">
+                                    {c.title}
+                                </Text>
+                                {c.is_featured && (
+                                    <Badge color="teal" size="xs" variant="light">
+                                        추천
+                                    </Badge>
+                                )}
+                            </Group>
+                            <Group gap={4} mb={4}>
+                                {c.tags?.slice(0, 4).map((tag) => (
+                                    <TagChip key={tag} label={tag} />
+                                ))}
+                            </Group>
+                            {c.summary && (
+                                <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                    {c.summary}
+                                </Text>
+                            )}
+                            <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} size="sm" />
+                            <Group grow gap={8} mt="sm">
+                                <Button component={Link} leftSection={<Eye size={14} />} radius="md" size="xs" to={`/course/${c.id}`} variant="filled">
+                                    보기
+                                </Button>
+                                <Button component={Link} leftSection={<Edit size={14} />} radius="md" size="xs" to={`/instructor/courses/${c.id}/edit`} variant="outline">
+                                    수정
+                                </Button>
+                            </Group>
+                        </Card>
+                    ))}
+                </CourseGrid>
+            )}
             <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
         </PageContainer>
     );

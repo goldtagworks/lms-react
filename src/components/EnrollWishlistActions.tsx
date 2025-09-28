@@ -1,7 +1,9 @@
-import { Button, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, HeartOff, LogIn, BookOpen } from 'lucide-react';
+
+import { AppButton } from './AppButton';
 
 interface EnrollWishlistActionsProps {
     enrolled: boolean;
@@ -41,12 +43,8 @@ export function EnrollWishlistActions({ enrolled, wish, userId, size = 'xs', onE
     if (!userId) {
         return (
             <Group grow gap={8}>
-                <Button component={Link} leftSection={<LogIn size={14} />} radius="md" size={size} to="/signin" variant="filled">
-                    {t.loginRequired}
-                </Button>
-                <Button component={Link} leftSection={<Heart size={14} />} radius="md" size={size} to="/signin" variant="outline">
-                    {t.wishAdd}
-                </Button>
+                <AppButton component={Link} href="/signin" label={t.loginRequired} leftSection={<LogIn size={14} />} roleName="primary" size={size} />
+                <AppButton component={Link} href="/signin" label={t.wishAdd} leftSection={<Heart size={14} />} roleName="add" size={size} />
             </Group>
         );
     }
@@ -62,12 +60,8 @@ export function EnrollWishlistActions({ enrolled, wish, userId, size = 'xs', onE
 
     return (
         <Group grow gap={8}>
-            <Button disabled={enrolled} leftSection={<BookOpen size={14} />} radius="md" size={size} variant="filled" onClick={handleEnrollClick}>
-                {enrollLabel}
-            </Button>
-            <Button leftSection={wish ? <HeartOff size={14} /> : <Heart size={14} />} radius="md" size={size} variant={wish ? 'light' : 'outline'} onClick={handleWishClick}>
-                {wishLabel}
-            </Button>
+            <AppButton disabled={enrolled} label={enrollLabel} leftSection={<BookOpen size={14} />} roleName="primary" size={size} onClick={handleEnrollClick} />
+            <AppButton label={wishLabel} leftSection={wish ? <HeartOff size={14} /> : <Heart size={14} />} roleName={wish ? 'edit' : 'add'} size={size} onClick={handleWishClick} />
         </Group>
     );
 }

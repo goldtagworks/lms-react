@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { TextInput, Textarea, Switch, Group, Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { addNotice, updateNotice } from '@main/lib/noticeRepo';
+import { Save, X } from 'lucide-react';
 
 export interface NoticeEditorProps {
     noticeId?: string;
@@ -53,24 +54,26 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
 
     return (
         <Stack gap="md" mt="sm">
-            <TextInput data-autofocus label="제목" placeholder="공지 제목" size="md" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+            <TextInput data-autofocus label="제목" placeholder="공지 제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
             <Textarea
                 autosize
                 label="본문"
                 maxRows={30}
                 minRows={10}
                 placeholder="공지 본문"
-                size="md"
+                size="sm"
                 styles={{ input: { fontFamily: 'inherit' } }}
                 value={body}
                 onChange={(e) => setBody(e.currentTarget.value)}
             />
             <Switch checked={pinned} label="상단 고정(PIN)" onChange={(e) => setPinned(e.currentTarget.checked)} />
             <Group justify="flex-end" mt="sm">
-                <Button variant="default" onClick={onCancel}>
+                <Button leftSection={<Save size={16} />} size="sm" onClick={handleSubmit}>
+                    {isEdit ? '수정' : '생성'}
+                </Button>
+                <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onCancel}>
                     취소
                 </Button>
-                <Button onClick={handleSubmit}>{isEdit ? '수정' : '생성'}</Button>
             </Group>
         </Stack>
     );

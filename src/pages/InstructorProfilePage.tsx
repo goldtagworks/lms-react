@@ -2,7 +2,11 @@ import { Anchor, Avatar, Badge, Button, Card, Divider, Group, Skeleton, Stack, T
 import { useParams } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import { useAuth } from '@main/lib/auth';
-import { ensureInstructorProfile, useInstructorProfile, upsertInstructorProfile, curateInstructorCourses, getInstructorLessonAggregates, formatDurationHM } from '@main/lib/repository';
+import { ensureInstructorProfile, useInstructorProfile, upsertInstructorProfile, curateInstructorCourses } from '@main/lib/repository';
+import CourseGrid from '@main/components/layout/CourseGrid';
+import AppImage from '@main/components/AppImage';
+import PriceText from '@main/components/price/PriceText';
+import { TagChip } from '@main/components/TagChip';
 import MarkdownViewer from '@main/components/MarkdownViewer';
 import { Link as LinkIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -23,7 +27,6 @@ const InstructorProfilePage = () => {
     }, [instructorId]);
 
     const curation = useMemo(() => curateInstructorCourses(instructorId, { limit: 4 }), [instructorId]);
-    const aggregates = useMemo(() => getInstructorLessonAggregates(instructorId), [instructorId]);
 
     function handleSaveProfile(patch: { display_name: string; bio_md?: string }) {
         if (!instructorId) return;
@@ -65,9 +68,7 @@ const InstructorProfilePage = () => {
                             </Button>
                         )}
                     </Group>
-                    <Text c="dimmed" size="sm">
-                        공개 강의 {curation.allCount}개 · 레슨 {aggregates.totalLessons}개 · 총 {formatDurationHM(aggregates.totalDurationSeconds)}
-                    </Text>
+                    {/* 향후 서버 사전 계산 메트릭 (코스/레슨/총 시간) 주입 예정 - 클라이언트 계산 금지 정책 */}
                     <MarkdownViewer source={profile.bio_md} />
                     {profile.links && profile.links.length > 0 && (
                         <Group gap={10} mt={4} wrap="wrap">
@@ -93,91 +94,80 @@ const InstructorProfilePage = () => {
         <PageContainer roleMain py={48} size="lg">
             <Stack gap="xl">
                 {hero()}
-                <Divider label="대표 강의" labelPosition="center" my="md" />
-                <Stack gap="md">
-                    {curation.allCount === 0 && (
-                        <Card withBorder padding="lg" radius="md">
-                            <Text c="dimmed" size="sm">
-                                아직 공개된 강의가 없습니다.
-                            </Text>
-                        </Card>
-                    )}
-                    {curation.featured && (
-                        <Card withBorder padding="md" radius="md" shadow="sm">
-                            <Group align="flex-start" justify="space-between">
-                                <Stack flex={1} gap={4}>
-                                    <Group gap={8}>
-                                        <Text fw={700}>{curation.featured.title}</Text>
+                <Divider label="강의" labelPosition="center" my="md" />
+                {curation.allCount === 0 && (
+                    <Card withBorder padding="lg" radius="md">
+                        <Text c="dimmed" size="sm">
+                            아직 공개된 강의가 없습니다.
+                        </Text>
+                    </Card>
+                )}
+                {curation.allCount > 0 && (
+                    <CourseGrid mt="md">
+                        {/* featured 먼저, 이후 others */}
+                        {curation.featured && (
+                            <Card key={curation.featured.id} withBorder p="lg" radius="md" shadow="sm">
+                                <AppImage alt={curation.featured.title} height={140} mb={12} radius="lg" src={curation.featured.thumbnail_url || ''} />
+                                <Group align="center" justify="space-between" mb={4} wrap="nowrap">
+                                    <Text fw={700} size="md">
+                                        {curation.featured.title}
+                                    </Text>
+                                    <Group gap={4}>
                                         {curation.featured.is_featured && (
-                                            <Badge color="grape" size="xs" variant="light">
+                                            <Badge color="grape" size="xs" variant="filled">
                                                 Featured
                                             </Badge>
                                         )}
                                     </Group>
-                                    <Text c="dimmed" lineClamp={2} size="xs">
+                                </Group>
+                                <Group gap={4} mb={4}>
+                                    {curation.featured.tags?.slice(0, 4).map((tag) => (
+                                        <TagChip key={tag} label={tag} />
+                                    ))}
+                                </Group>
+                                {curation.featured.summary && (
+                                    <Text c="dimmed" lineClamp={2} mb={6} size="xs">
                                         {curation.featured.summary}
                                     </Text>
-                                    <Group gap={6} mt={4}>
-                                        {curation.featured.category && (
-                                            <Badge color="blue" size="xs" variant="light">
-                                                {curation.featured.category}
+                                )}
+                                <PriceText discount={curation.featured.sale_price_cents ?? undefined} price={curation.featured.list_price_cents} />
+                                <Button fullWidth component="a" href={`/course/${curation.featured.id}`} mt="sm" radius="md" size="xs" target="_blank" variant="light">
+                                    상세 보기
+                                </Button>
+                            </Card>
+                        )}
+                        {curation.others.map((c) => (
+                            <Card key={c.id} withBorder p="lg" radius="md" shadow="sm">
+                                <AppImage alt={c.title} height={140} mb={12} radius="lg" src={c.thumbnail_url || ''} />
+                                <Group align="center" justify="space-between" mb={4} wrap="nowrap">
+                                    <Text fw={600} size="md">
+                                        {c.title}
+                                    </Text>
+                                    <Group gap={4}>
+                                        {c.is_featured && (
+                                            <Badge color="teal" size="xs" variant="light">
+                                                추천
                                             </Badge>
                                         )}
-                                        {(curation.featured.tags || []).slice(0, 3).map((t) => (
-                                            <Badge key={t} color="gray" size="xs" variant="outline">
-                                                {t}
-                                            </Badge>
-                                        ))}
                                     </Group>
-                                </Stack>
-                                <Stack align="flex-end" gap={6}>
-                                    <Text c="dimmed" size="xs">
-                                        ₩{curation.featured.price_cents.toLocaleString()}
-                                    </Text>
-                                    <Anchor href={`/course/${curation.featured.id}`} size="xs" target="_blank">
-                                        상세 보기
-                                    </Anchor>
-                                </Stack>
-                            </Group>
-                        </Card>
-                    )}
-                </Stack>
-                {curation.others.length > 0 && <Divider label="다른 강의" labelPosition="center" my="lg" />}
-                {curation.others.length > 0 && (
-                    <Stack gap="md">
-                        {curation.others.map((c) => (
-                            <Card key={c.id} withBorder padding="md" radius="md">
-                                <Group align="flex-start" justify="space-between">
-                                    <Stack flex={1} gap={4}>
-                                        <Text fw={600}>{c.title}</Text>
-                                        <Text c="dimmed" lineClamp={2} size="xs">
-                                            {c.summary}
-                                        </Text>
-                                        <Group gap={6} mt={4}>
-                                            {c.category && (
-                                                <Badge color="blue" size="xs" variant="light">
-                                                    {c.category}
-                                                </Badge>
-                                            )}
-                                            {(c.tags || []).slice(0, 3).map((t) => (
-                                                <Badge key={t} color="gray" size="xs" variant="outline">
-                                                    {t}
-                                                </Badge>
-                                            ))}
-                                        </Group>
-                                    </Stack>
-                                    <Stack align="flex-end" gap={6}>
-                                        <Text c="dimmed" size="xs">
-                                            ₩{c.price_cents.toLocaleString()}
-                                        </Text>
-                                        <Anchor href={`/course/${c.id}`} size="xs" target="_blank">
-                                            상세 보기
-                                        </Anchor>
-                                    </Stack>
                                 </Group>
+                                <Group gap={4} mb={4}>
+                                    {c.tags?.slice(0, 4).map((tag) => (
+                                        <TagChip key={tag} label={tag} />
+                                    ))}
+                                </Group>
+                                {c.summary && (
+                                    <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                        {c.summary}
+                                    </Text>
+                                )}
+                                <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} />
+                                <Button fullWidth component="a" href={`/course/${c.id}`} mt="sm" radius="md" size="xs" target="_blank" variant="light">
+                                    상세 보기
+                                </Button>
                             </Card>
                         ))}
-                    </Stack>
+                    </CourseGrid>
                 )}
                 {curation.allCount > (curation.featured ? 1 : 0) + curation.others.length && (
                     <Group justify="center" mt="md">

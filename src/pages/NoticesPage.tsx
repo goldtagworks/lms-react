@@ -1,19 +1,21 @@
-import { Card, Group, Badge, Text, Stack, Button } from '@mantine/core';
+import { Card, Group, Badge, Text, Stack, Button, Tooltip, ActionIcon, Modal } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { listNotices, togglePin, deleteNotice } from '@main/lib/noticeRepo';
+import { useNotices, togglePin, deleteNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
 import { formatDate } from '@main/utils/format';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
 import NoticeEditor from '@main/components/notices/NoticeEditor';
+import { Pin, Pencil, Trash2 } from 'lucide-react';
 
 export default function NoticesPage() {
-    const notices = listNotices();
+    // reactive notices (pin 토글/수정 즉시 반영)
+    const notices = useNotices();
     const PAGE_SIZE = 15;
     const [page, setPage] = useState(1);
     const totalPages = Math.max(1, Math.ceil(notices.length / PAGE_SIZE));
@@ -21,26 +23,25 @@ export default function NoticesPage() {
 
     useEffect(() => {
         if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+    }, [page, totalPages, notices.length]);
     const navigate = useNavigate();
 
     const { user } = useAuth(); // 사용자 컨텍스트 (admin 여부 판단)
     const isAdmin = user?.role === 'admin';
-    const [editorState, setEditorState] = useState<{ open: boolean; id?: string } | null>(null);
+    const [editorState, setEditorState] = useState<{ id?: string } | null>(null);
 
     function openCreate() {
         if (!isAdmin) return;
-        setEditorState({ open: true });
+        setEditorState({});
     }
 
     function openEdit(id: string) {
         if (!isAdmin) return;
-        setEditorState({ open: true, id });
+        setEditorState({ id });
     }
 
     function closeEditor() {
         setEditorState(null);
-        modals.close('notice-editor-modal');
     }
 
     function handleTogglePin(id: string) {
@@ -73,34 +74,7 @@ export default function NoticesPage() {
             }
         });
     }
-    // 모달 열기 (create / edit 공용) - 렌더 사이드이펙트 방지 위해 effect로 이동
-    useEffect(() => {
-        if (!editorState?.open) return;
-        const editing = editorState.id ? notices.find((n) => n.id === editorState.id) : undefined;
-
-        modals.open({
-            modalId: 'notice-editor-modal',
-            title: editing ? '공지 수정' : '새 공지 작성',
-            centered: true,
-            size: '800px',
-            onClose: () => {
-                closeEditor();
-            },
-            children: (
-                <NoticeEditor
-                    initialBody={editing?.body}
-                    initialPinned={!!editing?.pinned}
-                    initialTitle={editing?.title}
-                    noticeId={editing?.id}
-                    onCancel={closeEditor}
-                    onSaved={() => {
-                        closeEditor();
-                    }}
-                />
-            )
-        });
-        // editorState 변경 시 새 모달 오픈; unmount 시 close는 Mantine가 처리.
-    }, [editorState]);
+    const editingNotice = useMemo(() => (editorState?.id ? notices.find((n) => n.id === editorState.id) : undefined), [editorState, notices]);
 
     return (
         <PageContainer roleMain>
@@ -137,15 +111,28 @@ export default function NoticesPage() {
                             </Stack>
                             {isAdmin && (
                                 <Group gap={6} wrap="nowrap">
-                                    <Button size="xs" variant="subtle" onClick={() => openEdit(n.id)}>
-                                        수정
-                                    </Button>
-                                    <Button size="xs" variant="outline" onClick={() => handleTogglePin(n.id)}>
-                                        {n.pinned ? '핀 해제' : '핀 고정'}
-                                    </Button>
-                                    <Button color="red" size="xs" variant="light" onClick={() => handleDelete(n.id)}>
-                                        삭제
-                                    </Button>
+                                    <Tooltip withArrow label={n.pinned ? '상단 고정 해제' : '상단 고정'}>
+                                        <ActionIcon
+                                            aria-label={n.pinned ? '고정 해제' : '상단 고정'}
+                                            color={n.pinned ? 'red' : 'dimmed'}
+                                            variant={n.pinned ? 'light' : 'subtle'}
+                                            onClick={() => handleTogglePin(n.id)}
+                                        >
+                                            <Pin size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
+
+                                    <Tooltip withArrow label="공지 수정">
+                                        <ActionIcon aria-label="공지 수정" variant="subtle" onClick={() => openEdit(n.id)}>
+                                            <Pencil size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
+
+                                    <Tooltip withArrow label="공지 삭제">
+                                        <ActionIcon aria-label="공지 삭제" color="red" variant="subtle" onClick={() => handleDelete(n.id)}>
+                                            <Trash2 size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
                                 </Group>
                             )}
                         </Group>
@@ -153,6 +140,20 @@ export default function NoticesPage() {
                 ))}
             </Stack>
             <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
+            <Modal centered withinPortal opened={!!editorState} size="800px" title={editingNotice ? '공지 수정' : '새 공지 작성'} onClose={closeEditor}>
+                {editorState && (
+                    <NoticeEditor
+                        initialBody={editingNotice?.body}
+                        initialPinned={!!editingNotice?.pinned}
+                        initialTitle={editingNotice?.title}
+                        noticeId={editingNotice?.id}
+                        onCancel={closeEditor}
+                        onSaved={() => {
+                            closeEditor();
+                        }}
+                    />
+                )}
+            </Modal>
         </PageContainer>
     );
 }

@@ -99,7 +99,7 @@ const CourseListPage = () => {
             <PageSection withGapTop={false}>
                 {/* 필터/정렬/검색 UI */}
                 <Group gap="md" mb="xl" wrap="wrap">
-                    <Select aria-label="카테고리" data={categories} defaultValue="all" size="md" value={category} onChange={(v) => setCategory(v || 'all')} />
+                    <Select aria-label="카테고리" data={categories} defaultValue="all" size="sm" value={category} onChange={(v) => setCategory(v || 'all')} />
                     <Select
                         aria-label="정렬"
                         data={[
@@ -110,8 +110,8 @@ const CourseListPage = () => {
                         defaultValue="latest"
                         size="md"
                     />
-                    <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="md" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
-                    <Button disabled size="md" variant="outline">
+                    <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="sm" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
+                    <Button disabled size="sm" variant="outline">
                         정렬(스텁)
                     </Button>
                 </Group>

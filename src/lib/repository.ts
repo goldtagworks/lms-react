@@ -17,7 +17,8 @@ import { UserRole } from '@main/lib/nav';
 const K_COURSES = 'lms_courses_v1';
 const K_ENROLLMENTS = 'lms_enrollments_v1';
 const K_WISHLIST = 'lms_wishlist_v1'; // { [userId]: string[] }
-const K_LESSONS = 'lms_lessons_v1';
+const K_LESSONS = 'lms_lessons_v1'; // legacy (flat array)
+const K_LESSON_COURSE_PREFIX = 'lms_lessons_v2:'; // per-course key prefix
 const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
 const K_INSTRUCTOR_PROFILES = 'lms_instructor_profiles_v1';
 const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (mock)
@@ -473,23 +474,185 @@ export function loadCoursesPaged(page: number, pageSize: number): PagedResult<Co
 }
 
 // Lessons
-function loadLessons(): Lesson[] {
-    let lessons = ssGet<Lesson[]>(K_LESSONS);
+// ---- Lessons (namespaced per-course with lazy migration) ----
+function lessonKey(courseId: string) {
+    return K_LESSON_COURSE_PREFIX + courseId;
+}
 
-    if (!lessons || lessons.length === 0) {
+function migrateLegacyLessonsIfNeeded(): void {
+    // If any v2 key exists we assume migration already performed.
+    // Cheap check: look at sessionStorage keys.
+    const anyV2 = Object.keys(sessionStorage).some((k) => k.startsWith(K_LESSON_COURSE_PREFIX));
+
+    if (anyV2) return;
+
+    const legacy = ssGet<Lesson[]>(K_LESSONS);
+
+    if (!legacy || legacy.length === 0) {
+        // maybe need initial seed into per-course keys
         const courses = loadCourses();
+        const seeded = seedLessons(courses);
+        const byCourse: Record<string, Lesson[]> = {};
 
-        lessons = seedLessons(courses);
-        ssSet(K_LESSONS, lessons);
+        seeded.forEach((l) => {
+            byCourse[l.course_id] = byCourse[l.course_id] || [];
+            byCourse[l.course_id].push(l);
+        });
+
+        Object.entries(byCourse).forEach(([cid, arr]) => {
+            ssSet(lessonKey(cid), arr);
+        });
+
+        return;
     }
 
-    return lessons;
+    // split legacy flat list into per-course
+    const byCourse: Record<string, Lesson[]> = {};
+
+    legacy.forEach((l) => {
+        byCourse[l.course_id] = byCourse[l.course_id] || [];
+        byCourse[l.course_id].push(l);
+    });
+    Object.entries(byCourse).forEach(([cid, arr]) => {
+        // ensure ordering
+        arr.sort((a, b) => a.order_index - b.order_index).forEach((l, i) => (l.order_index = i + 1));
+        ssSet(lessonKey(cid), arr);
+    });
+    // Optional: keep legacy for rollback; do NOT delete to avoid data loss in dev.
+}
+
+function loadLessonsForCourse(courseId: string): Lesson[] {
+    migrateLegacyLessonsIfNeeded();
+    let list = ssGet<Lesson[]>(lessonKey(courseId));
+
+    if (!list || list.length === 0) {
+        // seed only this course (idempotent)
+        const course = getCourse(courseId);
+
+        if (course) {
+            const seeded = seedLessons([course]).filter((l) => l.course_id === courseId);
+
+            ssSet(lessonKey(courseId), seeded);
+            list = seeded;
+        } else {
+            list = [];
+        }
+    }
+
+    return list;
+}
+
+function saveLessonsForCourse(courseId: string, list: Lesson[]) {
+    ssSet(lessonKey(courseId), list);
 }
 
 export function listLessonsByCourse(courseId: string): Lesson[] {
-    return loadLessons()
-        .filter((l) => l.course_id === courseId)
-        .sort((a, b) => a.order_index - b.order_index);
+    return loadLessonsForCourse(courseId).sort((a, b) => a.order_index - b.order_index);
+}
+
+export function createLesson(params: { course_id: string; title: string; is_section?: boolean }): Lesson {
+    const ttl = params.title.trim();
+
+    if (!ttl) throw new Error('TITLE_REQUIRED');
+    const list = loadLessonsForCourse(params.course_id);
+    const now = new Date().toISOString();
+    const lesson: Lesson = {
+        id: (params.is_section ? 'sec-' : 'l-') + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+        course_id: params.course_id,
+        title: ttl,
+        outline: undefined,
+        content_md: undefined,
+        content_url: undefined,
+        attachments: undefined,
+        duration_seconds: 0,
+        order_index: list.filter((l) => l.course_id === params.course_id).length + 1,
+        is_preview: false,
+        created_at: now,
+        updated_at: now,
+        ...(params.is_section ? { is_section: true } : {})
+    } as Lesson;
+
+    list.push(lesson);
+    list.sort((a, b) => a.order_index - b.order_index).forEach((l, i) => (l.order_index = i + 1));
+    saveLessonsForCourse(params.course_id, list);
+    bump();
+
+    return lesson;
+}
+
+export function updateLesson(patch: { id: string } & Partial<Lesson>): Lesson | undefined {
+    if (!patch.id) return undefined;
+    // locate course by scanning v2 keys (small scale dev env)
+    // Optimization: maintain id->course map (future), skip now.
+    const courseIds = loadCourses().map((c) => c.id);
+    let foundCourse: string | undefined;
+    let list: Lesson[] = [];
+    let idx = -1;
+
+    for (const cid of courseIds) {
+        const arr = loadLessonsForCourse(cid);
+        const fIdx = arr.findIndex((l) => l.id === patch.id);
+
+        if (fIdx >= 0) {
+            foundCourse = cid;
+            list = arr;
+            idx = fIdx;
+            break;
+        }
+    }
+    if (!foundCourse || idx < 0) return undefined;
+
+    if (idx < 0) return undefined;
+    const now = new Date().toISOString();
+    const updated: Lesson = { ...list[idx], ...patch, updated_at: now } as Lesson;
+
+    list[idx] = updated;
+    saveLessonsForCourse(foundCourse, list);
+    bump();
+
+    return updated;
+}
+
+export function deleteLesson(id: string): boolean {
+    const courseIds = loadCourses().map((c) => c.id);
+
+    for (const cid of courseIds) {
+        const list = loadLessonsForCourse(cid);
+        const idx = list.findIndex((l) => l.id === id);
+
+        if (idx >= 0) {
+            list.splice(idx, 1);
+            list.sort((a, b) => a.order_index - b.order_index).forEach((l, i) => (l.order_index = i + 1));
+            saveLessonsForCourse(cid, list);
+            bump();
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function moveLesson(id: string, dir: 'up' | 'down'): Lesson[] {
+    const courseIds = loadCourses().map((c) => c.id);
+
+    for (const cid of courseIds) {
+        const list = loadLessonsForCourse(cid).sort((a, b) => a.order_index - b.order_index);
+        const idx = list.findIndex((l) => l.id === id);
+
+        if (idx < 0) continue;
+        const target = dir === 'up' ? idx - 1 : idx + 1;
+
+        if (target < 0 || target >= list.length) return list;
+        [list[idx], list[target]] = [list[target], list[idx]];
+        list.forEach((l, i) => (l.order_index = i + 1));
+        saveLessonsForCourse(cid, list);
+        bump();
+
+        return list;
+    }
+
+    return [];
 }
 
 export function getCourse(id: string): Course | undefined {
@@ -559,20 +722,30 @@ export function saveCourseDraft(input: { id?: string; title: string; summary: st
         return { created: false, course: updated };
     }
 
-    // new course: clone first as base (mock)
-    const base = list[0];
-
-    if (!base) {
-        return { created: false, error: 'NO_BASE' };
-    }
-
+    // new course: create minimal base (no seed clone)
     const newId = 'c' + (list.length + 1);
     const createdCourse: Course = {
-        ...base,
         id: newId,
+        instructor_id: 'inst-1', // mock 현재 로그인 강사 대체 (추후 auth 연결)
         title,
         summary,
         description,
+        slug: undefined,
+        category: 'frontend', // 기본 카테고리 (임시)
+        tags: [],
+        thumbnail_url: undefined,
+        pricing_mode: 'paid',
+        list_price_cents: 0,
+        sale_price_cents: undefined,
+        sale_ends_at: undefined,
+        currency_code: 'KRW',
+        price_cents: 0,
+        tax_included: true,
+        tax_rate_percent: undefined,
+        tax_country_code: 'KR',
+        progress_required_percent: 80,
+        is_active: false,
+        published: false,
         is_featured: !!is_featured,
         featured_rank: is_featured ? featured_rank : undefined,
         featured_badge_text: is_featured ? featured_badge_text : undefined,

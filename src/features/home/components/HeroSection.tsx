@@ -40,7 +40,7 @@ function HeroSectionBase({
                             {subHeading}
                         </Text>
                         <Group gap={12}>
-                            <Button color="primary" component={Link} radius="xl" size="lg" to={primaryCtaTo}>
+                            <Button color="gray" component={Link} radius="xl" size="lg" to={primaryCtaTo}>
                                 {primaryCtaLabel}
                             </Button>
                             {!user && (

@@ -28,7 +28,26 @@
         "signupSuccess": "회원가입이 완료되었습니다",
         "signoutSuccess": "로그아웃되었습니다",
         "error": "로그인 중 오류가 발생했습니다",
-        "invalid": "이메일 또는 비밀번호가 올바르지 않습니다"
+        "invalid": "이메일 또는 비밀번호가 올바르지 않습니다",
+        "subtitleSignIn": "계정에 로그인하여 학습을 이어가세요.",
+        "subtitleSignUp": "지금 계정을 만들고 학습 여정을 시작하세요.",
+        "noAccountYet": "아직 계정이 없나요?",
+        "haveAccount": "이미 계정이 있나요?",
+        "createAccount": "계정 만들기",
+        "continueWithEmail": "이메일로 계속",
+        "name": "이름",
+        "benefits.fast": "언제든 빠르게 다시 시작",
+        "benefits.progress": "진도 자동 저장·연동",
+        "benefits.cert": "수료증 발급 지원"
+    },
+    "consent": {
+        "acceptAll": "모두 동의",
+        "termsRequired": "(필수) 이용약관 동의",
+        "privacyRequired": "(필수) 개인정보 수집·이용 동의",
+        "marketingOptional": "(선택) 마케팅 정보 수신 동의",
+        "instructorPolicy": "(필수) 강사 활동 규정 및 저작권 보증 동의",
+        "viewDetail": "전문 보기",
+        "ageConfirm": "(필수) 만 14세 이상입니다"
     },
     "home": {
         "heroTitle": "Whenever, wherever, 배움은 계속됩니다",

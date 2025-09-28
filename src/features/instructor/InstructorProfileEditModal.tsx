@@ -54,10 +54,13 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
             <Stack gap="sm" mt="xs">
                 <TextInput label="표시 이름" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
                 <Textarea label="소개 (Markdown)" minRows={6} placeholder="## 소개\n경력 요약 ..." value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
+                <TextInput label="표시 이름" size="sm" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
+                <Textarea label="소개 (Markdown)" minRows={6} placeholder="## 소개\n경력 요약 ..." size="sm" value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
                 <Group justify="space-between" mt="xs">
                     <Group gap={6}>
                         <LinkIcon size={16} />
                         <TextInput disabled value="외부 링크" w={100} />
+                        <TextInput disabled size="sm" value="외부 링크" w={100} />
                     </Group>
                     <ActionIcon aria-label="링크 추가" variant="light" onClick={addLink}>
                         <Plus size={16} />
@@ -68,6 +71,8 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
                         <Group key={i} align="flex-end" gap={8} wrap="nowrap">
                             <TextInput flex={1} label={`Label ${i + 1}`} placeholder="GitHub" value={l.label} onChange={(e) => updateLink(i, { label: e.currentTarget.value })} />
                             <TextInput flex={2} label="URL" placeholder="https://" value={l.url} onChange={(e) => updateLink(i, { url: e.currentTarget.value })} />
+                            <TextInput flex={1} label={`Label ${i + 1}`} placeholder="GitHub" size="sm" value={l.label} onChange={(e) => updateLink(i, { label: e.currentTarget.value })} />
+                            <TextInput flex={2} label="URL" placeholder="https://" size="sm" value={l.url} onChange={(e) => updateLink(i, { url: e.currentTarget.value })} />
                             <ActionIcon aria-label="삭제" color="red" mb={4} variant="subtle" onClick={() => removeLink(i)}>
                                 <Trash2 size={16} />
                             </ActionIcon>

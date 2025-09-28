@@ -4,7 +4,12 @@ import { filterNav, navGroups } from '@main/lib/nav';
 import { useAuth } from '@main/lib/auth';
 import { useLocation } from 'react-router-dom';
 
-const Navbar = () => {
+interface NavbarProps {
+    closeNav?: () => void;
+    firstFocusableRef?: React.RefObject<HTMLButtonElement | HTMLAnchorElement | null>;
+}
+
+const Navbar = ({ closeNav, firstFocusableRef }: NavbarProps) => {
     const { user } = useAuth();
     const role = user?.role ?? null;
     const filtered = filterNav(
@@ -40,18 +45,23 @@ const Navbar = () => {
                                     ? matchCandidates.reduce((longest, current) => (current.href.length > longest.href.length ? current : longest)).href
                                     : null;
 
-                                return g.items.map((it) => {
+                                return g.items.map((it, idx) => {
                                     const active = it.href === activeItemHref;
 
                                     return (
                                         <LinkButton
                                             key={it.id}
+                                            ref={idx === 0 && gi === 0 ? (firstFocusableRef as any) : undefined}
                                             color={active ? 'primary' : 'gray'}
                                             href={it.href}
                                             justify="flex-start"
                                             label={it.label}
                                             style={active ? { fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
                                             variant={active ? 'light' : 'subtle'}
+                                            onClick={() => {
+                                                // 모바일 링크 클릭 시 닫기
+                                                closeNav?.();
+                                            }}
                                         />
                                     );
                                 });
@@ -62,8 +72,8 @@ const Navbar = () => {
                 ))}
                 {!user && (
                     <Stack gap={6} pt="sm">
-                        <LinkButton color="primary" href="/signin" justify="flex-start" label="로그인" variant="light" />
-                        <LinkButton color="primary" href="/signup" justify="flex-start" label="회원가입" variant="filled" />
+                        <LinkButton color="primary" href="/signin" justify="flex-start" label="로그인" variant="light" onClick={() => closeNav?.()} />
+                        <LinkButton color="primary" href="/signup" justify="flex-start" label="회원가입" variant="filled" onClick={() => closeNav?.()} />
                     </Stack>
                 )}
             </Stack>

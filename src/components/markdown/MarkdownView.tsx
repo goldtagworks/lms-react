@@ -81,7 +81,7 @@ export default function MarkdownView({ source, className, compact, clampLines }:
                 overflow: clampLines ? 'hidden' : undefined
             }}
         >
-            <ReactMarkdown skipHtml disallowedElements={disallowed} remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown skipHtml components={components} disallowedElements={disallowed} remarkPlugins={[remarkGfm]}>
                 {content}
             </ReactMarkdown>
         </Box>

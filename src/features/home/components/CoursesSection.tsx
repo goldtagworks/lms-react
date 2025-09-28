@@ -23,7 +23,7 @@ function CoursesSectionBase({ title, courses, viewAllTo = '/courses', limit, gri
                 <Title order={2} size="xl">
                     {title}
                 </Title>
-                <Button component={Link} size="md" to={viewAllTo} variant="subtle">
+                <Button component={Link} size="sm" to={viewAllTo} variant="subtle">
                     전체 보기
                 </Button>
             </Group>

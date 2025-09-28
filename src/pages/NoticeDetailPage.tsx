@@ -128,7 +128,7 @@ export default function NoticeDetailPage() {
                             </Tooltip>
                         )}
                         <Tooltip withArrow label="링크 복사">
-                            <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : undefined} variant="subtle" onClick={handleCopyLink}>
+                            <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : 'yellow'} variant="subtle" onClick={handleCopyLink}>
                                 {copied ? <Copy size={16} /> : <Share2 size={16} />}
                             </ActionIcon>
                         </Tooltip>

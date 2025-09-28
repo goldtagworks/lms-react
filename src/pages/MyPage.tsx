@@ -35,16 +35,16 @@ export default function MyPage() {
             <PageHeader
                 actions={
                     <Group gap="xs">
-                        <Button component={Link} leftSection={<List size={16} />} to="/courses" variant="light">
+                        <Button color="orange" component={Link} leftSection={<List size={16} />} size="xs" to="/courses" variant="light">
                             코스 목록
                         </Button>
-                        <Button component={Link} leftSection={<Heart size={16} />} to="/my/wishlist" variant="light">
+                        <Button color="green" component={Link} leftSection={<Heart size={16} />} size="xs" to="/my/wishlist" variant="light">
                             위시리스트
                         </Button>
-                        <Button component={Link} leftSection={<Award size={16} />} to="/my/certificates" variant="light">
+                        <Button color="violet" component={Link} leftSection={<Award size={16} />} size="xs" to="/my/certificates" variant="light">
                             수료증
                         </Button>
-                        <Button component={Link} leftSection={<Home size={16} />} to="/" variant="outline">
+                        <Button component={Link} leftSection={<Home size={16} />} size="xs" to="/" variant="outline">
                             홈으로
                         </Button>
                     </Group>

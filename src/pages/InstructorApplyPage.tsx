@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button, Card, Group, Stack, Text, TextInput, Textarea, Badge, Alert } from '@mantine/core';
+import { Button, Card, Group, Stack, Text, TextInput, Textarea, Badge, Alert, Divider } from '@mantine/core';
 import { useAuth } from '@main/lib/auth';
 import { applyInstructor, useMyInstructorApplication } from '@main/lib/repository';
+import { ConsentCheckboxes, ConsentState } from '@main/components/auth/ConsentCheckboxes';
 
 interface LinkInput {
     label: string;
@@ -16,6 +17,7 @@ export function InstructorApplyPage() {
     const [links, setLinks] = useState<LinkInput[]>([]);
     const [linkLabel, setLinkLabel] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
+    const [consent, setConsent] = useState<ConsentState | null>(null);
 
     if (!user) {
         return (
@@ -41,6 +43,7 @@ export function InstructorApplyPage() {
 
     const submit = () => {
         if (!displayName.trim()) return;
+        if (!consent?.terms || !consent.privacy) return; // require base terms/privacy
         applyInstructor(
             { id: user.id, name: user.name || user.id, email: user.email || user.id + '@local', role: user.role },
             { display_name: displayName.trim(), bio_md: bio || undefined, links: links.length ? links : undefined }
@@ -104,9 +107,14 @@ export function InstructorApplyPage() {
                             </Group>
                         )}
                     </Stack>
+                    <Divider my="sm" />
+                    <Stack>
+                        <Text fw={600}>약관 동의</Text>
+                        <ConsentCheckboxes compact requireAge requireInstructorPolicy onChange={setConsent} />
+                    </Stack>
                     <Group justify="flex-end">
                         {!app && (
-                            <Button disabled={!displayName.trim()} onClick={submit}>
+                            <Button disabled={!displayName.trim() || !consent?.terms || !consent.privacy} onClick={submit}>
                                 신청 제출
                             </Button>
                         )}

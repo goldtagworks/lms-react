@@ -77,6 +77,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
             <Stack gap="sm" mt="xs">
                 <TextInput
                     label="제목"
+                    size="sm"
                     value={draft.title}
                     onChange={(e) => {
                         const val = e.currentTarget.value;
@@ -100,6 +101,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                             <TextInput
                                 label={draft.videoType === 'youtube' ? 'YouTube URL' : '영상 URL'}
                                 placeholder={draft.videoType === 'youtube' ? 'https://youtu.be/...' : 'https://cdn.example.com/video.mp4'}
+                                size="sm"
                                 value={draft.url}
                                 onChange={(e) => {
                                     const val = e.currentTarget.value;
@@ -113,6 +115,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                             label="본문(Markdown)"
                             minRows={4}
                             placeholder="# 제목\n내용 ..."
+                            size="sm"
                             value={draft.content}
                             onChange={(e) => {
                                 const val = e.currentTarget.value;
@@ -123,6 +126,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                         <TextInput
                             label="첨부 (쉼표 구분)"
                             placeholder="file1.pdf, link2"
+                            size="sm"
                             value={draft.attachments}
                             onChange={(e) => {
                                 const val = e.currentTarget.value;

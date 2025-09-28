@@ -149,7 +149,7 @@ export default function AdminInstructorAppsPage() {
                         <Tabs keepMounted={false} value={activeTab} onChange={(v) => setActiveTab((v as 'PENDING' | 'DECIDED' | 'REVOKED') || 'PENDING')}>
                             <Tabs.List>
                                 <Tabs.Tab value="PENDING">대기중 ({filteredPending.length})</Tabs.Tab>
-                                <Tabs.Tab value="DECIDED">승인/반려 ({filteredDecided.length})</Tabs.Tab>
+                                <Tabs.Tab value="DECIDED">승인 / 반려 ({filteredDecided.length})</Tabs.Tab>
                                 <Tabs.Tab value="REVOKED">회수 ({filteredRevoked.length})</Tabs.Tab>
                             </Tabs.List>
                         </Tabs>

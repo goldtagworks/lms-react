@@ -1,17 +1,20 @@
 import { Button, ButtonProps } from '@mantine/core';
-import { memo } from 'react';
+import React, { memo } from 'react';
 
 interface LinkButtonProps extends ButtonProps {
     label: string;
     href?: string;
+    onClick?: () => void;
 }
 
-const LinkButtonComponent = ({ label, href, ...props }: LinkButtonProps) => {
+const LinkButtonComponent = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, LinkButtonProps>(({ label, href, onClick, ...props }, ref) => {
     return (
-        <Button component={href ? 'a' : 'button'} href={href} variant="subtle" {...props}>
+        <Button ref={ref as any} component={href ? 'a' : 'button'} href={href} variant="subtle" {...props} onClick={onClick}>
             {label}
         </Button>
     );
-};
+});
+
+LinkButtonComponent.displayName = 'LinkButton';
 
 export const LinkButton = memo(LinkButtonComponent);
