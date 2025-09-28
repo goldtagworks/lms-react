@@ -6,7 +6,7 @@ export interface Lesson {
     id: string;
     /** 코스 ID */
     course_id: string;
-    /** 섹션 ID(옵션) */
+    /** @deprecated 섹션 통합: 과거 섹션 테이블 참조. is_section=true 구조 전환 후 사용 중지 예정 */
     section_id?: string;
     /** 레슨명 */
     title: string;
@@ -24,6 +24,8 @@ export interface Lesson {
     order_index: number;
     /** 미리보기 여부 */
     is_preview: boolean;
+    /** 섹션 헤더 여부: true 시 콘텐츠/영상/미리보기 필드 무시. (신규 단순 모델) */
+    is_section?: boolean;
     /** 생성일 */
     created_at: string;
     /** 수정일 */

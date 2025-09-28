@@ -3,6 +3,8 @@ import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
 import { useAuth } from '@main/lib/auth';
+import { useState, useEffect } from 'react';
+import PaginationBar from '@main/components/PaginationBar';
 import { useCourses, useEnrollmentsState, issueCertificate, useCertificates } from '@main/lib/repository';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import CertificateCard from '@main/components/CertificateCard';
@@ -27,6 +29,14 @@ const CertificatesListPage = () => {
         ...c,
         courseTitle: courseMap[c.enrollment_id.split('-').slice(-1)[0]] || '수료 강의'
     }));
+    const PAGE_SIZE = 12;
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(certs.length / PAGE_SIZE));
+    const paged = certs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [page, totalPages]);
 
     const handleIssueOne = () => {
         if (!userId) return;
@@ -75,7 +85,7 @@ const CertificatesListPage = () => {
                     {userId && certs.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="합격한 시험이 아직 없어 수료증이 없습니다." title="수료증 없음" to="/courses" />}
                     {userId && certs.length > 0 && (
                         <CourseGrid mt="md">
-                            {certs.map((c) => (
+                            {paged.map((c) => (
                                 <CertificateCard key={c.id} courseTitle={c.courseTitle} id={c.id} issuedAt={c.issued_at} pdfPath={c.pdf_path} serialNo={c.serial_no} />
                             ))}
                         </CourseGrid>
@@ -85,6 +95,7 @@ const CertificatesListPage = () => {
                             (목업) 발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
                         </Text>
                     )}
+                    <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
                 </Stack>
             </Card>
         </PageContainer>

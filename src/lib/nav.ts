@@ -63,7 +63,8 @@ export const navGroups: NavGroup[] = [
         roles: ['instructor'],
         items: [
             { id: 'instructor-courses', label: '내 코스 관리', href: '/instructor/courses', auth: 'auth', roles: ['instructor'] },
-            { id: 'instructor-profile', label: '프로필', href: '/instructor/123', auth: 'auth', roles: ['instructor'] }
+            // 사용자 로그인 후 Header/Navbar 에서 동적으로 userId 치환 (간단 구현)
+            { id: 'instructor-profile', label: '프로필', href: '/instructor/__USER_ID__', auth: 'auth', roles: ['instructor'] }
             // TODO: 동적 ID 대체 필요
         ]
     },

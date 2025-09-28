@@ -1,5 +1,6 @@
-import { Button, Card, Container, Stack, Text, Title } from '@mantine/core';
-import { useParams, Link } from 'react-router-dom';
+import { Button, Card, Stack, Text, Title } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import PageContainer from '@main/components/layout/PageContainer';
 
 const mockExam = {
     id: 1,
@@ -10,11 +11,9 @@ const mockExam = {
 };
 
 const ExamPage = () => {
-    const { id } = useParams();
-
     // 실제로는 id로 데이터 fetch, 여기선 mock만 사용
     return (
-        <Container py="xl" size="sm">
+        <PageContainer roleMain py={48} size="sm">
             <Card withBorder padding="xl" radius="md" shadow="sm">
                 <Stack>
                     <Title order={2}>시험 응시</Title>
@@ -29,7 +28,7 @@ const ExamPage = () => {
                     </Button>
                 </Stack>
             </Card>
-        </Container>
+        </PageContainer>
     );
 };
 

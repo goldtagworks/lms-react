@@ -39,10 +39,10 @@ export default function EnrollPage() {
                         </Text>
                     )}
                     <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} size="md" />
-                    <Button color="blue" component={Link} leftSection={<CreditCard size={16} />} size="md" to={`/payment/${course.id}`} variant="filled">
+                    <Button color="blue" component={Link} leftSection={<CreditCard size={14} />} size="md" to={`/payment/${course.id}`} variant="filled">
                         결제하기
                     </Button>
-                    <Button component={Link} leftSection={<Info size={16} />} size="md" to={`/course/${course.id}`} variant="outline">
+                    <Button component={Link} leftSection={<Info size={14} />} size="md" to={`/course/${course.id}`} variant="outline">
                         코스 상세로
                     </Button>
                 </Stack>

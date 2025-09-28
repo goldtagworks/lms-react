@@ -39,10 +39,10 @@ const PaymentPage = () => {
                     <Text c="dimmed" size="sm">
                         상태: {status}
                     </Text>
-                    <Button color="blue" component={Link} leftSection={<CreditCard size={16} />} size="md" to={`/exam/${course.id}`} variant="filled">
+                    <Button color="blue" component={Link} leftSection={<CreditCard size={14} />} size="md" to={`/exam/${course.id}`} variant="filled">
                         결제 진행 (시험 응시 예시)
                     </Button>
-                    <Button component={Link} leftSection={<BookOpen size={16} />} size="md" to={`/enroll/${course.id}`} variant="outline">
+                    <Button component={Link} leftSection={<BookOpen size={14} />} size="md" to={`/enroll/${course.id}`} variant="outline">
                         수강신청 화면으로
                     </Button>
                 </Stack>

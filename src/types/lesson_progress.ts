@@ -12,8 +12,8 @@ export interface LessonProgress {
     watched_seconds: number;
     /** 완료 여부 */
     is_completed: boolean;
-    /** 수정일 */
-    updated_at: string;
     /** 생성일 */
     created_at: string;
+    /** 수정일 */
+    updated_at: string;
 }

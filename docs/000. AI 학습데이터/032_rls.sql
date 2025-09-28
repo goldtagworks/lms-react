@@ -7,7 +7,7 @@
 -- Enable RLS on exposed tables
 alter table if exists profiles                enable row level security;
 alter table if exists courses                 enable row level security;
-alter table if exists course_sections         enable row level security;
+-- (v3.5) course_sections 제거: 통합 커리큘럼(is_section). RLS enable 불필요.
 alter table if exists lessons                 enable row level security;
 alter table if exists enrollments             enable row level security;
 alter table if exists payments                enable row level security;
@@ -88,18 +88,7 @@ create policy if not exists course_write_owner on courses
 for all using (is_course_owner(id)) with check (is_course_owner(id));
 
 -- =============================
--- course_sections
--- =============================
--- Read: visible to enrolled users, or public if course is published, or staff/owner
-create policy if not exists sections_read on course_sections
-for select using (
-  is_course_owner(course_id) or is_enrolled_for_course(course_id)
-  or exists(select 1 from courses c where c.id = course_sections.course_id and c.published = true and c.is_active = true)
-);
-
--- Write: only course owner/admin
-create policy if not exists sections_write_owner on course_sections
-for all using (is_course_owner(course_id)) with check (is_course_owner(course_id));
+-- course_sections RLS 정책 삭제 (통합 모델). DOWNGRADE 시 위 정책 복원.
 
 -- =============================
 -- lessons (content visible to enrolled learners; preview public; owner/admin full)

@@ -4,6 +4,7 @@
 각 화면은 목적/데이터 계약/상호작용/수용 기준까지 정의한다.
 
 ────────────────────────────────────────────────────
+
 ## 홈 (/)
 
 1. 목적/행동: 추천 코스 확인, 가이드/공지 접근
@@ -14,6 +15,7 @@
 6. AC: empty 상태시 안내 메시지 표시
 
 ────────────────────────────────────────────────────
+
 ## 코스 목록 (/courses)
 
 1. 목적/행동: 전체 코스 탐색, 검색/필터
@@ -24,18 +26,20 @@
 6. AC: 서버 페이징, 각 카드에 응시 기준% 표시
 
 ────────────────────────────────────────────────────
+
 ## 코스 상세 (/course/:id)
 
 1. 목적/행동: 코스 설명 확인, 결제 시작
 2. 접근: public (결제 버튼은 auth 필요)
-3. 레이아웃: HeroCard(title, price, required%), SectionList(미리보기 강의 포함), Tabs(Reviews/Q&A/Instructor), CTAGroup
-4. 데이터: ['course',id], ['lessons',id], ['sections',id], ['reviews',{id,page}], ['qna',{id,page}]
+3. 레이아웃: HeroCard(title, price, required%), LessonList(섹션 헤더=is_section 포함), Tabs(Reviews/Q&A/Instructor), CTAGroup
+4. 데이터: ['course',id], ['lessons',id], ['reviews',{id,page}], ['qna',{id,page}]
 5. 상태: loading / empty / error / ready / coupon.invalid / coupon.expired
 6. 상호작용: [결제] 클릭 → PG 위젯 → "처리 중" 배너 → 웹훅 후 ENROLLED, WishlistButton 토글(로딩/에러 상태 처리), CouponInput 검증, Review/QnA 작성 폼
 7. 에러: E_COURSE_NOT_FOUND → common.error.notFound, E_COUPON_INVALID → coupon.error.invalid, E_COUPON_EXPIRED → coupon.error.expired
 8. AC: ENROLLED는 웹훅만 설정, 프론트 변경 금지, 수강생만 리뷰/Q&A 작성 가능, 위시리스트 토글은 본인만
 
 ────────────────────────────────────────────────────
+
 ## 마이 강의실 (/my)
 
 1. 목적/행동: ENROLLED 강좌 목록 관리, 학습/시험/수료증 진입
@@ -43,12 +47,13 @@
 3. 레이아웃: CourseCardGrid(진도율/버튼 상태 표시)
 4. 데이터: ['enrollments','me'], ['progress','batch'], ['certs','me']
 5. 카드 상태:
-   - progress < required → [학습하기]
-   - progress ≥ required & 미합격 → [시험 응시]
-   - 합격 & 수료증 존재 → [수료증 다운로드]
+    - progress < required → [학습하기]
+    - progress ≥ required & 미합격 → [시험 응시]
+    - 합격 & 수료증 존재 → [수료증 다운로드]
 6. AC: 각 카드에 "현재 진도 x% / 기준 y%" 표시
 
 ────────────────────────────────────────────────────
+
 ## 레슨 플레이어 (/learn/:enrollmentId)
 
 1. 목적/행동: 차시 학습, 진도 저장
@@ -60,6 +65,7 @@
 7. AC: 학습 종료 시 진도율 업데이트
 
 ────────────────────────────────────────────────────
+
 ## 시험 응시 (/exam/:examId/attempt)
 
 1. 목적/행동: 시험 응시/제출
@@ -70,19 +76,21 @@
 6. AC: 타이머 만료시 자동 제출, 합격 시 certificates 생성
 
 ────────────────────────────────────────────────────
+
 ## 결제 확인 (위젯/웹훅)
 
 1. 목적/행동: 결제 상태 안내
 2. 접근: auth
 3. 레이아웃: PaymentNotice(status)
 4. 상태:
-   - processing: "결제를 처리하고 있습니다…"
-   - delayed: 30s 경과시 지연 안내
-   - paid: My 페이지로 이동
-   - failed/cancelled: 원화면 유지 + 알림
+    - processing: "결제를 처리하고 있습니다…"
+    - delayed: 30s 경과시 지연 안내
+    - paid: My 페이지로 이동
+    - failed/cancelled: 원화면 유지 + 알림
 5. AC: 웹훅만 ENROLLED 설정, 프런트 변경 금지
 
 ────────────────────────────────────────────────────
+
 ## 로그인/회원가입 (/login)
 
 1. 목적/행동: 계정 생성, 로그인
@@ -93,6 +101,7 @@
 6. AC: 성공 시 redirect=/my, 실패 시 에러 메시지(i18n auth.error)
 
 ────────────────────────────────────────────────────
+
 ## 관심 강좌 목록 (/my/wishlist)
 
 1. 목적/행동: 관심 강좌 목록 관리
@@ -102,6 +111,7 @@
 5. AC: 비로그인 시 redirect=/login, 토글 시 리스트 반영
 
 ────────────────────────────────────────────────────
+
 ## 강사 프로필 (/instructor/:id)
 
 1. 목적/행동: 강사 정보 및 강의 목록 공개
@@ -111,6 +121,7 @@
 5. AC: 강사 정보와 강의 목록 동시 표시
 
 ────────────────────────────────────────────────────
+
 ## 쿠폰 관리 (/admin/coupons)
 
 1. 목적/행동: 쿠폰 관리
@@ -120,6 +131,7 @@
 5. AC: admin만 접근 가능
 
 ────────────────────────────────────────────────────
+
 ## 카테고리 관리 (/admin/categories)
 
 1. 목적/행동: 카테고리 관리

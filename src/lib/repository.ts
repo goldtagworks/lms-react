@@ -19,8 +19,12 @@ const K_ENROLLMENTS = 'lms_enrollments_v1';
 const K_WISHLIST = 'lms_wishlist_v1'; // { [userId]: string[] }
 const K_LESSONS = 'lms_lessons_v1';
 const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
+const K_INSTRUCTOR_PROFILES = 'lms_instructor_profiles_v1';
 const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (mock)
 const K_MARKETING_COPY = 'lms_marketing_copy_v1'; // courseId -> MarketingCopy
+// NOTE: 강사 프로필 페이지 큐레이션/메트릭 계산 관련 새 유틸은
+// schema v1.1의 공개(published) + 활성(is_active) 코스를 기준으로 한다.
+// 리팩터링 시 서버 API 전환이 용이하도록 단일 파일 내 pure 함수 형태 유지.
 
 interface StoredUser {
     id: string;
@@ -54,6 +58,85 @@ function loadUsers(): StoredUser[] {
 }
 function saveUsers(list: StoredUser[]) {
     ssSet(K_USERS, list);
+}
+
+// -------- Instructor Profiles (approved instructor editable profile) --------
+export interface InstructorProfile {
+    instructor_id: string;
+    display_name: string;
+    bio_md?: string;
+    avatar_url?: string; // future
+    links?: { label: string; url: string }[];
+    updated_at: string;
+}
+
+function loadInstructorProfileMap(): Record<string, InstructorProfile> {
+    return ssGet<Record<string, InstructorProfile>>(K_INSTRUCTOR_PROFILES) || {};
+}
+function saveInstructorProfileMap(map: Record<string, InstructorProfile>) {
+    ssSet(K_INSTRUCTOR_PROFILES, map);
+}
+
+export function getInstructorProfile(instructorId: string): InstructorProfile | undefined {
+    return loadInstructorProfileMap()[instructorId];
+}
+
+export function upsertInstructorProfile(instructorId: string, patch: { display_name?: string; bio_md?: string; links?: { label: string; url: string }[] }) {
+    const map = loadInstructorProfileMap();
+    const now = new Date().toISOString();
+    const existing = map[instructorId];
+    const profile: InstructorProfile = {
+        instructor_id: instructorId,
+        display_name: patch.display_name ?? existing?.display_name ?? '강사',
+        bio_md: patch.bio_md ?? existing?.bio_md,
+        links: patch.links ?? existing?.links,
+        avatar_url: existing?.avatar_url,
+        updated_at: now
+    };
+
+    map[instructorId] = profile;
+    saveInstructorProfileMap(map);
+    bump();
+
+    return profile;
+}
+
+export function ensureInstructorProfile(instructorId: string, seed?: { display_name?: string; bio_md?: string }) {
+    const map = loadInstructorProfileMap();
+
+    if (!map[instructorId]) {
+        map[instructorId] = {
+            instructor_id: instructorId,
+            display_name: seed?.display_name || '강사',
+            bio_md: seed?.bio_md,
+            updated_at: new Date().toISOString()
+        };
+        saveInstructorProfileMap(map);
+        bump();
+    }
+
+    return map[instructorId];
+}
+
+export function useInstructorProfile(instructorId: string | undefined) {
+    const [p, setP] = useState<InstructorProfile | undefined>(() => (instructorId ? getInstructorProfile(instructorId) : undefined));
+
+    useEffect(() => {
+        if (instructorId) setP(getInstructorProfile(instructorId));
+    }, [instructorId]);
+    useEffect(() => {
+        const fn = () => {
+            if (instructorId) setP(getInstructorProfile(instructorId));
+        };
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, [instructorId]);
+
+    return p;
 }
 
 // 초기 샘플 코스 (운영 스키마 구조 따름)
@@ -214,27 +297,57 @@ export function useMarketingCopy(courseId: string | undefined) {
     return mc;
 }
 
-// Lessons seed (간단 mock: 각 코스 3개 레슨)
+// Lessons seed (단일 리스트 + 섹션 헤더 2개 + 레슨 3개 예시)
 function seedLessons(courses: Course[]): Lesson[] {
     const list: Lesson[] = [];
     const now = new Date().toISOString();
 
     courses.forEach((c) => {
-        for (let i = 1; i <= 3; i++) {
-            // 간단한 섹션 구분: 1~2 = s1, 3 = s2 (데모용)
-            const sectionId = i <= 2 ? `${c.id}-s1` : `${c.id}-s2`;
+        const base = c.id;
 
+        // 섹션 헤더 2개
+        list.push({
+            id: `${base}-sec1`,
+            course_id: c.id,
+            title: '섹션 1. 소개',
+            outline: undefined,
+            content_md: undefined,
+            content_url: undefined,
+            attachments: undefined,
+            duration_seconds: 0,
+            order_index: list.length + 1,
+            is_preview: false,
+            is_section: true,
+            created_at: now,
+            updated_at: now
+        });
+        list.push({
+            id: `${base}-sec2`,
+            course_id: c.id,
+            title: '섹션 2. 본문',
+            outline: undefined,
+            content_md: undefined,
+            content_url: undefined,
+            attachments: undefined,
+            duration_seconds: 0,
+            order_index: list.length + 1,
+            is_preview: false,
+            is_section: true,
+            created_at: now,
+            updated_at: now
+        });
+        // 레슨 3개
+        for (let i = 1; i <= 3; i++) {
             list.push({
-                id: `${c.id}-l${i}`,
+                id: `${base}-l${i}`,
                 course_id: c.id,
-                section_id: sectionId,
                 title: `${c.title} 레슨 ${i}`,
                 outline: undefined,
                 content_md: undefined,
                 content_url: undefined,
                 attachments: undefined,
                 duration_seconds: 300 + i * 60,
-                order_index: i,
+                order_index: list.length + 1,
                 is_preview: i === 1,
                 created_at: now,
                 updated_at: now
@@ -243,6 +356,88 @@ function seedLessons(courses: Course[]): Lesson[] {
     });
 
     return list;
+}
+
+// ================= Instructor Profile Curation & Metrics =================
+export interface InstructorCourseCurationResult {
+    featured?: Course;
+    others: Course[]; // 대표 제외 노출 코스 (max limit 적용 결과)
+    allCount: number; // 공개+활성 전체 수
+}
+
+/** 공개+활성 코스만 반환 */
+function listPublicActiveCoursesByInstructor(instructorId: string): Course[] {
+    return loadCourses().filter((c) => c.instructor_id === instructorId && c.published && c.is_active);
+}
+
+/** 단순 metrics: 레슨 수 & 총 duration 합산 (섹션 헤더 제외) */
+export function getInstructorLessonAggregates(instructorId: string): { totalLessons: number; totalDurationSeconds: number } {
+    if (!instructorId) return { totalLessons: 0, totalDurationSeconds: 0 };
+    const courses = listPublicActiveCoursesByInstructor(instructorId).map((c) => c.id);
+
+    if (courses.length === 0) return { totalLessons: 0, totalDurationSeconds: 0 };
+
+    // 로컬 스토리지 상 모든 레슨 로드 → 필터 → 집계
+    const allLessons = (function () {
+        // 내부 loadLessons 함수 접근 불가(스코프 밖) → listLessonsByCourse 반복 사용
+        let acc: Lesson[] = [];
+
+        courses.forEach((cid) => {
+            acc = acc.concat(listLessonsByCourse(cid));
+        });
+
+        return acc;
+    })();
+    const filtered = allLessons.filter((l) => !l.is_section);
+    let totalDurationSeconds = 0;
+
+    filtered.forEach((l) => {
+        totalDurationSeconds += l.duration_seconds || 0;
+    });
+
+    return { totalLessons: filtered.length, totalDurationSeconds };
+}
+
+/** HH:MM 포맷 (시간 단위 초과 시 HHh MMm) 간단 포맷터 */
+export function formatDurationHM(totalSeconds: number): string {
+    if (!totalSeconds || totalSeconds <= 0) return '0m';
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    if (hours === 0) return minutes + 'm';
+
+    return hours + 'h ' + (minutes > 0 ? minutes + 'm' : '');
+}
+
+/** 대표 코스 선정 우선순위: is_featured.rank ASC → fallback: updated_at desc */
+function pickFeaturedCourse(courses: Course[]): Course | undefined {
+    if (courses.length === 0) return undefined;
+    const featured = courses.filter((c) => c.is_featured).sort((a, b) => (a.featured_rank || 999) - (b.featured_rank || 999));
+
+    if (featured.length > 0) return featured[0];
+    // fallback: 최신 수정일
+
+    return [...courses].sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1))[0];
+}
+
+/** 나머지 정렬: updated_at desc (추후 평점/수강생 메트릭 접목 가능) */
+function sortRemainingForProfile(courses: Course[]): Course[] {
+    return [...courses].sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+}
+
+/** 강사 프로필 페이지 노출용 코스 큐레이션 */
+export function curateInstructorCourses(instructorId: string, options?: { limit?: number }): InstructorCourseCurationResult {
+    const limit = options?.limit ?? 4; // 대표 제외 후 최대 노출 개수
+
+    if (!instructorId) return { featured: undefined, others: [], allCount: 0 };
+    const all = listPublicActiveCoursesByInstructor(instructorId);
+
+    if (all.length === 0) return { featured: undefined, others: [], allCount: 0 };
+    const featured = pickFeaturedCourse(all);
+    const restPool = featured ? all.filter((c) => c.id !== featured.id) : all;
+    const sorted = sortRemainingForProfile(restPool).slice(0, limit);
+
+    return { featured, others: sorted, allCount: all.length };
 }
 
 // Courses
@@ -255,6 +450,26 @@ export function loadCourses(): Course[] {
     }
 
     return list;
+}
+
+// Simple client-side pagination wrapper (server 전환 시 동일 서명 유지 후 내부 offset/cursor 적용 예정)
+export interface PagedResult<T> {
+    items: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export function loadCoursesPaged(page: number, pageSize: number): PagedResult<Course> {
+    const all = loadCourses();
+    const total = all.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const current = Math.min(Math.max(1, page), totalPages);
+    const start = (current - 1) * pageSize;
+    const items = all.slice(start, start + pageSize);
+
+    return { items, total, page: current, pageSize, totalPages };
 }
 
 // Lessons

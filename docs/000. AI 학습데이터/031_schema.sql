@@ -108,37 +108,28 @@ create trigger if not exists trg_courses_updated before update on courses
 for each row execute function set_updated_at();
 
 -- ----------
--- Sections (course curriculum grouping)
--- ----------
-create table if not exists course_sections (
-  id uuid primary key default gen_random_uuid(),
-  course_id uuid not null references courses(id) on delete cascade,
-  title text not null,
-  order_index int not null,
-  created_at timestamptz not null default now(),
-  unique(course_id, order_index)
-);
-create index if not exists idx_sections_course on course_sections(course_id);
+-- (v3.5 제거 예정) course_sections 테이블 삭제: 통합 커리큘럼 모델(is_section 플래그)
+-- DOWNGRADE 시 이전 정의 복원 필요
 -- ----------
 -- lessons (ordered within a course; richer authoring)
 -- ----------
 create table if not exists lessons (
   id uuid primary key default gen_random_uuid(),
   course_id uuid not null references courses(id) on delete cascade,
-  title text not null,
-  outline jsonb,        -- e.g., [{"h":"Intro","t":60}]
-  content_md text,      -- markdown content body
-  content_url text,     -- optional hosted video/asset url
-  attachments jsonb,    -- e.g., [{"name":"slides.pdf","url":"..."}]
-  duration_seconds int not null check (duration_seconds >= 0),
+  title text not null, -- 레슨/섹션 제목
+  outline jsonb,
+  content_md text,
+  content_url text,
+  attachments jsonb,
+  duration_seconds int not null default 0 check (duration_seconds >= 0),
   order_index int not null,
+  is_section boolean not null default false, -- 섹션 헤더 여부
+  is_preview boolean not null default false check (is_section = false or is_preview = false),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  section_id uuid, -- @deprecated 유지(legacy 마이그레이션), 의미 없음
   unique (course_id, order_index)
 );
--- new columns (idempotent)
-alter table lessons add column if not exists section_id uuid references course_sections(id) on delete set null;
-alter table lessons add column if not exists is_preview boolean not null default false;
 create index if not exists idx_lessons_course on lessons(course_id);
 create trigger if not exists trg_lessons_updated before update on lessons
 for each row execute function set_updated_at();

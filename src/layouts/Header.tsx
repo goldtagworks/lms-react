@@ -17,7 +17,16 @@ const Header = ({ navOpened, toggleNav }: HeaderProps) => {
     const role = user?.role ?? null;
     const location = useLocation();
     const pathname = location.pathname;
-    const filtered = filterNav(navGroups, { isAuthenticated: !!user, role });
+    const filtered = filterNav(
+        navGroups.map((g) => ({
+            ...g,
+            items: g.items.map((it) => ({
+                ...it,
+                href: user ? it.href.replace('__USER_ID__', user.id) : it.href
+            }))
+        })),
+        { isAuthenticated: !!user, role }
+    );
 
     return (
         <Container component="header" h="100%" size="lg">

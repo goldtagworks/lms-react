@@ -4,6 +4,8 @@ import EmptyState from '@main/components/EmptyState';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import { useAuth } from '@main/lib/auth';
+import { useState, useEffect } from 'react';
+import PaginationBar from '@main/components/PaginationBar';
 import { useCourses, useWishlistState, isWishlisted, toggleWishlistAndNotify, isEnrolled, enrollAndNotify } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import AppImage from '@main/components/AppImage';
@@ -19,6 +21,14 @@ export default function WishlistPage() {
     const wishlist = useWishlistState(userId);
 
     const wishCourses = allCourses.filter((c) => (userId ? isWishlisted(userId, c.id) : false));
+    const PAGE_SIZE = 12;
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(wishCourses.length / PAGE_SIZE));
+    const paged = wishCourses.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [page, totalPages]);
 
     const handleToggle = (courseId: string) => {
         if (!userId) return;
@@ -49,7 +59,7 @@ export default function WishlistPage() {
                     {userId && wishlist.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="아직 찜한 강의가 없습니다." title="위시한 강의 없음" to="/courses" />}
                     {userId && wishlist.length > 0 && (
                         <CourseGrid mt="md">
-                            {wishCourses.map((course) => {
+                            {paged.map((course) => {
                                 const enrolled = userId ? isEnrolled(userId, course.id) : false;
                                 const wish = userId ? isWishlisted(userId, course.id) : false;
 
@@ -100,6 +110,7 @@ export default function WishlistPage() {
                             })}
                         </CourseGrid>
                     )}
+                    <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
                 </Stack>
             </Card>
         </PageContainer>

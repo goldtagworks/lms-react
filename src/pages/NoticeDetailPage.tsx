@@ -3,6 +3,7 @@ import { togglePin, deleteNotice, useNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
 import EmptyState from '@main/components/EmptyState';
 import { Badge, Group, Stack, Text, Anchor, Paper, Divider, ActionIcon, Tooltip, Title } from '@mantine/core';
+import MarkdownView from '@main/components/markdown/MarkdownView';
 import { formatDate } from '@main/utils/format';
 import { ChevronLeft, Pin, Share2, Copy, Pencil, Trash2 } from 'lucide-react';
 import NoticeEditor from '@main/components/notices/NoticeEditor';
@@ -93,7 +94,7 @@ export default function NoticeDetailPage() {
                         underline="never"
                     >
                         <ActionIcon aria-hidden="true" size="sm" variant="subtle">
-                            <ChevronLeft size={18} />
+                            <ChevronLeft size={16} />
                         </ActionIcon>
                         <Text c="dimmed" size="sm">
                             공지사항
@@ -150,9 +151,7 @@ export default function NoticeDetailPage() {
                             </Text>
                         </Group>
                         <Divider my="xs" />
-                        <Text aria-label="공지 본문" component="div" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                            {notice.body}
-                        </Text>
+                        <MarkdownView source={notice.body} />
                     </Stack>
                 </Paper>
 

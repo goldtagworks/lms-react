@@ -7,7 +7,16 @@ import { useLocation } from 'react-router-dom';
 const Navbar = () => {
     const { user } = useAuth();
     const role = user?.role ?? null;
-    const filtered = filterNav(navGroups, { isAuthenticated: !!user, role });
+    const filtered = filterNav(
+        navGroups.map((g) => ({
+            ...g,
+            items: g.items.map((it) => ({
+                ...it,
+                href: user ? it.href.replace('__USER_ID__', user.id) : it.href
+            }))
+        })),
+        { isAuthenticated: !!user, role }
+    );
     const { pathname } = useLocation();
 
     return (

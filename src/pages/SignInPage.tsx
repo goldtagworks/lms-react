@@ -24,7 +24,7 @@ export default function SignInPage() {
                 <Stack>
                     <TextInput label="이메일" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <TextInput label="비밀번호" placeholder="비밀번호" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <Button fullWidth disabled={!email || !password} leftSection={<LogIn size={16} />} loading={loading} onClick={handleSubmit}>
+                    <Button fullWidth disabled={!email || !password} leftSection={<LogIn size={14} />} loading={loading} onClick={handleSubmit}>
                         로그인
                     </Button>
                 </Stack>

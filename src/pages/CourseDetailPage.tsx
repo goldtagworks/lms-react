@@ -1,4 +1,5 @@
-import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, Badge, ActionIcon, Tooltip, TextInput, Switch, Stack, Textarea } from '@mantine/core';
+import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, Badge, ActionIcon, Tooltip, TextInput, Switch, Stack, Textarea, AspectRatio } from '@mantine/core';
+import MarkdownView from '@main/components/markdown/MarkdownView';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { TagChip } from '@main/components/TagChip';
@@ -6,7 +7,7 @@ import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageSection from '@main/components/layout/PageSection';
 import PageHeader from '@main/components/layout/PageHeader';
-import { Share2, Copy, Pencil, Plus, Trash2, Undo2 } from 'lucide-react';
+import { Share2, Copy, Pencil, Plus, Trash2, Undo2, Award, ThumbsUp } from 'lucide-react';
 import useCopyLink from '@main/hooks/useCopyLink';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
@@ -41,17 +42,35 @@ export default function CourseDetailPage() {
     const lessons = useLessons(course?.id);
     const marketingCopy = useMarketingCopy(course?.id);
 
-    // 섹션 그룹 (section_id 기준). 빈 값은 'default' 그룹
-    const sectionGroups = lessons.reduce<Record<string, typeof lessons>>((acc, l) => {
-        const sid = l.section_id || 'default';
+    // 커리큘럼: 단일 lessons 배열 내에서 is_section=true 를 헤더로 사용
+    // 기존 section_id 그룹핑 제거됨. 렌더 단계에서 순차 스캔하며 헤더 블록 생성.
+    const curriculumBlocks = (() => {
+        if (!lessons.length) {
+            return [] as { header?: (typeof lessons)[number]; items: typeof lessons }[];
+        }
 
-        if (!acc[sid]) acc[sid] = [];
+        const ordered = [...lessons].sort((a, b) => a.order_index - b.order_index);
+        const blocks: { header?: (typeof ordered)[number]; items: typeof ordered }[] = [];
+        let current: { header?: (typeof ordered)[number]; items: typeof ordered } | null = null;
 
-        acc[sid].push(l);
+        for (const l of ordered) {
+            if (l.is_section) {
+                // 새 블록 시작
+                current = { header: l, items: [] };
+                blocks.push(current);
+                continue;
+            }
 
-        return acc;
-    }, {});
-    const orderedSectionIds = Object.keys(sectionGroups).sort();
+            if (!current) {
+                // 헤더 없이 시작하는 레슨들 -> implicit 블록
+                current = { header: undefined, items: [] };
+                blocks.push(current);
+            }
+            current.items.push(l);
+        }
+
+        return blocks;
+    })();
 
     // 공유/복사 상태 공통 훅
     const { copied, copy } = useCopyLink(1200);
@@ -238,6 +257,61 @@ export default function CourseDetailPage() {
         );
     }
 
+    // ----- Preview Lesson (first is_preview true) -----
+    const previewLesson = (() => {
+        if (!lessons.length) return undefined;
+        const ordered = [...lessons].sort((a, b) => a.order_index - b.order_index);
+
+        return ordered.find((l) => l.is_preview && !!l.content_url);
+    })();
+
+    function renderPreviewPlayer() {
+        if (!previewLesson) return null;
+        const url = previewLesson.content_url!;
+        let embed: React.ReactNode = null;
+
+        // Very simple YouTube detection; later server can supply embed meta.
+        const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([A-Za-z0-9_-]{6,})/);
+
+        if (ytMatch) {
+            const videoId = ytMatch[1];
+
+            embed = (
+                <AspectRatio maw={960} mx="auto" ratio={16 / 9}>
+                    <iframe
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        style={{ border: 0 }}
+                        title={previewLesson.title}
+                    />
+                </AspectRatio>
+            );
+        } else if (/^https?:/.test(url)) {
+            embed = (
+                <AspectRatio maw={960} mx="auto" ratio={16 / 9}>
+                    <video controls preload="metadata" src={url} style={{ width: '100%', height: '100%', background: '#000', borderRadius: 8 }}>
+                        <track kind="captions" label="captions" srcLang="ko" />
+                    </video>
+                </AspectRatio>
+            );
+        }
+
+        if (!embed) return null;
+
+        return (
+            <Card withBorder mb="lg" p="md" radius="md" shadow="sm">
+                <Text c="blue.6" fw={600} mb={8} size="sm">
+                    미리보기 영상
+                </Text>
+                {embed}
+                <Text c="dimmed" mt={8} size="xs">
+                    이 강의의 무료 미리보기 레슨입니다.
+                </Text>
+            </Card>
+        );
+    }
+
     return (
         <PageContainer roleMain>
             <Group align="flex-start" justify="space-between" mb="md" wrap="nowrap">
@@ -259,19 +333,15 @@ export default function CourseDetailPage() {
                     )}
                     {user?.role === 'admin' && (
                         <Tooltip withArrow label="추천(Featured) 설정">
-                            <ActionIcon aria-label="추천 설정" variant="subtle" onClick={openFeaturedModal}>
-                                <Badge color="teal" size="xs" variant={course.is_featured ? 'filled' : 'outline'}>
-                                    Feat
-                                </Badge>
+                            <ActionIcon aria-label="추천 설정" color="teal" variant="subtle" w="100%" onClick={openFeaturedModal}>
+                                <Award size={16} />
                             </ActionIcon>
                         </Tooltip>
                     )}
                     {user?.role === 'admin' && (
                         <Tooltip withArrow label="마케팅 추천 카피">
-                            <ActionIcon aria-label="마케팅 추천 카피" variant="subtle" onClick={openMarketingModal}>
-                                <Badge color="grape" size="xs" variant={marketingCopy?.headline ? 'filled' : 'outline'}>
-                                    Mkt
-                                </Badge>
+                            <ActionIcon aria-label="마케팅 추천 카피" color="grape" variant="subtle" w="100%" onClick={openMarketingModal}>
+                                <ThumbsUp size={16} />
                             </ActionIcon>
                         </Tooltip>
                     )}
@@ -283,27 +353,27 @@ export default function CourseDetailPage() {
                                 to={user.role === 'admin' ? `/admin/courses/${course.id}/edit` : `/instructor/courses/${course.id}/edit`}
                                 variant="subtle"
                             >
-                                <Pencil size={18} />
+                                <Pencil size={16} />
                             </ActionIcon>
                         </Tooltip>
                     )}
                     {user?.role === 'admin' && (
                         <Tooltip withArrow label={course.is_active ? '강의 비활성화' : '강의 활성화'}>
                             <ActionIcon aria-label={course.is_active ? '강의 비활성화' : '강의 활성화'} color={course.is_active ? 'red' : 'teal'} variant="subtle" onClick={handleToggleActive}>
-                                {course.is_active ? <Trash2 size={18} /> : <Undo2 size={18} />}
+                                {course.is_active ? <Trash2 size={16} /> : <Undo2 size={16} />}
                             </ActionIcon>
                         </Tooltip>
                     )}
                     {user && user.role === 'instructor' && (
                         <Tooltip withArrow label="새 강의 작성">
                             <ActionIcon aria-label="새 강의 작성" component={Link} to="/instructor/courses/new" variant="subtle">
-                                <Plus size={18} />
+                                <Plus size={16} />
                             </ActionIcon>
                         </Tooltip>
                     )}
                     <Tooltip withArrow label={copied ? '복사됨' : '링크 복사'}>
                         <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : undefined} variant="subtle" onClick={handleCopy}>
-                            {copied ? <Copy size={18} /> : <Share2 size={18} />}
+                            {copied ? <Copy size={16} /> : <Share2 size={16} />}
                         </ActionIcon>
                     </Tooltip>
                 </Group>
@@ -381,15 +451,14 @@ export default function CourseDetailPage() {
                             <Tabs.Tab value="qna">Q&A</Tabs.Tab>
                         </Tabs.List>
                         <Tabs.Panel pt="md" value="desc">
-                            <Text lh={1.6} mb={16} size="md">
-                                {course.description}
-                            </Text>
+                            <MarkdownView source={course.description || ''} />
                             <Divider my="md" />
                             <Text c="dimmed" size="sm">
                                 {course.summary}
                             </Text>
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="curriculum">
+                            {renderPreviewPlayer()}
                             {lessons.length === 0 && (
                                 <Text c="dimmed" size="sm">
                                     레슨이 아직 없습니다.
@@ -397,18 +466,23 @@ export default function CourseDetailPage() {
                             )}
                             {lessons.length > 0 && (
                                 <Box>
-                                    {orderedSectionIds.map((sid, sIndex) => {
-                                        const list = sectionGroups[sid];
+                                    {curriculumBlocks.map((block, bIndex) => {
+                                        const list = block.items;
+                                        // 빈 블록(헤더만 있고 레슨 없음) skip
+
+                                        if (block.header && list.length === 0) {
+                                            return null;
+                                        }
 
                                         return (
-                                            <Box key={sid} mb={sIndex === orderedSectionIds.length - 1 ? 0 : 24}>
-                                                {sid !== 'default' && (
+                                            <Box key={block.header ? block.header.id : `block-${bIndex}`} mb={bIndex === curriculumBlocks.length - 1 ? 0 : 24}>
+                                                {block.header && (
                                                     <Text c="blue.6" fw={600} mb={6} size="sm">
-                                                        섹션 {sIndex + 1}
+                                                        {block.header.title}
                                                     </Text>
                                                 )}
                                                 <Box
-                                                    aria-label={`섹션 ${sIndex + 1} 레슨 목록`}
+                                                    aria-label={`커리큘럼 블록 ${bIndex + 1}`}
                                                     component="ul"
                                                     style={{
                                                         listStyle: 'none',
@@ -448,7 +522,7 @@ export default function CourseDetailPage() {
                                                                 <Text c="dimmed" size="xs" style={{ width: 32 }} ta="right">
                                                                     {l.order_index}
                                                                 </Text>
-                                                                <Text lineClamp={1} size="sm" style={{ flex: 1, lineHeight: 1.35 }}>
+                                                                <Text component="div" lineClamp={1} size="sm" style={{ flex: 1, lineHeight: 1.35 }}>
                                                                     {l.title}
                                                                     {l.is_preview && (
                                                                         <Badge color="blue" ml={8} size="xs" variant="light">
@@ -486,11 +560,7 @@ export default function CourseDetailPage() {
                                 {marketingCopy.headline}
                             </Text>
                         )}
-                        {marketingCopy?.body_md && (
-                            <Text c="dimmed" lh={1.6} size="sm" style={{ whiteSpace: 'pre-line' }}>
-                                {marketingCopy.body_md}
-                            </Text>
-                        )}
+                        {marketingCopy?.body_md && <MarkdownView compact source={marketingCopy.body_md} />}
                         {!marketingCopy?.headline && !marketingCopy?.body_md && (
                             <Text c="dimmed" size="sm">
                                 마케팅 카피가 아직 없습니다.

@@ -167,7 +167,15 @@
         "applyApproved": "이미 승인된 강사입니다",
         "applyButton": "신청 제출",
         "links": "관련 링크",
-        "badgeFeatured": "추천"
+        "badgeFeatured": "추천",
+        "profileEdit": "프로필 수정",
+        "profileCoursesFeatured": "대표 강의",
+        "profileCoursesOthers": "다른 강의",
+        "profileNoCourses": "아직 공개된 강의가 없습니다.",
+        "profileMetrics": "공개 강의 {{count}}개 · 레슨 {{lessons}}개 · 총 {{duration}}",
+        "profileLinks": "Links",
+        "profileBioEmpty": "소개가 아직 없습니다.",
+        "profileAllCourses": "전체 강의 보기 ({{count}}개)"
     },
     "coupon": {
         "apply": "쿠폰 적용",

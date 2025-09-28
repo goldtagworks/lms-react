@@ -1,6 +1,6 @@
 import { Card, Text, Button, Group, Select, TextInput, Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TagChip } from '@main/components/TagChip';
 import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -12,6 +12,7 @@ import PriceText from '@main/components/price/PriceText';
 import { useCourses, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import EmptyState from '@main/components/EmptyState';
+import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
 
 const categories = [
@@ -66,6 +67,17 @@ const CourseListPage = () => {
         });
     }, [courses, category, query]);
 
+    // Pagination state (client-side for mock data)
+    const PAGE_SIZE = 12;
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    const paged = filtered.slice(start, start + PAGE_SIZE);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [page, totalPages]);
+
     const handleEnroll = (courseId: string, enrolled: boolean) => {
         if (!userId || enrolled) return;
         enrollAndNotify(userId, courseId);
@@ -104,7 +116,7 @@ const CourseListPage = () => {
                     </Button>
                 </Group>
                 <CourseGrid>
-                    {filtered.map((course) => {
+                    {paged.map((course) => {
                         const enrolled = userId ? isEnrolled(userId, course.id) : false;
                         const wish = userId ? isWishlisted(userId, course.id) : false;
 
@@ -170,6 +182,7 @@ const CourseListPage = () => {
                         <EmptyState actionLabel="필터 초기화" message="검색어나 필터를 조정해 다시 시도해 주세요." title="코스를 찾을 수 없어요" onActionClick={handleResetFilters} />
                     )}
                 </CourseGrid>
+                <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
             </PageSection>
         </PageContainer>
     );

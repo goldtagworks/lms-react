@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Badge, Button, Card, Group, Stack, Table, Text, Textarea, Modal, Pagination, Tabs, TextInput, ActionIcon, Tooltip } from '@mantine/core';
+import { Badge, Button, Card, Group, Stack, Table, Text, Textarea, Modal, Tabs, TextInput, ActionIcon, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { approveInstructorApplication, rejectInstructorApplication, revokeInstructorApplication, useInstructorApplications } from '@main/lib/repository';
 import InstructorAppDetail from '@main/components/instructors/InstructorAppDetail';
 import { Search, XCircle, CheckCircle2, Clock, Check, X, ShieldAlert } from 'lucide-react';
 import PageContainer from '@main/components/layout/PageContainer';
+import PaginationBar from '@main/components/PaginationBar';
 import PageHeader from '@main/components/layout/PageHeader';
 
 const statusColor: Record<string, string> = {
@@ -118,7 +119,7 @@ export default function AdminInstructorAppsPage() {
     }
 
     return (
-        <PageContainer roleMain size="xl">
+        <PageContainer roleMain>
             <PageHeader
                 actions={
                     <Group gap={6} wrap="wrap">
@@ -224,7 +225,7 @@ export default function AdminInstructorAppsPage() {
                                                                     approve(a.id);
                                                                 }}
                                                             >
-                                                                <CheckCircle2 size={18} />
+                                                                <CheckCircle2 size={16} />
                                                             </ActionIcon>
                                                         </Tooltip>
                                                         <Tooltip withArrow label="반려">
@@ -237,7 +238,7 @@ export default function AdminInstructorAppsPage() {
                                                                     openReject(a.id);
                                                                 }}
                                                             >
-                                                                <XCircle size={18} />
+                                                                <XCircle size={16} />
                                                             </ActionIcon>
                                                         </Tooltip>
                                                     </Group>
@@ -260,7 +261,7 @@ export default function AdminInstructorAppsPage() {
                                 <Text c="dimmed" size="xs">
                                     {rangeText(filteredPending.length, pendingPage)}
                                 </Text>
-                                {filteredPending.length > pageSize && <Pagination size="xs" total={Math.ceil(filteredPending.length / pageSize)} value={pendingPage} onChange={setPendingPage} />}
+                                <PaginationBar align="right" page={pendingPage} totalPages={Math.max(1, Math.ceil(filteredPending.length / pageSize))} onChange={setPendingPage} />
                             </Group>
                         </Stack>
                     )}
@@ -324,7 +325,7 @@ export default function AdminInstructorAppsPage() {
                                                                     openRevoke(a.id);
                                                                 }}
                                                             >
-                                                                <ShieldAlert size={18} />
+                                                                <ShieldAlert size={16} />
                                                             </ActionIcon>
                                                         </Tooltip>
                                                     )}
@@ -347,7 +348,7 @@ export default function AdminInstructorAppsPage() {
                                 <Text c="dimmed" size="xs">
                                     {rangeText(filteredDecided.length, decidedPage)}
                                 </Text>
-                                {filteredDecided.length > pageSize && <Pagination size="xs" total={Math.ceil(filteredDecided.length / pageSize)} value={decidedPage} onChange={setDecidedPage} />}
+                                <PaginationBar align="right" page={decidedPage} totalPages={Math.max(1, Math.ceil(filteredDecided.length / pageSize))} onChange={setDecidedPage} />
                             </Group>
                         </Stack>
                     )}
@@ -398,7 +399,7 @@ export default function AdminInstructorAppsPage() {
                                 <Text c="dimmed" size="xs">
                                     {rangeText(filteredRevoked.length, revokedPage)}
                                 </Text>
-                                {filteredRevoked.length > pageSize && <Pagination size="xs" total={Math.ceil(filteredRevoked.length / pageSize)} value={revokedPage} onChange={setRevokedPage} />}
+                                <PaginationBar align="right" page={revokedPage} totalPages={Math.max(1, Math.ceil(filteredRevoked.length / pageSize))} onChange={setRevokedPage} />
                             </Group>
                         </Stack>
                     )}
@@ -427,7 +428,7 @@ export default function AdminInstructorAppsPage() {
                     </Text>
                     <Textarea minRows={3} placeholder="회수 사유 (선택) - 예: 부적절한 콘텐츠, 정책 위반" value={revokeReason} onChange={(e) => setRevokeReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
-                        <Button color="gray" leftSection={<ShieldAlert size={16} />} onClick={confirmRevoke}>
+                        <Button color="gray" leftSection={<ShieldAlert size={14} />} onClick={confirmRevoke}>
                             회수 확정
                         </Button>
                         <Button leftSection={<CheckCircle2 size={14} />} variant="default" onClick={() => setRevokingId(null)}>

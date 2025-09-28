@@ -1,9 +1,10 @@
-import { Container, Title, Text, Button } from '@mantine/core';
+import { Title, Text, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
+import PageContainer from '@main/components/layout/PageContainer';
 
 const NotFoundPage = () => {
     return (
-        <Container py="xl" ta="center">
+        <PageContainer roleMain py={48} ta="center">
             <Title mb="md" order={1}>
                 404 Not Found
             </Title>
@@ -13,7 +14,7 @@ const NotFoundPage = () => {
             <Button color="primary" component={Link} to="/" variant="filled">
                 홈으로 이동
             </Button>
-        </Container>
+        </PageContainer>
     );
 };
 

@@ -5,6 +5,8 @@ import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
+import { useState, useEffect } from 'react';
+import PaginationBar from '@main/components/PaginationBar';
 import { useEnrollmentsState, useCourses, isEnrolled, isWishlisted } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import AppImage from '@main/components/AppImage';
@@ -19,6 +21,14 @@ export default function MyPage() {
     const courses = useCourses();
 
     const enrolledCourses = enrollments.map((e) => courses.find((c) => c.id === e.course_id)).filter((c): c is NonNullable<typeof c> => !!c);
+    const PAGE_SIZE = 8;
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(enrolledCourses.length / PAGE_SIZE));
+    const paged = enrolledCourses.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [page, totalPages]);
 
     return (
         <PageContainer roleMain>
@@ -58,7 +68,7 @@ export default function MyPage() {
                     {userId && enrolledCourses.length === 0 && <EmptyState actionLabel="강의 탐색" message="아직 수강중인 강의가 없습니다." title="수강중 강의 없음" to="/courses" />}
                     {userId && enrolledCourses.length > 0 && (
                         <CourseGrid mt="md">
-                            {enrolledCourses.map((course) => {
+                            {paged.map((course) => {
                                 const wish = isWishlisted(userId!, course.id);
                                 const enrolled = isEnrolled(userId!, course.id);
 
@@ -123,6 +133,7 @@ export default function MyPage() {
                             })}
                         </CourseGrid>
                     )}
+                    <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
                 </Stack>
             </Card>
         </PageContainer>

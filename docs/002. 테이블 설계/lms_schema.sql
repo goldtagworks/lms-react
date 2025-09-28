@@ -1,5 +1,9 @@
 -- =============================
--- LMS schema v1.0 (single domain; roles: admin|instructor|learner)
+-- LMS schema v1.1 (2025-09-28)
+-- Change Log:
+--  * v1.1: Removed course_sections table; simplified curriculum model.
+--          Added lessons.is_section boolean; deprecated lessons.section_id.
+--          Rationale: 프론트/UX 단순화 요구. (섹션 헤더를 레슨 Row로 통합)
 -- =============================
 
 -- [코스] 강의/클래스의 기본 정보 테이블
@@ -60,34 +64,26 @@ CREATE TABLE IF NOT EXISTS enrollments (
 CREATE INDEX IF NOT EXISTS idx_enrollments_user_id ON enrollments(user_id);
 CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
 
--- [코스 섹션] 강의 내 목차/단원
-DROP TABLE IF EXISTS course_sections CASCADE;
-CREATE TABLE IF NOT EXISTS course_sections (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 섹션 고유 ID
-  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
-  title text NOT NULL, -- 섹션명
-  order_index int NOT NULL, -- 순서
-  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
-  UNIQUE(course_id, order_index)
-);
-CREATE INDEX IF NOT EXISTS idx_sections_course ON course_sections(course_id);
+-- [Deprecated] course_sections 테이블 제거 (v1.1 이전 버전에서 존재)
+-- IF NEEDED FOR DOWNGRADE, recreate using previous definition.
 
 -- [레슨] 강의 내 개별 학습 단위(신버전)
 DROP TABLE IF EXISTS lessons CASCADE;
 CREATE TABLE IF NOT EXISTS lessons (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 레슨 고유 ID
   course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
-  title text NOT NULL, -- 레슨명
+  title text NOT NULL, -- 레슨/섹션 제목 (is_section=true 시 섹션 헤더)
   outline jsonb, -- 목차/개요
   content_md text, -- 본문(Markdown)
   content_url text, -- 외부 본문 URL
   attachments jsonb, -- 첨부파일
-  duration_seconds int NOT NULL CHECK (duration_seconds >= 0), -- 영상 길이(초)
-  order_index int NOT NULL, -- 순서
+  duration_seconds int NOT NULL DEFAULT 0 CHECK (duration_seconds >= 0), -- 영상 길이(초)
+  order_index int NOT NULL, -- 순서 (섹션 포함 전역 정렬)
+  is_section boolean NOT NULL DEFAULT false, -- 섹션 헤더 여부 (v1.1 추가)
+  is_preview boolean NOT NULL DEFAULT false CHECK (is_section = false OR is_preview = false), -- 미리보기 (섹션 헤더는 미리보기 불가)
   created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
   updated_at timestamptz NOT NULL DEFAULT now(), -- 수정일
-  section_id uuid REFERENCES course_sections(id) ON DELETE SET NULL, -- 섹션 ID
-  is_preview boolean NOT NULL DEFAULT false, -- 미리보기 여부
+  section_id uuid, -- @deprecated v1.1: 유지(마이그레이션 호환), 의미 없음
   UNIQUE (course_id, order_index)
 );
 CREATE INDEX IF NOT EXISTS idx_lessons_course ON lessons(course_id);
