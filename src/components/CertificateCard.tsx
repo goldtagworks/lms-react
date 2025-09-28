@@ -13,7 +13,7 @@ export interface CertificateCardProps {
     compact?: boolean;
 }
 
-// 간단한 표시 컴포넌트 (목업 단계): 추후 성적/점수/강사명 추가 가능
+// 간단한 표시 컴포넌트: 추후 성적/점수/강사명 추가 가능
 export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }: CertificateCardProps) {
     const date = new Date(issuedAt).toLocaleDateString();
 

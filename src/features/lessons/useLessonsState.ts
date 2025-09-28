@@ -12,7 +12,7 @@ export interface LessonsStateApi {
     removeLesson: (id: string, opts?: { silent?: boolean }) => void;
     move: (id: string, dir: 'up' | 'down') => void;
     togglePreview: (id: string) => void;
-    patch: (patch: Partial<Lesson> & { id: string }) => void;
+    patch: (patch: Partial<Lesson> & { id: string }, opts?: { silent?: boolean }) => void;
 }
 
 // repository 기반으로 전환되어 개별 STORAGE_KEY 불필요
@@ -116,11 +116,24 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
         });
     }, []);
 
-    const patch = useCallback((p: Partial<Lesson> & { id: string }) => {
-        updateLesson(p as any);
-        setLessons((prev) => prev.map((l) => (l.id === p.id ? { ...l, ...p } : l)));
-        notifications.show({ color: 'teal', title: '레슨 수정', message: '저장되었습니다.' });
-    }, []);
+    const patch = useCallback(
+        (p: Partial<Lesson> & { id: string }, opts?: { silent?: boolean }) => {
+            updateLesson(p as any);
+            setLessons((prev) => prev.map((l) => (l.id === p.id ? { ...l, ...p } : l)));
+            if (!opts?.silent) {
+                // 섹션과 일반 레슨 메시지 구분
+                const updated = lessons.find((l) => l.id === p.id);
+                const isSection = updated?.is_section;
+
+                notifications.show({
+                    color: 'teal',
+                    title: isSection ? '섹션 수정' : '레슨 수정',
+                    message: isSection ? '섹션이 업데이트되었습니다.' : '레슨이 업데이트되었습니다.'
+                });
+            }
+        },
+        [lessons]
+    );
 
     return { lessons, orderedLessons, addLesson, addSection, removeLesson, move, togglePreview, patch };
 }

@@ -168,7 +168,7 @@ export default function AppRouter() {
                     path="/admin/instructors/apps"
                 />
 
-                {/* LMS 주요 플로우 목업 */}
+                {/* LMS 주요 플로우 */}
                 <Route element={<EnrollPage />} path="/enroll/:id" />
                 <Route element={<ExamPage />} path="/exam/:id" />
                 <Route element={<CertificatePage />} path="/certificate/:id" />

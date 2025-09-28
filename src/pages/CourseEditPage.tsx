@@ -28,6 +28,9 @@ const CourseEditPage = () => {
     const [newLessonTitle, setNewLessonTitle] = useState('');
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
+    // 인라인 제목 편집 상태 (레슨 또는 섹션 공용 id)
+    const [renamingId, setRenamingId] = useState<string | null>(null);
+    const [renameDraft, setRenameDraft] = useState('');
 
     // ----- Dirty Guard -----
     // 초기 스냅샷 (코스 생성 전이면 빈 상태)
@@ -125,6 +128,11 @@ const CourseEditPage = () => {
 
     // ----- Lesson Edit Modal -----
     function openLessonEdit(l: Lesson) {
+        // 인라인 rename 중이면 취소
+        if (renamingId) {
+            setRenamingId(null);
+            setRenameDraft('');
+        }
         setEditingLesson(l);
         setLessonModalOpen(true);
     }
@@ -148,6 +156,42 @@ const CourseEditPage = () => {
         move(id, dir);
     }
 
+    // ----- Inline Rename -----
+    function startRename(l: Lesson) {
+        // 기존 편집 중이던 제목이 유효(2글자 이상)하고 다른 행이면 자동 저장
+        if (renamingId && renamingId !== l.id) {
+            const prev = renameDraft.trim();
+
+            if (prev.length >= 2) {
+                // 자동 저장 (토스트는 새 rename commit 시 한 번만 보여주도록 suppress)
+                patch({ id: renamingId, title: prev });
+            }
+        }
+        setRenamingId(l.id);
+        setRenameDraft(l.title);
+    }
+
+    function cancelRename() {
+        setRenamingId(null);
+        setRenameDraft('');
+    }
+
+    function commitRename() {
+        if (!renamingId) return;
+        const v = renameDraft.trim();
+
+        if (v.length < 2) {
+            notifications.show({ color: 'red', title: '이름 오류', message: '제목 2글자 이상 입력' });
+        }
+
+        if (v.length < 2) {
+            return;
+        }
+        patch({ id: renamingId, title: v });
+        setRenamingId(null);
+        setRenameDraft('');
+    }
+
     const [lessonModalOpen, setLessonModalOpen] = useState(false);
 
     return (
@@ -168,7 +212,7 @@ const CourseEditPage = () => {
                     <Stack gap="sm">
                         <Group justify="space-between">
                             <Text fw={600} size="sm">
-                                섹션 & 레슨 (목업)
+                                섹션 & 레슨
                             </Text>
                             {course && (
                                 <Badge color="pink" variant="light">
@@ -183,7 +227,7 @@ const CourseEditPage = () => {
                         )}
                         {course && (
                             <>
-                                <Group align="flex-end" gap="xs">
+                                <Group align="flex-end" gap="xs" justify="center">
                                     <TextInput
                                         flex={1}
                                         id="new-lesson-input"
@@ -217,10 +261,16 @@ const CourseEditPage = () => {
                                                         displayIndex={sectionCounter}
                                                         index={idx}
                                                         lesson={row}
+                                                        renameDraft={renameDraft}
+                                                        renamingId={renamingId}
                                                         total={orderedLessons.length}
                                                         onDelete={removeRow}
                                                         onEdit={openLessonEdit}
                                                         onMove={moveRow}
+                                                        onRenameCancel={cancelRename}
+                                                        onRenameChange={setRenameDraft}
+                                                        onRenameCommit={commitRename}
+                                                        onStartRename={startRename}
                                                     />
                                                 );
                                             }
@@ -233,10 +283,16 @@ const CourseEditPage = () => {
                                                     displayIndex={composite}
                                                     index={idx}
                                                     lesson={row}
+                                                    renameDraft={renameDraft}
+                                                    renamingId={renamingId}
                                                     total={orderedLessons.length}
                                                     onDelete={handleRemoveLesson}
                                                     onEdit={openLessonEdit}
                                                     onMove={moveRow}
+                                                    onRenameCancel={cancelRename}
+                                                    onRenameChange={setRenameDraft}
+                                                    onRenameCommit={commitRename}
+                                                    onStartRename={startRename}
                                                     onTogglePreview={togglePreview}
                                                 />
                                             );
@@ -259,14 +315,14 @@ const CourseEditPage = () => {
                 </Card>
                 <Group justify="flex-end" mt="md">
                     <Button disabled={!title.trim()} leftSection={<Save size={14} />} size="xs" onClick={handleSave}>
-                        {dirty ? '변경 저장' : '저장(목업)'}
+                        {dirty ? '변경 저장' : '저장'}
                     </Button>
                     <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => guardedNavigate(-1)}>
                         {dirty ? '변경 취소' : '취소'}
                     </Button>
                 </Group>
                 <Text c="dimmed" size="xs">
-                    단순화된 목업: 섹션은 is_section 플래그를 가진 헤더 행입니다. (드래그 정렬 / 고급 필드 추후) {dirty && ' · 미저장 변경 있음'}
+                    단순화된 안내: 섹션은 is_section 플래그를 가진 헤더 행입니다. (드래그 정렬 / 고급 필드 추후) {dirty && ' · 미저장 변경 있음'}
                 </Text>
                 <LessonEditModal
                     lesson={editingLesson}

@@ -29,7 +29,7 @@ const InstructorCoursesPage = () => {
                 </Button>
             </Group>
             <Text c="dimmed" mb="md" size="sm">
-                내가 개설한 강의 목록 (목업)
+                내가 개설한 강의 목록
             </Text>
             {total === 0 && (
                 <Text c="dimmed" size="sm">

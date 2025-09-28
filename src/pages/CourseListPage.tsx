@@ -108,7 +108,7 @@ const CourseListPage = () => {
                             { value: 'rating', label: '평점순' }
                         ]}
                         defaultValue="latest"
-                        size="md"
+                        size="sm"
                     />
                     <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="sm" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
                     <Button disabled size="xs" variant="outline">

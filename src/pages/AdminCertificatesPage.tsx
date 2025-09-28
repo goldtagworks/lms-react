@@ -149,10 +149,10 @@ export default function AdminCertificatesPage() {
                         </Text>
                         <TextInput aria-label="메모" label="관리 메모 (옵션)" placeholder="사유/메모" value={reissueNote} onChange={(e) => setReissueNote(e.currentTarget.value)} />
                         <Group justify="flex-end" mt="sm">
-                            <Button leftSection={<RotateCcw size={14} />} onClick={commitReissue}>
+                            <Button leftSection={<RotateCcw size={14} />} size="xs" onClick={commitReissue}>
                                 재발급
                             </Button>
-                            <Button leftSection={<X size={14} />} variant="default" onClick={() => setReissueErr(null)}>
+                            <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setReissueErr(null)}>
                                 취소
                             </Button>
                         </Group>

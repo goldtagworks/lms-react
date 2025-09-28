@@ -11,7 +11,7 @@ import CertificateCard from '@main/components/CertificateCard';
 import { notifications } from '@mantine/notifications';
 
 // 임시: 수료증 파생 로직 (실제 구현 전까지)
-// 이전 파생 목업 로직 제거: 실제 issueCertificate + useCertificates 사용
+// 이전 파생 로직 제거: 실제 issueCertificate + useCertificates 사용
 
 const CertificatesListPage = () => {
     const { user } = useAuth();
@@ -48,7 +48,7 @@ const CertificatesListPage = () => {
             return;
         }
         const courseId = enrollment.course_id;
-        const attemptId = 'attempt-' + Date.now().toString(36); // 목업 시험 시도 ID
+        const attemptId = 'attempt-' + Date.now().toString(36); // 임시 시험 시도 ID
         const cert = issueCertificate({ enrollment_id: enrollment.id, exam_attempt_id: attemptId, user_id: userId, course_id: courseId });
 
         notifications.show({ color: 'teal', message: '수료증이 발급되었습니다: ' + cert.serial_no, title: '발급 완료' });
@@ -61,7 +61,7 @@ const CertificatesListPage = () => {
                     userId && (
                         <Group gap="xs">
                             <Button size="xs" variant="light" onClick={handleIssueOne}>
-                                수료증 발급(목업)
+                                수료증 발급
                             </Button>
                         </Group>
                     )
@@ -92,7 +92,7 @@ const CertificatesListPage = () => {
                     )}
                     {userId && (
                         <Text c="dimmed" mt="sm" size="xs">
-                            (목업) 발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
+                            발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
                         </Text>
                     )}
                     <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />

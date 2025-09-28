@@ -55,7 +55,7 @@ function CourseCardBase({ course, to }: CourseCardProps) {
                     </Text>
                 )}
             </Group>
-            <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" to={finalLink} variant="light">
+            <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" size="xs" to={finalLink} variant="light">
                 자세히 보기
             </Button>
         </Card>

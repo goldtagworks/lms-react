@@ -419,13 +419,13 @@ export default function CourseDetailPage() {
                         <EnrollWishlistActions
                             enrolled={enrolled}
                             labels={{ enroll: '수강신청', loginRequired: '로그인 필요', wishAdd: '위시 담기' }}
-                            size="sm"
+                            size="xs"
                             userId={userId}
                             wish={wish}
                             onEnroll={handleEnroll}
                             onToggleWish={handleWishlist}
                         />
-                        <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="default">
+                        <Button fullWidth component={Link} mt="sm" radius="md" size="xs" to="/courses" variant="default">
                             목록으로
                         </Button>
                     </Card>
@@ -481,7 +481,7 @@ export default function CourseDetailPage() {
                                             <Box key={block.header ? block.header.id : `block-${bIndex}`} mb={bIndex === curriculumBlocks.length - 1 ? 0 : 24}>
                                                 {block.header && (
                                                     <Text c="blue.6" fw={600} mb={6} size="sm">
-                                                        {block.sectionIndex}. {block.header.title}
+                                                        {block.sectionIndex}. {block.header.title}1ㅁ
                                                     </Text>
                                                 )}
                                                 <Box

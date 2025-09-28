@@ -15,7 +15,7 @@ export function PriceText({ price, discount, size = 'md', showStrike = true }: P
     const hasDiscount = discount != null && discount < price;
 
     return (
-        <Group align="flex-end" gap={8}>
+        <Group align="flex-end" gap={8} mb="md">
             <Text c={hasDiscount ? 'red.6' : 'dark'} fw={700} size={size}>
                 {formatPrice(hasDiscount ? discount! : price)}
             </Text>

@@ -235,31 +235,39 @@ const AdminCouponsPage = () => {
                             </Notification>
                         )}
                         <Group grow>
-                            <TextInput label="코드" value={editDraft.code} onChange={(e) => setEditDraft((d) => ({ ...d, code: e.currentTarget.value }))} />
+                            <TextInput label="코드" radius="md" value={editDraft.code} onChange={(e) => setEditDraft((d) => ({ ...d, code: e.currentTarget.value }))} />
                             <Select
                                 data={[
                                     { value: 'percent', label: 'percent' },
                                     { value: 'fixed', label: 'fixed' }
                                 ]}
                                 label="종류"
+                                radius="md"
                                 value={editDraft.type}
                                 onChange={(v) => v && setEditDraft((d) => ({ ...d, type: v as 'percent' | 'fixed' }))}
                             />
                             <NumberInput
                                 label="값"
                                 min={1}
+                                radius="md"
                                 value={editDraft.value as number | undefined}
                                 onChange={(val) => setEditDraft((d) => ({ ...d, value: typeof val === 'number' ? val : d.value }))}
                             />
                         </Group>
                         {editDraft.type === 'fixed' && (
-                            <TextInput label="통화" value={editDraft.currency_code || ''} onChange={(e) => setEditDraft((d) => ({ ...d, currency_code: e.currentTarget.value.toUpperCase() }))} />
+                            <TextInput
+                                label="통화"
+                                radius="md"
+                                value={editDraft.currency_code || ''}
+                                onChange={(e) => setEditDraft((d) => ({ ...d, currency_code: e.currentTarget.value.toUpperCase() }))}
+                            />
                         )}
                         <Group grow>
                             <NumberInput
                                 label="총 사용 한도"
                                 min={1}
                                 placeholder="무제한"
+                                radius="md"
                                 value={editDraft.max_uses as number | undefined}
                                 onChange={(val) => setEditDraft((d) => ({ ...d, max_uses: typeof val === 'number' ? val : undefined }))}
                             />
@@ -267,13 +275,19 @@ const AdminCouponsPage = () => {
                                 label="사용자당 한도"
                                 min={1}
                                 placeholder="무제한"
+                                radius="md"
                                 value={editDraft.per_user_limit as number | undefined}
                                 onChange={(val) => setEditDraft((d) => ({ ...d, per_user_limit: typeof val === 'number' ? val : undefined }))}
                             />
                         </Group>
                         <Group grow>
-                            <TextInput label="시작 (ISO)" value={editDraft.starts_at || ''} onChange={(e) => setEditDraft((d) => ({ ...d, starts_at: e.currentTarget.value || undefined }))} />
-                            <TextInput label="종료 (ISO)" value={editDraft.ends_at || ''} onChange={(e) => setEditDraft((d) => ({ ...d, ends_at: e.currentTarget.value || undefined }))} />
+                            <TextInput
+                                label="시작 (ISO)"
+                                radius="md"
+                                value={editDraft.starts_at || ''}
+                                onChange={(e) => setEditDraft((d) => ({ ...d, starts_at: e.currentTarget.value || undefined }))}
+                            />
+                            <TextInput label="종료 (ISO)" radius="md" value={editDraft.ends_at || ''} onChange={(e) => setEditDraft((d) => ({ ...d, ends_at: e.currentTarget.value || undefined }))} />
                         </Group>
                         <Switch checked={!!editDraft.active} label="활성 상태" onChange={(e) => setEditDraft((d) => ({ ...d, active: e.currentTarget.checked }))} />
                         <Group justify="flex-end" mt="sm">
