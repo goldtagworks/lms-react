@@ -49,7 +49,7 @@ export default function SignInPage() {
                                     회원가입
                                 </Text>
                             </Text>
-                            <Text c="dimmed" component={Link} size="xs" style={{ textDecoration: 'underline' }} to="/forgot">
+                            <Text c="dimmed" component={Link} size="xs" style={{ textDecoration: 'underline' }} to="/password/reset">
                                 비밀번호 재설정
                             </Text>
                         </Group>

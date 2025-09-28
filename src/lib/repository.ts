@@ -22,6 +22,7 @@ const K_LESSON_COURSE_PREFIX = 'lms_lessons_v2:'; // per-course key prefix
 const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
 const K_INSTRUCTOR_PROFILES = 'lms_instructor_profiles_v1';
 const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (mock)
+const K_USER_PASSWORDS = 'lms_user_passwords_v1'; // userId -> password (mock)
 const K_MARKETING_COPY = 'lms_marketing_copy_v1'; // courseId -> MarketingCopy
 // NOTE: 강사 프로필 페이지 큐레이션/메트릭 계산 관련 새 유틸은
 // schema v1.1의 공개(published) + 활성(is_active) 코스를 기준으로 한다.
@@ -32,6 +33,61 @@ interface StoredUser {
     name: string;
     email: string;
     role: UserRole;
+}
+
+interface PasswordMap {
+    [userId: string]: string; // 해시 아님 (mock). 실제 구현 시 절대 평문 저장 금지.
+}
+
+// ---------------- Users (admin mock) ----------------
+export function listUsers(): StoredUser[] {
+    return loadUsers();
+}
+
+export function ensureUser(u: { id: string; name: string; email: string; role: UserRole }) {
+    const users = loadUsers();
+
+    if (!users.find((x) => x.id === u.id)) {
+        users.push(u);
+        saveUsers(users);
+        bump();
+    }
+}
+
+export function upsertUserRole(userId: string, role: UserRole) {
+    const users = loadUsers();
+    const idx = users.findIndex((u) => u.id === userId);
+
+    if (idx >= 0) {
+        users[idx] = { ...users[idx], role };
+    } else {
+        users.push({ id: userId, name: '사용자', email: userId + '@unknown.local', role });
+    }
+    saveUsers(users);
+    bump();
+}
+
+export function removeUser(userId: string) {
+    const users = loadUsers().filter((u) => u.id !== userId);
+
+    saveUsers(users);
+    bump();
+}
+
+export function useUsers() {
+    const [list, setList] = useState<StoredUser[]>(() => listUsers());
+
+    useEffect(() => {
+        const fn = () => setList(listUsers());
+
+        listeners.add(fn);
+
+        return () => {
+            listeners.delete(fn);
+        };
+    }, []);
+
+    return list;
 }
 
 export interface InstructorApplication {
@@ -59,6 +115,69 @@ function loadUsers(): StoredUser[] {
 }
 function saveUsers(list: StoredUser[]) {
     ssSet(K_USERS, list);
+}
+function loadPasswordMap(): PasswordMap {
+    return ssGet<PasswordMap>(K_USER_PASSWORDS) || {};
+}
+function savePasswordMap(map: PasswordMap) {
+    ssSet(K_USER_PASSWORDS, map);
+}
+
+// 관리자: 임시 비밀번호 즉시 발급 (기존 방식) - UI 간소화를 위해 내부에서만 사용 가능.
+export function resetUserPassword(userId: string): { temp: string } {
+    const users = loadUsers();
+
+    if (!users.find((u) => u.id === userId)) throw new Error('USER_NOT_FOUND');
+    const map = loadPasswordMap();
+    const temp = 'tmp-' + Math.random().toString(36).slice(2, 10);
+
+    map[userId] = temp; // mock: plain text
+    savePasswordMap(map);
+
+    return { temp };
+}
+
+// 이메일 기반 리셋 (토큰 발급) 모킹: 실제 구현시 서버 저장 & 메일 발송 필요.
+interface PasswordResetToken {
+    token: string;
+    user_id: string;
+    created_at: string; // ISO
+}
+const K_PASSWORD_RESET_TOKENS = 'lms_pw_reset_tokens_v1';
+
+function loadResetTokens(): PasswordResetToken[] {
+    return ssGet<PasswordResetToken[]>(K_PASSWORD_RESET_TOKENS) || [];
+}
+function saveResetTokens(list: PasswordResetToken[]) {
+    ssSet(K_PASSWORD_RESET_TOKENS, list);
+}
+export function initiatePasswordReset(userId: string): { token: string } {
+    const users = loadUsers();
+
+    if (!users.find((u) => u.id === userId)) throw new Error('USER_NOT_FOUND');
+    const list = loadResetTokens().filter((t) => t.created_at > new Date(Date.now() - 1000 * 60 * 60).toISOString()); // 최근 1시간 유지만 남김
+    const token = 'rt-' + Math.random().toString(36).slice(2, 14);
+
+    list.push({ token, user_id: userId, created_at: new Date().toISOString() });
+    saveResetTokens(list);
+    // mock 이메일 발송 (실제: 서버 side mailer)
+    // eslint-disable-next-line no-console
+    console.log('[mock-email] password_reset', { userId, token });
+
+    return { token };
+}
+
+export function validateUserPassword(email: string, password: string): { ok: boolean; user?: StoredUser } {
+    const users = loadUsers();
+    const u = users.find((x) => x.email === email);
+
+    if (!u) return { ok: false };
+    const map = loadPasswordMap();
+    const stored = map[u.id];
+
+    if (!stored) return { ok: true, user: u }; // 비밀번호 미설정 상태는 프리패스 (기존 로직 유지)
+
+    return { ok: stored === password, user: stored === password ? u : undefined };
 }
 
 // -------- Instructor Profiles (approved instructor editable profile) --------

@@ -19,6 +19,9 @@ import CertificatePage from '@main/pages/CertificatePage';
 import CertificatesListPage from '@main/pages/CertificatesListPage';
 import SignInPage from '@main/pages/SignInPage';
 import SignUpPage from '@main/pages/SignUpPage';
+import PasswordResetRequestPage from '@main/pages/PasswordResetRequestPage';
+import PasswordChangePage from '@main/pages/PasswordChangePage';
+import { useAuth } from '@main/lib/auth';
 import NotFoundPage from '@main/pages/NotFoundPage';
 import MainLayout from '@main/layouts/MainLayout';
 import TermsPage from '@main/pages/TermsPage';
@@ -28,6 +31,17 @@ import NoticeDetailPage from '@main/pages/NoticeDetailPage';
 import InstructorApplyPage from '@main/pages/InstructorApplyPage';
 import AdminInstructorAppsPage from '@main/pages/AdminInstructorAppsPage';
 import RequireRole from '@main/components/RequireRole';
+import { ReactNode } from 'react';
+
+function AuthAny({ children }: { children: ReactNode }) {
+    const { user, loading } = useAuth();
+
+    if (loading) return null;
+
+    if (!user) return <Navigate replace to="/signin" />;
+
+    return <>{children}</>;
+}
 
 function MainLayoutRoute() {
     return (
@@ -52,6 +66,15 @@ export default function AppRouter() {
                 <Route element={<NoticesPage />} path="/notices" />
                 <Route element={<NoticeDetailPage />} path="/notices/:id" />
                 <Route element={<SignInPage />} path="/signin" />
+                <Route element={<PasswordResetRequestPage />} path="/password/reset" />
+                <Route
+                    element={
+                        <AuthAny>
+                            <PasswordChangePage />
+                        </AuthAny>
+                    }
+                    path="/password/change"
+                />
                 <Route
                     element={
                         <RequireRole requiredRole="instructor">

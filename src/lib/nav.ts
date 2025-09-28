@@ -75,7 +75,7 @@ export const navGroups: NavGroup[] = [
         auth: 'auth',
         roles: ['admin'],
         items: [
-            { id: 'admin-users', label: '사용자', href: '/admin/users', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-users', label: '사용자 관리', href: '/admin/users', roles: ['admin'], auth: 'auth' },
             { id: 'admin-categories', label: '카테고리', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
             { id: 'admin-coupons', label: '쿠폰', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
             { id: 'admin-certificates', label: '수료증', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },

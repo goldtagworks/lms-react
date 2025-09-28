@@ -92,6 +92,9 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                                 <Menu.Item component="a" href="/my">
                                     마이페이지
                                 </Menu.Item>
+                                <Menu.Item component="a" href="/password/change">
+                                    비밀번호 변경
+                                </Menu.Item>
                                 <Menu.Item
                                     onClick={() => {
                                         logout();
