@@ -50,7 +50,7 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
     }
 
     return (
-        <Modal centered withinPortal opened={opened} size="lg" title="프로필 수정" onClose={onClose}>
+        <Modal centered withinPortal opened={opened} radius="md" size="lg" title="프로필 수정" onClose={onClose}>
             <Stack gap="sm" mt="xs">
                 <TextInput label="표시 이름" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
                 <Textarea label="소개 (Markdown)" minRows={6} placeholder="## 소개\n경력 요약 ..." value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
@@ -80,10 +80,10 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
                     ))}
                 </Stack>
                 <Group justify="flex-end" mt="sm">
-                    <Button disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} onClick={handleSave}>
+                    <Button disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} size="xs" onClick={handleSave}>
                         저장
                     </Button>
-                    <Button leftSection={<X size={16} />} variant="default" onClick={onClose}>
+                    <Button leftSection={<X size={16} />} size="xs" variant="default" onClick={onClose}>
                         취소
                     </Button>
                 </Group>

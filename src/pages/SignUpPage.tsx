@@ -60,7 +60,7 @@ export default function SignUpPage() {
                             </Text>
                         )}
                         <ConsentCheckboxes requireAge onChange={setConsent} />
-                        <Button disabled={!canSubmit} leftSection={<UserPlus size={14} />} loading={loading} size="sm" type="submit">
+                        <Button disabled={!canSubmit} leftSection={<UserPlus size={14} />} loading={loading} size="xs" type="submit">
                             회원가입
                         </Button>
                         <Divider label="이미 계정이 있나요?" labelPosition="center" my="xs" />

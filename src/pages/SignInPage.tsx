@@ -38,7 +38,7 @@ export default function SignInPage() {
                             <TextInput autoComplete="email" label="이메일" placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <TextInput autoComplete="current-password" label="비밀번호" placeholder="••••••" size="sm" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </Stack>
-                        <Button disabled={disabled} leftSection={<LogIn size={14} />} loading={loading} size="sm" type="submit">
+                        <Button disabled={disabled} leftSection={<LogIn size={14} />} loading={loading} size="xs" type="submit">
                             로그인
                         </Button>
                         <Divider label="이메일로 계속" labelPosition="center" my="xs" />

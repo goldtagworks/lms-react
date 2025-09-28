@@ -63,6 +63,7 @@ export default function NoticeDetailPage() {
     function handleDelete() {
         if (!isAdmin || !notice) return;
         modals.openConfirmModal({
+            radius: 'md',
             title: '공지 삭제',
             centered: true,
             children: <Text size="sm">정말로 이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</Text>,

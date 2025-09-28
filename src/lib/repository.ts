@@ -1110,6 +1110,239 @@ function bump() {
     listeners.forEach((l) => l());
 }
 
+// ================= Coupons (mock) =================
+// 단순 클라이언트 목업: 서버 authoritative 이전 임시. 금액/EPP 검증 로직 없음.
+export interface Coupon {
+    id: string;
+    code: string; // 대문자 고유
+    type: 'percent' | 'fixed';
+    value: number; // percent=1~100, fixed=양수
+    currency_code?: string; // fixed일 때 통화
+    max_uses?: number;
+    used_count: number;
+    per_user_limit?: number; // user별 사용 한도
+    starts_at?: string;
+    ends_at?: string;
+    active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+const K_COUPONS = 'lms.coupons.v1';
+
+function loadCoupons(): Coupon[] {
+    return ssGet<Coupon[]>(K_COUPONS) || [];
+}
+function saveCoupons(list: Coupon[]) {
+    ssSet(K_COUPONS, list);
+}
+
+export interface CouponFilters {
+    q?: string;
+    active?: boolean;
+}
+
+export function listCouponsPaged(filters: CouponFilters, page: number, pageSize: number) {
+    const all = loadCoupons()
+        .filter((c) => (filters.active == null ? true : c.active === filters.active))
+        .filter((c) => {
+            if (!filters.q) return true;
+            const q = filters.q.toLowerCase();
+
+            return c.code.toLowerCase().includes(q);
+        })
+        .sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const total = all.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const start = (safePage - 1) * pageSize;
+    const items = all.slice(start, start + pageSize);
+
+    return { items, total, totalPages, page: safePage };
+}
+
+export function createCoupon(input: Omit<Coupon, 'id' | 'created_at' | 'updated_at' | 'used_count' | 'active'> & { active?: boolean }) {
+    const now = new Date().toISOString();
+    const list = loadCoupons();
+    const code = input.code.trim().toUpperCase();
+
+    if (list.some((c) => c.code === code)) return { error: 'DUPLICATE_CODE' } as const;
+    if (input.type === 'percent' && (input.value < 1 || input.value > 100)) return { error: 'INVALID_PERCENT' } as const;
+    if (input.type === 'fixed' && input.value <= 0) return { error: 'INVALID_VALUE' } as const;
+    if (input.starts_at && input.ends_at && input.starts_at > input.ends_at) return { error: 'INVALID_RANGE' } as const;
+    const coupon: Coupon = {
+        id: 'cp-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        code,
+        type: input.type,
+        value: input.value,
+        currency_code: input.currency_code,
+        max_uses: input.max_uses,
+        per_user_limit: input.per_user_limit,
+        starts_at: input.starts_at,
+        ends_at: input.ends_at,
+        active: input.active ?? true,
+        used_count: 0,
+        created_at: now,
+        updated_at: now
+    };
+
+    list.push(coupon);
+    saveCoupons(list);
+    bump();
+
+    return { coupon } as const;
+}
+
+export function updateCoupon(id: string, patch: Partial<Omit<Coupon, 'id' | 'created_at' | 'used_count'>>) {
+    const list = loadCoupons();
+    const idx = list.findIndex((c) => c.id === id);
+
+    if (idx < 0) return { error: 'NOT_FOUND' } as const;
+    const now = new Date().toISOString();
+    const cur = list[idx];
+
+    if (patch.code) {
+        const code = patch.code.trim().toUpperCase();
+
+        if (list.some((c) => c.code === code && c.id !== id)) return { error: 'DUPLICATE_CODE' } as const;
+        cur.code = code;
+    }
+    if (patch.type) cur.type = patch.type;
+    if (patch.value != null) {
+        if (cur.type === 'percent' && (patch.value < 1 || patch.value > 100)) return { error: 'INVALID_PERCENT' } as const;
+        if (cur.type === 'fixed' && patch.value <= 0) return { error: 'INVALID_VALUE' } as const;
+        cur.value = patch.value;
+    }
+    if (patch.starts_at && patch.ends_at && patch.starts_at > patch.ends_at) return { error: 'INVALID_RANGE' } as const;
+    if (patch.currency_code !== undefined) cur.currency_code = patch.currency_code;
+    if (patch.max_uses !== undefined) cur.max_uses = patch.max_uses;
+    if (patch.per_user_limit !== undefined) cur.per_user_limit = patch.per_user_limit;
+    if (patch.starts_at !== undefined) cur.starts_at = patch.starts_at;
+    if (patch.ends_at !== undefined) cur.ends_at = patch.ends_at;
+    if (patch.active !== undefined) cur.active = patch.active;
+    cur.updated_at = now;
+    saveCoupons(list);
+    bump();
+
+    return { coupon: cur } as const;
+}
+
+export function deactivateCoupon(id: string) {
+    return updateCoupon(id, { active: false });
+}
+
+// 간단 검증 (FE 표시용) — 실제 결제 시 서버 재검증 필요
+export function validateCouponForDisplay(code: string, nowIso: string): { valid: boolean; reason?: string; coupon?: Coupon } {
+    const list = loadCoupons();
+    const c = list.find((x) => x.code === code.trim().toUpperCase());
+
+    if (!c) return { valid: false, reason: 'NOT_FOUND' };
+    if (!c.active) return { valid: false, reason: 'INACTIVE' };
+    if (c.starts_at && nowIso < c.starts_at) return { valid: false, reason: 'NOT_STARTED' };
+    if (c.ends_at && nowIso > c.ends_at) return { valid: false, reason: 'EXPIRED' };
+    if (c.max_uses && c.used_count >= c.max_uses) return { valid: false, reason: 'MAX_REACHED' };
+
+    return { valid: true, coupon: c };
+}
+
+// ================= Categories (mock) =================
+export interface CategoryItem {
+    id: string;
+    name: string;
+    slug: string;
+    sort_order: number;
+    active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+const K_CATEGORIES = 'lms.categories.v1';
+
+function loadCategories(): CategoryItem[] {
+    return ssGet<CategoryItem[]>(K_CATEGORIES) || [];
+}
+function saveCategories(list: CategoryItem[]) {
+    ssSet(K_CATEGORIES, list);
+}
+
+export function listCategories(): CategoryItem[] {
+    return loadCategories()
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+export function createCategory(name: string) {
+    const now = new Date().toISOString();
+    const list = loadCategories();
+    const slug =
+        name
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+            .slice(0, 40) || 'cat';
+
+    if (list.some((c) => c.slug === slug)) return { error: 'DUP_SLUG' } as const;
+    const item: CategoryItem = {
+        id: 'cat-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: name.trim(),
+        slug,
+        sort_order: list.length ? Math.max(...list.map((x) => x.sort_order)) + 1 : 1,
+        active: true,
+        created_at: now,
+        updated_at: now
+    };
+
+    list.push(item);
+    saveCategories(list);
+    bump();
+
+    return { category: item } as const;
+}
+
+export function updateCategory(id: string, patch: Partial<Pick<CategoryItem, 'name' | 'active'>>) {
+    const list = loadCategories();
+    const idx = list.findIndex((c) => c.id === id);
+
+    if (idx < 0) return { error: 'NOT_FOUND' } as const;
+    const now = new Date().toISOString();
+    const cur = list[idx];
+
+    if (patch.name) {
+        cur.name = patch.name.trim();
+    }
+    if (patch.active !== undefined) cur.active = patch.active;
+    cur.updated_at = now;
+    saveCategories(list);
+    bump();
+
+    return { category: cur } as const;
+}
+
+export function moveCategory(id: string, dir: 'up' | 'down') {
+    const list = loadCategories().slice();
+    const idx = list.findIndex((c) => c.id === id);
+
+    if (idx < 0) return { error: 'NOT_FOUND' } as const;
+    const swapWith = dir === 'up' ? idx - 1 : idx + 1;
+
+    if (swapWith < 0 || swapWith >= list.length) return { error: 'OUT_OF_RANGE' } as const;
+    const a = list[idx];
+    const b = list[swapWith];
+    const temp = a.sort_order;
+
+    a.sort_order = b.sort_order;
+    b.sort_order = temp;
+    saveCategories(list);
+    bump();
+
+    return { ok: true } as const;
+}
+
+export function deactivateCategory(id: string) {
+    return updateCategory(id, { active: false });
+}
+
 // ================= Certificates (in-memory/sessionStorage mock) =================
 const K_CERTIFICATES = 'lms.certificates.v1';
 

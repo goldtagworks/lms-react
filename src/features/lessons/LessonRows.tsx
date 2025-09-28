@@ -19,17 +19,19 @@ export interface LessonRowHandlers extends BaseRowHandlers {
 
 interface SectionRowProps extends BaseRowHandlers {
     lesson: Lesson; // is_section=true 보장
-    index: number;
+    index: number; // absolute index in ordered list (이동/비활성 제어 용)
     total: number;
+    displayIndex: number; // 섹션 번호 (1부터)
 }
 
 interface LessonRowProps extends LessonRowHandlers {
     lesson: Lesson; // is_section=false 보장
-    index: number;
+    index: number; // absolute index in ordered list
     total: number;
+    displayIndex: number | string; // 블록 내부 레슨 번호 또는 '섹션-레슨'
 }
 
-export const SectionRow = memo(function SectionRow({ lesson, index, total, onEdit, onDelete, onMove }: SectionRowProps) {
+export const SectionRow = memo(function SectionRow({ lesson, index, total, displayIndex, onEdit, onDelete, onMove }: SectionRowProps) {
     const handleEdit = useCallback(() => onEdit(lesson), [lesson, onEdit]);
     const keyHandler = useEnterSpace(handleEdit);
 
@@ -45,7 +47,7 @@ export const SectionRow = memo(function SectionRow({ lesson, index, total, onEdi
                 <ArrowDown size={16} />
             </ActionIcon>
             <Text aria-label={`섹션 편집: ${lesson.title}`} flex={1} fw={600} role="button" size="sm" style={{ cursor: 'pointer' }} tabIndex={0} onClick={handleEdit} onKeyDown={keyHandler}>
-                {lesson.title}
+                {displayIndex}. {lesson.title}
             </Text>
             <ActionIcon aria-label="섹션 편집" variant="subtle" onClick={handleEdit}>
                 <Pencil size={16} />
@@ -57,7 +59,7 @@ export const SectionRow = memo(function SectionRow({ lesson, index, total, onEdi
     );
 });
 
-export const LessonRow = memo(function LessonRow({ lesson, index, total, onEdit, onDelete, onMove, onTogglePreview }: LessonRowProps) {
+export const LessonRow = memo(function LessonRow({ lesson, index, total, displayIndex, onEdit, onDelete, onMove, onTogglePreview }: LessonRowProps) {
     const handleEdit = useCallback(() => onEdit(lesson), [lesson, onEdit]);
     const keyHandler = useEnterSpace(handleEdit);
     const videoLabel = lesson.content_url ? (YOUTUBE_REGEX.test(lesson.content_url) ? 'YouTube' : 'Video') : '—';
@@ -74,7 +76,7 @@ export const LessonRow = memo(function LessonRow({ lesson, index, total, onEdit,
                 <ArrowDown size={16} />
             </ActionIcon>
             <Text aria-label={`레슨 편집: ${lesson.title}`} component="div" flex={1} role="button" size="sm" style={{ cursor: 'pointer' }} tabIndex={0} onClick={handleEdit} onKeyDown={keyHandler}>
-                {index + 1}. {lesson.title}{' '}
+                {displayIndex}. {lesson.title}{' '}
                 {lesson.is_preview && (
                     <Badge color="teal" size="xs" variant="light">
                         미리보기

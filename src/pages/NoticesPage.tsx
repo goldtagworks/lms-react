@@ -59,6 +59,7 @@ export default function NoticesPage() {
         const n = notices.find((x) => x.id === id);
 
         modals.openConfirmModal({
+            radius: 'md',
             title: '공지 삭제',
             centered: true,
             children: <Text size="sm">정말로 삭제하시겠습니까? ({n?.title})</Text>,
@@ -140,7 +141,7 @@ export default function NoticesPage() {
                 ))}
             </Stack>
             <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
-            <Modal centered withinPortal opened={!!editorState} size="800px" title={editingNotice ? '공지 수정' : '새 공지 작성'} onClose={closeEditor}>
+            <Modal centered withinPortal opened={!!editorState} radius="md" size="800px" title={editingNotice ? '공지 수정' : '새 공지 작성'} onClose={closeEditor}>
                 {editorState && (
                     <NoticeEditor
                         initialBody={editingNotice?.body}

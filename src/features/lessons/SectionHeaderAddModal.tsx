@@ -29,7 +29,7 @@ export default function SectionHeaderAddModal({ opened, onClose, onAdd }: Sectio
     }
 
     return (
-        <Modal centered withinPortal opened={opened} title="섹션 구분 추가" onClose={onClose}>
+        <Modal centered withinPortal opened={opened} radius="md" title="섹션 구분 추가" onClose={onClose}>
             <Stack gap="sm" mt="xs">
                 <TextInput
                     ref={inputRef}

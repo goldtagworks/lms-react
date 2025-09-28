@@ -36,11 +36,11 @@ export function RequireRole({ requiredRole, children }: RequireRoleProps) {
                 </Alert>
                 <Group>
                     {isInstructorGuard && user.role === 'student' && (
-                        <Button component={Link} to="/instructor/apply" variant="filled">
+                        <Button component={Link} size="xs" to="/instructor/apply" variant="filled">
                             강사 신청하기
                         </Button>
                     )}
-                    <Button component={Link} to="/" variant="subtle">
+                    <Button component={Link} size="xs" to="/" variant="subtle">
                         홈으로
                     </Button>
                 </Group>

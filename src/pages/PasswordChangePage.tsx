@@ -68,7 +68,7 @@ export default function PasswordChangePage() {
                             {error}
                         </Text>
                     )}
-                    <Button disabled={!user} size="sm" onClick={submit}>
+                    <Button disabled={!user} size="xs" onClick={submit}>
                         변경
                     </Button>
                 </Stack>

@@ -64,7 +64,7 @@ export default function EnrollPage() {
                                 aria-label={already ? '학습 페이지로 이동' : '즉시 수강 시작'}
                                 color="blue"
                                 leftSection={<CreditCard size={16} />}
-                                size="md"
+                                size="xs"
                                 variant="filled"
                                 onClick={handleEnrollAndGo}
                             >

@@ -44,26 +44,26 @@ export default function CourseDetailPage() {
 
     // 커리큘럼: 단일 lessons 배열 내에서 is_section=true 를 헤더로 사용
     // 기존 section_id 그룹핑 제거됨. 렌더 단계에서 순차 스캔하며 헤더 블록 생성.
+    // 섹션과 레슨 카운터 분리: 섹션 번호(sectionIndex)는 is_section 항목만 증가, 레슨 번호는 블록 내 index + 1 사용
     const curriculumBlocks = (() => {
         if (!lessons.length) {
-            return [] as { header?: (typeof lessons)[number]; items: typeof lessons }[];
+            return [] as { header?: (typeof lessons)[number]; items: typeof lessons; sectionIndex?: number }[];
         }
 
         const ordered = [...lessons].sort((a, b) => a.order_index - b.order_index);
-        const blocks: { header?: (typeof ordered)[number]; items: typeof ordered }[] = [];
-        let current: { header?: (typeof ordered)[number]; items: typeof ordered } | null = null;
+        const blocks: { header?: (typeof ordered)[number]; items: typeof ordered; sectionIndex?: number }[] = [];
+        let current: { header?: (typeof ordered)[number]; items: typeof ordered; sectionIndex?: number } | null = null;
+        let sectionCounter = 0;
 
         for (const l of ordered) {
             if (l.is_section) {
-                // 새 블록 시작
-                current = { header: l, items: [] };
+                sectionCounter += 1;
+                current = { header: l, items: [], sectionIndex: sectionCounter };
                 blocks.push(current);
                 continue;
             }
-
             if (!current) {
-                // 헤더 없이 시작하는 레슨들 -> implicit 블록
-                current = { header: undefined, items: [] };
+                current = { header: undefined, items: [] }; // implicit block (섹션 없는 레슨 그룹)
                 blocks.push(current);
             }
             current.items.push(l);
@@ -82,6 +82,7 @@ export default function CourseDetailPage() {
         const willDeactivate = course.is_active;
 
         modals.openConfirmModal({
+            radius: 'md',
             title: willDeactivate ? '강의 비활성화' : '강의 활성화',
             centered: true,
             labels: { confirm: willDeactivate ? '비활성화' : '활성화', cancel: '취소' },
@@ -158,10 +159,8 @@ export default function CourseDetailPage() {
                         </Group>
                     )}
                     <Group justify="flex-end" mt="sm">
-                        <Button variant="default" onClick={() => modals.close('course-featured-modal')}>
-                            취소
-                        </Button>
                         <Button
+                            size="xs"
                             onClick={() => {
                                 if (!course.id) return;
                                 const patch = localFeatured
@@ -182,6 +181,9 @@ export default function CourseDetailPage() {
                             }}
                         >
                             저장
+                        </Button>
+                        <Button size="xs" variant="default" onClick={() => modals.close('course-featured-modal')}>
+                            취소
                         </Button>
                     </Group>
                 </Stack>
@@ -228,10 +230,8 @@ export default function CourseDetailPage() {
                             {`헤드라인 ${localHeadline.length}/120 · 본문 ${localBody.length}/1200`}
                         </Text>
                         <Group gap="xs">
-                            <Button variant="default" onClick={() => modals.close('course-marketing-modal')}>
-                                취소
-                            </Button>
                             <Button
+                                size="xs"
                                 onClick={() => {
                                     if (!course.id) return;
                                     const saved = upsertMarketingCopy(course.id, { headline: localHeadline.trim() || undefined, body_md: localBody.trim() || undefined });
@@ -241,6 +241,9 @@ export default function CourseDetailPage() {
                                 }}
                             >
                                 저장
+                            </Button>
+                            <Button size="xs" variant="default" onClick={() => modals.close('course-marketing-modal')}>
+                                취소
                             </Button>
                         </Group>
                     </Group>
@@ -478,7 +481,7 @@ export default function CourseDetailPage() {
                                             <Box key={block.header ? block.header.id : `block-${bIndex}`} mb={bIndex === curriculumBlocks.length - 1 ? 0 : 24}>
                                                 {block.header && (
                                                     <Text c="blue.6" fw={600} mb={6} size="sm">
-                                                        {block.header.title}
+                                                        {block.sectionIndex}. {block.header.title}
                                                     </Text>
                                                 )}
                                                 <Box
@@ -519,8 +522,8 @@ export default function CourseDetailPage() {
                                                                     }
                                                                 }}
                                                             >
-                                                                <Text c="dimmed" size="xs" style={{ width: 32 }} ta="right">
-                                                                    {l.order_index}
+                                                                <Text c="dimmed" size="xs" style={{ width: 42 }} ta="right">
+                                                                    {block.sectionIndex ? `${block.sectionIndex}-${idx + 1}` : idx + 1}
                                                                 </Text>
                                                                 <Text component="div" lineClamp={1} size="sm" style={{ flex: 1, lineHeight: 1.35 }}>
                                                                     {l.title}

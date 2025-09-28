@@ -111,7 +111,7 @@ export function ConsentCheckboxes({ onChange, showMarketing = true, requireAge =
                 )}
                 {requireInstructorPolicy && <Checkbox disabled checked={state.terms && state.privacy} label="(필수) 강사 정책 동의 (구현 예정)" size="xs" />}
             </Stack>
-            <Modal centered className={classes.legalModal} opened={opened} size="xl" title="약관 전문" onClose={() => setOpened(false)}>
+            <Modal centered className={classes.legalModal} opened={opened} radius="md" size="xl" title="약관 전문" onClose={() => setOpened(false)}>
                 <Tabs defaultValue="terms" value={activeTab} onChange={(v) => v && setActiveTab(v as any)}>
                     <Tabs.List aria-label="약관 종류 선택">
                         <Tabs.Tab value="terms">이용약관</Tabs.Tab>

@@ -158,8 +158,8 @@ const AdminUsersPage = () => {
                         {paged.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
-                                    <Text c="dimmed" size="xs">
-                                        사용자 없음
+                                    <Text c="dimmed" py={20} size="sm" ta="center">
+                                        사용자가 없습니다.
                                     </Text>
                                 </Table.Td>
                             </Table.Tr>
@@ -222,7 +222,7 @@ const AdminUsersPage = () => {
                 </Table>
                 <PaginationBar align="right" page={page} size="xs" totalPages={totalPages} onChange={(p) => setPage(p)} />
             </Stack>
-            <Modal centered opened={!!editUserId} title="역할 변경" onClose={() => setEditUserId(null)}>
+            <Modal centered opened={!!editUserId} radius="md" title="역할 변경" onClose={() => setEditUserId(null)}>
                 <Stack gap="sm" mt="xs">
                     <Select
                         data={ROLE_OPTIONS}
@@ -234,22 +234,22 @@ const AdminUsersPage = () => {
                         onChange={(v) => v && setEditRole(v as UserRole)}
                     />
                     <Group justify="flex-end" mt="sm">
-                        <Button leftSection={<Save size={14} />} size="sm" onClick={saveRole}>
+                        <Button leftSection={<Save size={14} />} size="xs" onClick={saveRole}>
                             저장
                         </Button>
-                        <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditUserId(null)}>
+                        <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setEditUserId(null)}>
                             취소
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
-            <Modal centered opened={!!confirmRemove} title="사용자 비활성화" onClose={() => setConfirmRemove(null)}>
+            <Modal centered opened={!!confirmRemove} radius="md" title="사용자 비활성화" onClose={() => setConfirmRemove(null)}>
                 <Text size="sm">이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)</Text>
                 <Group justify="flex-end" mt="md">
-                    <Button color="red" leftSection={<Trash2 size={14} />} size="sm" onClick={handleRemove}>
+                    <Button color="red" leftSection={<Trash2 size={14} />} size="xs" onClick={handleRemove}>
                         비활성화
                     </Button>
-                    <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setConfirmRemove(null)}>
+                    <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setConfirmRemove(null)}>
                         취소
                     </Button>
                 </Group>
@@ -257,6 +257,7 @@ const AdminUsersPage = () => {
             <Modal
                 centered
                 opened={!!resetTarget}
+                radius="md"
                 title={resetDone ? '초기화 완료' : '비밀번호 초기화'}
                 onClose={() => {
                     setResetTarget(null);
@@ -271,7 +272,7 @@ const AdminUsersPage = () => {
                                 <Button
                                     color="grape"
                                     leftSection={<RefreshCw size={14} />}
-                                    size="sm"
+                                    size="xs"
                                     onClick={() => {
                                         if (resetTarget) {
                                             initiatePasswordReset(resetTarget);
@@ -281,7 +282,7 @@ const AdminUsersPage = () => {
                                 >
                                     초기화 및 발송
                                 </Button>
-                                <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setResetTarget(null)}>
+                                <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setResetTarget(null)}>
                                     취소
                                 </Button>
                             </Group>

@@ -43,7 +43,7 @@ export default function PasswordResetRequestPage() {
                                     {error}
                                 </Text>
                             )}
-                            <Button size="sm" onClick={submit}>
+                            <Button size="xs" onClick={submit}>
                                 링크 보내기
                             </Button>
                         </>

@@ -111,7 +111,7 @@ const CourseListPage = () => {
                         size="md"
                     />
                     <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="sm" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
-                    <Button disabled size="sm" variant="outline">
+                    <Button disabled size="xs" variant="outline">
                         정렬(스텁)
                     </Button>
                 </Group>

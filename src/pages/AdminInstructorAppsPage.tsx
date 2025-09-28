@@ -401,33 +401,33 @@ export default function AdminInstructorAppsPage() {
                 )}
             </Stack>
 
-            <Modal centered opened={!!detailId} size="lg" title="강사 신청 상세" onClose={() => setDetailId(null)}>
+            <Modal centered opened={!!detailId} radius="md" size="lg" title="강사 신청 상세" onClose={() => setDetailId(null)}>
                 {detailId && <InstructorAppDetail appId={detailId} onClose={() => setDetailId(null)} />}
             </Modal>
-            <Modal centered opened={!!rejectingId} title="반려 사유" onClose={() => setRejectingId(null)}>
+            <Modal centered opened={!!rejectingId} radius="md" title="반려 사유" onClose={() => setRejectingId(null)}>
                 <Stack>
                     <Textarea minRows={3} placeholder="사유 (선택)" value={reason} onChange={(e) => setReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
-                        <Button color="red" leftSection={<XCircle size={14} />} onClick={submitReject}>
+                        <Button color="red" leftSection={<XCircle size={14} />} size="xs" onClick={submitReject}>
                             반려 확정
                         </Button>
-                        <Button leftSection={<CheckCircle2 size={14} />} variant="default" onClick={() => setRejectingId(null)}>
+                        <Button leftSection={<CheckCircle2 size={14} />} size="xs" variant="default" onClick={() => setRejectingId(null)}>
                             취소
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
-            <Modal centered opened={!!revokingId} title="강사 권한 회수" onClose={() => setRevokingId(null)}>
+            <Modal centered opened={!!revokingId} radius="md" title="강사 권한 회수" onClose={() => setRevokingId(null)}>
                 <Stack>
                     <Text c="dimmed" size="sm">
                         승인된 강사의 권한을 회수합니다. 이미 생성된 코스 처리 등은 후속 정책에 따릅니다.
                     </Text>
                     <Textarea minRows={3} placeholder="회수 사유 (선택) - 예: 부적절한 콘텐츠, 정책 위반" value={revokeReason} onChange={(e) => setRevokeReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
-                        <Button color="gray" leftSection={<ShieldAlert size={14} />} onClick={confirmRevoke}>
+                        <Button color="gray" leftSection={<ShieldAlert size={14} />} size="xs" onClick={confirmRevoke}>
                             회수 확정
                         </Button>
-                        <Button leftSection={<CheckCircle2 size={14} />} variant="default" onClick={() => setRevokingId(null)}>
+                        <Button leftSection={<CheckCircle2 size={14} />} size="xs" variant="default" onClick={() => setRevokingId(null)}>
                             취소
                         </Button>
                     </Group>

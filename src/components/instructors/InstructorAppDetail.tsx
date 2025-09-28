@@ -27,7 +27,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                 <Text c="dimmed" size="sm">
                     데이터를 불러올 수 없습니다.
                 </Text>
-                <Button mt="sm" variant="default" onClick={onClose}>
+                <Button mt="sm" size="xs" variant="default" onClick={onClose}>
                     닫기
                 </Button>
             </Stack>

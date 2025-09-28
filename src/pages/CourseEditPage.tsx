@@ -193,31 +193,55 @@ const CourseEditPage = () => {
                                         value={newLessonTitle}
                                         onChange={(e) => setNewLessonTitle(e.currentTarget.value)}
                                     />
-                                    <Button leftSection={<Plus size={14} />} variant="light" onClick={handleAddLesson}>
+                                    <Button leftSection={<Plus size={14} />} size="xs" variant="light" onClick={handleAddLesson}>
                                         레슨 추가
                                     </Button>
-                                    <Button leftSection={<Split size={14} />} variant="default" onClick={openSectionModal}>
+                                    <Button leftSection={<Split size={14} />} size="xs" variant="default" onClick={openSectionModal}>
                                         섹션 구분 추가
                                     </Button>
                                 </Group>
                                 <Divider my={6} />
                                 <Stack gap={10}>
-                                    {orderedLessons.map((row, idx) =>
-                                        row.is_section ? (
-                                            <SectionRow key={row.id} index={idx} lesson={row} total={orderedLessons.length} onDelete={removeRow} onEdit={openLessonEdit} onMove={moveRow} />
-                                        ) : (
-                                            <LessonRow
-                                                key={row.id}
-                                                index={idx}
-                                                lesson={row}
-                                                total={orderedLessons.length}
-                                                onDelete={handleRemoveLesson}
-                                                onEdit={openLessonEdit}
-                                                onMove={moveRow}
-                                                onTogglePreview={togglePreview}
-                                            />
-                                        )
-                                    )}
+                                    {(() => {
+                                        let sectionCounter = 0;
+                                        let lessonCounterWithinSection = 0;
+
+                                        return orderedLessons.map((row, idx) => {
+                                            if (row.is_section) {
+                                                sectionCounter += 1;
+                                                lessonCounterWithinSection = 0; // reset for new section
+
+                                                return (
+                                                    <SectionRow
+                                                        key={row.id}
+                                                        displayIndex={sectionCounter}
+                                                        index={idx}
+                                                        lesson={row}
+                                                        total={orderedLessons.length}
+                                                        onDelete={removeRow}
+                                                        onEdit={openLessonEdit}
+                                                        onMove={moveRow}
+                                                    />
+                                                );
+                                            }
+                                            lessonCounterWithinSection += 1;
+                                            const composite = sectionCounter > 0 ? `${sectionCounter}-${lessonCounterWithinSection}` : String(lessonCounterWithinSection);
+
+                                            return (
+                                                <LessonRow
+                                                    key={row.id}
+                                                    displayIndex={composite}
+                                                    index={idx}
+                                                    lesson={row}
+                                                    total={orderedLessons.length}
+                                                    onDelete={handleRemoveLesson}
+                                                    onEdit={openLessonEdit}
+                                                    onMove={moveRow}
+                                                    onTogglePreview={togglePreview}
+                                                />
+                                            );
+                                        });
+                                    })()}
                                     {lessons.some((l) => l.is_preview) === false && lessons.length > 0 && (
                                         <Text c="dimmed" size="xs">
                                             현재 미리보기 레슨이 없습니다. (선택은 옵션)
@@ -234,10 +258,10 @@ const CourseEditPage = () => {
                     </Stack>
                 </Card>
                 <Group justify="flex-end" mt="md">
-                    <Button disabled={!title.trim()} leftSection={<Save size={14} />} onClick={handleSave}>
+                    <Button disabled={!title.trim()} leftSection={<Save size={14} />} size="xs" onClick={handleSave}>
                         {dirty ? '변경 저장' : '저장(목업)'}
                     </Button>
-                    <Button leftSection={<X size={14} />} variant="default" onClick={() => guardedNavigate(-1)}>
+                    <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => guardedNavigate(-1)}>
                         {dirty ? '변경 취소' : '취소'}
                     </Button>
                 </Group>
