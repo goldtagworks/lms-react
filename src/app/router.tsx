@@ -14,7 +14,6 @@ import HomePage from '@main/pages/HomePage';
 import CourseListPage from '@main/pages/CourseListPage';
 import CourseDetailPage from '@main/pages/CourseDetailPage';
 import EnrollPage from '@main/pages/EnrollPage';
-import PaymentPage from '@main/pages/PaymentPage';
 import ExamPage from '@main/pages/ExamPage';
 import CertificatePage from '@main/pages/CertificatePage';
 import CertificatesListPage from '@main/pages/CertificatesListPage';
@@ -148,7 +147,6 @@ export default function AppRouter() {
 
                 {/* LMS 주요 플로우 목업 */}
                 <Route element={<EnrollPage />} path="/enroll/:id" />
-                <Route element={<PaymentPage />} path="/payment/:id" />
                 <Route element={<ExamPage />} path="/exam/:id" />
                 <Route element={<CertificatePage />} path="/certificate/:id" />
                 <Route element={<SignUpPage />} path="/signup" />

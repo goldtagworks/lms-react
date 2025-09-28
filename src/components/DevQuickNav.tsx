@@ -75,7 +75,7 @@ export function DevQuickNav() {
                         <Divider my={4} />
                         <SectionLabel label="수강 & 결제" />
                         <QuickLink label="수강 신청 c1" to="/enroll/c1" />
-                        <QuickLink label="결제 모크 c1" to="/payment/c1" />
+                        <QuickLink label="체크아웃 c1" to="/enroll/c1" />
                         <Divider my={4} />
                         <SectionLabel label="학습" />
                         <QuickLink label="레슨 플레이어 enr-1" to="/learn/enr-1" />
