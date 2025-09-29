@@ -1,0 +1,5 @@
+{
+    "title": "My Classroom",
+    "noEnrollments": "No active enrollments",
+    "progressNow": "Current {{now}}% / Required {{req}}%"
+}

@@ -1,0 +1,11 @@
+{
+    "notFound": "요청하신 페이지를 찾을 수 없습니다",
+    "forbidden": "접근 권한이 없습니다",
+    "network": "네트워크 오류가 발생했습니다",
+    "timeout": "요청 시간이 초과되었습니다",
+    "unknown": "알 수 없는 오류가 발생했습니다",
+    "noticeTitleRequired": "공지 제목을 입력해주세요",
+    "dataUnavailable": "데이터를 불러올 수 없습니다",
+    "error": "오류",
+    "blocked": "차단됨"
+}

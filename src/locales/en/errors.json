@@ -1,0 +1,11 @@
+{
+    "notFound": "Page not found",
+    "forbidden": "Access denied",
+    "network": "Network error",
+    "timeout": "Request timed out",
+    "unknown": "Unknown error occurred",
+    "noticeTitleRequired": "Please enter a notice title",
+    "dataUnavailable": "Data unavailable",
+    "error": "Error",
+    "blocked": "Blocked"
+}

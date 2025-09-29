@@ -1,0 +1,8 @@
+{
+    "lesson": {
+        "title.min": "Title must be at least 2 characters.",
+        "title.max": "Title cannot exceed 150 characters.",
+        "duration.min": "Duration must be >= 0.",
+        "duration.max": "Cannot exceed 5 hours."
+    }
+}

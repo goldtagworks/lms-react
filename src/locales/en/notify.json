@@ -1,0 +1,24 @@
+{
+    "success": {
+        "generic": "Success",
+        "noticeCreate": "Notice created",
+        "noticeUpdate": "Notice updated",
+        "approve": "Approved",
+        "reject": "Rejected",
+        "revoke": "Revoked",
+        "lessonAdd": "Lesson added",
+        "sectionAdd": "Section added",
+        "lessonUpdate": "Lesson updated",
+        "sectionUpdate": "Section updated",
+        "previewSet": "Preview set",
+        "previewUnset": "Preview unset",
+        "delete": "Deleted"
+    },
+    "error": {
+        "generic": "Error",
+        "validation": "Validation error",
+        "saveFailed": "Save failed",
+        "lessonAdd": "Lesson add failed",
+        "sectionAdd": "Section add failed"
+    }
+}

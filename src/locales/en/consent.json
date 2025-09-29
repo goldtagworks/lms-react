@@ -1,0 +1,9 @@
+{
+    "acceptAll": "Accept All",
+    "termsRequired": "(Required) Accept Terms of Service",
+    "privacyRequired": "(Required) Accept Privacy Policy",
+    "marketingOptional": "(Optional) Marketing Communications Consent",
+    "instructorPolicy": "(Required) Instructor policy & copyright warranty",
+    "viewDetail": "View Details",
+    "ageConfirm": "(Required) I am 14 or older"
+}

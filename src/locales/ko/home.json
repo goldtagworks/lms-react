@@ -1,0 +1,41 @@
+{
+    "hero": {
+        "title": "최고의 온라인 강의 플랫폼",
+        "subtitle": "실무 중심의 강의 목차, 검증된 강사 소개, 다양한 할인 혜택까지!\n지금 바로 원하는 강의를 찾아보세요.",
+        "primaryCta": "강의 전체 보기",
+        "secondaryCta": "회원가입",
+        "imageAlt": "메인 배너"
+    },
+    "guide": {
+        "title": "수강생 이용 가이드",
+        "intro": "수강 절차, 자료 다운로드, 뷰어 설치 안내를 확인하세요.",
+        "item.guidePdf": "학습자 가이드 PDF",
+        "item.resources": "자료실 바로가기",
+        "item.viewer": "파일 뷰어 다운로드"
+    },
+    "support": {
+        "title": "도움이 필요하신가요?",
+        "hours": "평일 09:00–18:00",
+        "faq": "FAQ",
+        "contact": "1:1 문의",
+        "meta": "운영시간 {{hours}} · {{email}} · {{phone}}"
+    },
+    "instructors": {
+        "title": "강사 소개",
+        "aria": "강사 {{name}}{{headline}}"
+    },
+    "promo": {
+        "couponLabel": "쿠폰코드: {{code}}"
+    },
+    "courses": {
+        "viewAll": "전체 보기"
+    },
+    "card": {
+        "students": "수강생 {{count}}명",
+        "rating": "평점 {{rating}}"
+    },
+    "reviews": {
+        "title": "실제 수강생 후기",
+        "ariaRating": "평점 {{value}}점 (5점 만점)"
+    }
+}

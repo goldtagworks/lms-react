@@ -1,0 +1,5 @@
+{
+    "title": "마이 강의실",
+    "noEnrollments": "수강 중인 강의가 없습니다",
+    "progressNow": "현재 진도 {{now}}% / 기준 {{req}}%"
+}

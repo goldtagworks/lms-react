@@ -1,0 +1,8 @@
+{
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "active": "Active",
+    "inactive": "Inactive",
+    "revoked": "Revoked"
+}
