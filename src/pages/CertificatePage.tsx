@@ -80,10 +80,10 @@ const CertificatePage = () => {
                             </Group>
                         </div>
                         <Group gap="xs">
-                            <Button component={Link} size="xs" to="/my/certificates" variant="light">
+                            <Button component={Link} size="sm" to="/my/certificates" variant="light">
                                 목록으로
                             </Button>
-                            <Button component={Link} size="xs" to="/my" variant="outline">
+                            <Button component={Link} size="sm" to="/my" variant="outline">
                                 마이페이지
                             </Button>
                         </Group>
@@ -92,7 +92,7 @@ const CertificatePage = () => {
                     <Grid gutter="md">
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
-                                <Text c="dimmed" size="xs">
+                                <Text c="dimmed" size="sm">
                                     일련번호
                                 </Text>
                                 <Group gap="xs" wrap="nowrap">
@@ -100,7 +100,7 @@ const CertificatePage = () => {
                                     <CopyButton timeout={1500} value={cert.serial_no}>
                                         {({ copied, copy }) => (
                                             <Tooltip withArrow label={copied ? '복사됨' : '복사'}>
-                                                <Button color={copied ? 'teal' : 'gray'} size="xs" variant={copied ? 'filled' : 'light'} onClick={copy}>
+                                                <Button color={copied ? 'teal' : 'gray'} size="sm" variant={copied ? 'filled' : 'light'} onClick={copy}>
                                                     {copied ? '복사됨' : '복사'}
                                                 </Button>
                                             </Tooltip>
@@ -111,7 +111,7 @@ const CertificatePage = () => {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
-                                <Text c="dimmed" size="xs">
+                                <Text c="dimmed" size="sm">
                                     발급일
                                 </Text>
                                 <Text fw={500}>{new Date(cert.issued_at).toLocaleString()}</Text>
@@ -119,7 +119,7 @@ const CertificatePage = () => {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
-                                <Text c="dimmed" size="xs">
+                                <Text c="dimmed" size="smsm">
                                     점수 / 합격기준
                                 </Text>
                                 <Text fw={500}>
@@ -129,7 +129,7 @@ const CertificatePage = () => {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
-                                <Text c="dimmed" size="xs">
+                                <Text c="dimmed" size="sm">
                                     시험명
                                 </Text>
                                 <Text fw={500}>{attemptMeta?.exam_title || '—'}</Text>
@@ -137,7 +137,7 @@ const CertificatePage = () => {
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Box mt="sm">
-                                <Button size="xs" variant="filled" onClick={() => openCertificatePrintView({ certificate: cert, courseTitle })}>
+                                <Button size="sm" variant="filled" onClick={() => openCertificatePrintView({ certificate: cert, courseTitle })}>
                                     PDF 다운로드
                                 </Button>
                             </Box>

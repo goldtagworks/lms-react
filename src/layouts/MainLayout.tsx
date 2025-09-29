@@ -1,7 +1,6 @@
 import { AppShell } from '@mantine/core';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
-import { useDisclosure } from '@mantine/hooks';
-import { useMediaQuery } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import Header from './Header';
 import Navbar from './Navbar';

@@ -63,7 +63,7 @@ const InstructorProfilePage = () => {
                             Instructor
                         </Badge>
                         {canEdit && (
-                            <Button leftSection={<Edit size={14} />} size="xs" variant="subtle" onClick={() => setEditOpen(true)}>
+                            <Button leftSection={<Edit size={14} />} size="sm" variant="subtle" onClick={() => setEditOpen(true)}>
                                 프로필 수정
                             </Button>
                         )}
@@ -74,12 +74,12 @@ const InstructorProfilePage = () => {
                         <Group gap={10} mt={4} wrap="wrap">
                             <Group gap={4}>
                                 <LinkIcon size={14} />
-                                <Text fw={500} size="xs">
+                                <Text fw={500} size="sm">
                                     Links
                                 </Text>
                             </Group>
                             {profile.links.map((l, i) => (
-                                <Anchor key={i} href={l.url} rel="noopener noreferrer" size="xs" target="_blank">
+                                <Anchor key={i} href={l.url} rel="noopener noreferrer" size="sm" target="_blank">
                                     {l.label}
                                 </Anchor>
                             ))}
@@ -126,12 +126,12 @@ const InstructorProfilePage = () => {
                                     ))}
                                 </Group>
                                 {curation.featured.summary && (
-                                    <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                    <Text c="dimmed" lineClamp={2} mb={6} size="sm">
                                         {curation.featured.summary}
                                     </Text>
                                 )}
                                 <PriceText discount={curation.featured.sale_price_cents ?? undefined} price={curation.featured.list_price_cents} />
-                                <Button fullWidth component="a" href={`/course/${curation.featured.id}`} mt="sm" radius="md" size="xs" target="_blank" variant="light">
+                                <Button fullWidth component="a" href={`/course/${curation.featured.id}`} mt="sm" radius="md" size="sm" target="_blank" variant="light">
                                     상세 보기
                                 </Button>
                             </Card>
@@ -157,12 +157,12 @@ const InstructorProfilePage = () => {
                                     ))}
                                 </Group>
                                 {c.summary && (
-                                    <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                    <Text c="dimmed" lineClamp={2} mb={6} size="sm">
                                         {c.summary}
                                     </Text>
                                 )}
                                 <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} />
-                                <Button fullWidth component="a" href={`/course/${c.id}`} mt="sm" radius="md" size="xs" target="_blank" variant="light">
+                                <Button fullWidth component="a" href={`/course/${c.id}`} mt="sm" radius="md" size="sm" target="_blank" variant="light">
                                     상세 보기
                                 </Button>
                             </Card>

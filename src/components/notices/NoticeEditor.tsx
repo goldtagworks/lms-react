@@ -68,10 +68,10 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
             />
             <Switch checked={pinned} label="상단 고정(PIN)" onChange={(e) => setPinned(e.currentTarget.checked)} />
             <Group justify="flex-end" mt="sm">
-                <Button leftSection={<Save size={16} />} size="xs" onClick={handleSubmit}>
+                <Button leftSection={<Save size={16} />} size="sm" onClick={handleSubmit}>
                     {isEdit ? '수정' : '생성'}
                 </Button>
-                <Button leftSection={<X size={16} />} size="xs" variant="default" onClick={onCancel}>
+                <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onCancel}>
                     취소
                 </Button>
             </Group>

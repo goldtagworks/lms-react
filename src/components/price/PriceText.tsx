@@ -1,6 +1,8 @@
-import { Group, Text } from '@mantine/core';
 import React from 'react';
+import { Group, Text } from '@mantine/core';
 import { formatPrice } from '@main/utils/format';
+
+import { TextMeta } from '../typography';
 
 type TextSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -20,9 +22,9 @@ export function PriceText({ price, discount, size = 'md', showStrike = true }: P
                 {formatPrice(hasDiscount ? discount! : price)}
             </Text>
             {hasDiscount && showStrike && (
-                <Text c="dimmed" className="text-strike" size="sm">
+                <TextMeta c="dimmed" className="text-strike">
                     {formatPrice(price)}
-                </Text>
+                </TextMeta>
             )}
         </Group>
     );

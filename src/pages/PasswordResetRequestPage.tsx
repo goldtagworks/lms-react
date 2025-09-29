@@ -27,7 +27,7 @@ export default function PasswordResetRequestPage() {
                         <Text fw={600} size="lg">
                             비밀번호 재설정
                         </Text>
-                        <Text c="dimmed" mt={4} size="xs">
+                        <Text c="dimmed" mt={4} size="sm">
                             가입한 이메일을 입력하면 재설정 링크(모의)를 전송합니다.
                         </Text>
                     </div>
@@ -39,11 +39,11 @@ export default function PasswordResetRequestPage() {
                         <>
                             <TextInput autoComplete="email" label="이메일" placeholder="you@example.com" size="sm" value={email} onChange={(e) => setEmail(e.currentTarget.value)} />
                             {error && (
-                                <Text c="red" size="xs">
+                                <Text c="red" size="sm">
                                     {error}
                                 </Text>
                             )}
-                            <Button size="xs" onClick={submit}>
+                            <Button size="sm" onClick={submit}>
                                 링크 보내기
                             </Button>
                         </>

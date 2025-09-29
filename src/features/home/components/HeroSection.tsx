@@ -3,6 +3,7 @@ import { Box, Container, Group, Title, Text, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import AppImage from '@main/components/AppImage';
 import { useAuth } from '@main/lib/auth';
+import { useMediaQuery } from '@mantine/hooks';
 
 interface HeroSectionProps {
     heading?: string;
@@ -24,12 +25,13 @@ function HeroSectionBase({
     secondaryCtaTo = '/signup',
     imageUrl = 'https://cdn.inflearn.com/public/main/hero@2x.png'
 }: HeroSectionProps) {
+    const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine sm breakpoint (≈768px)
     // CSS 변수 기반(색상 모드 자동 전환). token fallback 포함.
     const heroBg = 'var(--gradient-hero, linear-gradient(90deg, #f5f7fa 60%, #e0e7ff 100%))';
     const { user } = useAuth();
 
     return (
-        <Box bg={heroBg} component="section" mih={420} px={0} py={0} style={{ alignItems: 'center', display: 'flex' }}>
+        <Box bg={heroBg} component="section" mih={isMobile ? 620 : 420} px={0} py={0} style={{ alignItems: 'center', display: 'flex' }}>
             <Container size="lg" w="100%">
                 <Group align="center" justify="space-between" wrap="wrap">
                     <Box maw={520}>

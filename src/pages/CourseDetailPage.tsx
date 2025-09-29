@@ -1,4 +1,5 @@
 import { Button, Card, Group, Text, Box, SimpleGrid, Divider, Avatar, Tabs, Badge, ActionIcon, Tooltip, TextInput, Switch, Stack, Textarea, AspectRatio } from '@mantine/core';
+import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
 import MarkdownView from '@main/components/markdown/MarkdownView';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -88,9 +89,9 @@ export default function CourseDetailPage() {
             labels: { confirm: willDeactivate ? '비활성화' : '활성화', cancel: '취소' },
             confirmProps: { color: willDeactivate ? 'red' : 'teal' },
             children: (
-                <Text size="sm">
+                <TextBody>
                     {willDeactivate ? '이 강의는 학습자에게 더 이상 노출되지 않습니다. 진행중인 수강에는 영향이 없으며 언제든 다시 활성화할 수 있습니다.' : '강의를 다시 공개 상태로 전환합니다.'}
-                </Text>
+                </TextBody>
             ),
             onConfirm: () => {
                 const updated = toggleCourseActive(course.id);
@@ -160,7 +161,7 @@ export default function CourseDetailPage() {
                     )}
                     <Group justify="flex-end" mt="sm">
                         <Button
-                            size="xs"
+                            size="sm"
                             onClick={() => {
                                 if (!course.id) return;
                                 const patch = localFeatured
@@ -182,7 +183,7 @@ export default function CourseDetailPage() {
                         >
                             저장
                         </Button>
-                        <Button size="xs" variant="default" onClick={() => modals.close('course-featured-modal')}>
+                        <Button size="sm" variant="default" onClick={() => modals.close('course-featured-modal')}>
                             취소
                         </Button>
                     </Group>
@@ -226,12 +227,12 @@ export default function CourseDetailPage() {
                         }}
                     />
                     <Group justify="space-between" mt="sm">
-                        <Text c="dimmed" size="xs">
+                        <Text c="dimmed" size="sm">
                             {`헤드라인 ${localHeadline.length}/120 · 본문 ${localBody.length}/1200`}
                         </Text>
                         <Group gap="xs">
                             <Button
-                                size="xs"
+                                size="sm"
                                 onClick={() => {
                                     if (!course.id) return;
                                     const saved = upsertMarketingCopy(course.id, { headline: localHeadline.trim() || undefined, body_md: localBody.trim() || undefined });
@@ -242,7 +243,7 @@ export default function CourseDetailPage() {
                             >
                                 저장
                             </Button>
-                            <Button size="xs" variant="default" onClick={() => modals.close('course-marketing-modal')}>
+                            <Button size="sm" variant="default" onClick={() => modals.close('course-marketing-modal')}>
                                 취소
                             </Button>
                         </Group>
@@ -304,13 +305,13 @@ export default function CourseDetailPage() {
 
         return (
             <Card withBorder mb="lg" p="md" radius="md" shadow="sm">
-                <Text c="blue.6" fw={600} mb={8} size="sm">
+                <TextTitle c="blue.6" fw={600} mb={8}>
                     미리보기 영상
-                </Text>
+                </TextTitle>
                 {embed}
-                <Text c="dimmed" mt={8} size="xs">
+                <TextBody c="dimmed" mt={8}>
                     이 강의의 무료 미리보기 레슨입니다.
-                </Text>
+                </TextBody>
             </Card>
         );
     }
@@ -404,28 +405,20 @@ export default function CourseDetailPage() {
                                     위시
                                 </Badge>
                             )}
-                            {!enrolled && !wish && (
-                                <Text c="dimmed" size="xs">
-                                    상태: 미수강
-                                </Text>
-                            )}
-                            <Text c="yellow.7" size="xs">
-                                ★ 4.8
-                            </Text>
-                            <Text c="dimmed" size="xs">
-                                수강생 1,200명
-                            </Text>
+                            {!enrolled && !wish && <TextMeta c="dimmed">상태: 미수강</TextMeta>}
+                            <TextMeta c="yellow.7">★ 4.8</TextMeta>
+                            <TextMeta c="dimmed">수강생 1,200명</TextMeta>
                         </Group>
                         <EnrollWishlistActions
                             enrolled={enrolled}
                             labels={{ enroll: '수강신청', loginRequired: '로그인 필요', wishAdd: '위시 담기' }}
-                            size="xs"
+                            size="sm"
                             userId={userId}
                             wish={wish}
                             onEnroll={handleEnroll}
                             onToggleWish={handleWishlist}
                         />
-                        <Button fullWidth component={Link} mt="sm" radius="md" size="xs" to="/courses" variant="default">
+                        <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="default">
                             목록으로
                         </Button>
                     </Card>
@@ -437,9 +430,7 @@ export default function CourseDetailPage() {
                                 <Text fw={700} size="lg">
                                     강사명(샘플)
                                 </Text>
-                                <Text c="dimmed" size="sm">
-                                    강사 프로필은 별도 fetch 예정
-                                </Text>
+                                <TextBody c="dimmed">강사 프로필은 별도 fetch 예정</TextBody>
                             </Box>
                         </Group>
                     </Card>
@@ -456,9 +447,7 @@ export default function CourseDetailPage() {
                         <Tabs.Panel pt="md" value="desc">
                             <MarkdownView source={course.description || ''} />
                             <Divider my="md" />
-                            <Text c="dimmed" size="sm">
-                                {course.summary}
-                            </Text>
+                            <TextBody c="dimmed">{course.summary}</TextBody>
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="curriculum">
                             {renderPreviewPlayer()}
@@ -522,20 +511,20 @@ export default function CourseDetailPage() {
                                                                     }
                                                                 }}
                                                             >
-                                                                <Text c="dimmed" size="xs" style={{ width: 42 }} ta="right">
+                                                                <TextMeta style={{ width: 42 }} ta="right">
                                                                     {block.sectionIndex ? `${block.sectionIndex}-${idx + 1}` : idx + 1}
-                                                                </Text>
-                                                                <Text component="div" lineClamp={1} size="sm" style={{ flex: 1, lineHeight: 1.35 }}>
+                                                                </TextMeta>
+                                                                <TextBody lineClamp={1} style={{ flex: 1, lineHeight: 1.35 }}>
                                                                     {l.title}
                                                                     {l.is_preview && (
                                                                         <Badge color="blue" ml={8} size="xs" variant="light">
                                                                             미리보기
                                                                         </Badge>
                                                                     )}
-                                                                </Text>
-                                                                <Text c="dimmed" size="xs" style={{ width: 42 }} ta="right">
+                                                                </TextBody>
+                                                                <TextMeta style={{ width: 42 }} ta="right">
                                                                     {mins}분
-                                                                </Text>
+                                                                </TextMeta>
                                                             </Box>
                                                         );
                                                     })}

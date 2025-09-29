@@ -90,7 +90,7 @@ export function InstructorApplyPage() {
                                         <Badge color="grape" variant="light">
                                             {l.label}
                                         </Badge>
-                                        <Text c="blue" size="xs" style={{ wordBreak: 'break-all' }}>
+                                        <Text c="blue" size="sm" style={{ wordBreak: 'break-all' }}>
                                             {l.url}
                                         </Text>
                                     </Group>
@@ -101,7 +101,7 @@ export function InstructorApplyPage() {
                             <Group align="flex-end" wrap="nowrap">
                                 <TextInput label="라벨" placeholder="GitHub" style={{ flex: 1 }} value={linkLabel} onChange={(e) => setLinkLabel(e.currentTarget.value)} />
                                 <TextInput label="URL" placeholder="https://github.com/username" style={{ flex: 2 }} value={linkUrl} onChange={(e) => setLinkUrl(e.currentTarget.value)} />
-                                <Button size="xs" variant="light" onClick={addLink}>
+                                <Button size="sm" variant="light" onClick={addLink}>
                                     추가
                                 </Button>
                             </Group>
@@ -114,7 +114,7 @@ export function InstructorApplyPage() {
                     </Stack>
                     <Group justify="flex-end">
                         {!app && (
-                            <Button disabled={!displayName.trim() || !consent?.terms || !consent.privacy} size="xs" onClick={submit}>
+                            <Button disabled={!displayName.trim() || !consent?.terms || !consent.privacy} size="sm" onClick={submit}>
                                 신청 제출
                             </Button>
                         )}

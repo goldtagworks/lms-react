@@ -24,30 +24,30 @@ export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }
                     <Text fw={700} lineClamp={1} size="md" title={courseTitle}>
                         {courseTitle}
                     </Text>
-                    <Badge color="teal" size="xs" variant="light">
+                    <Badge color="teal" size="sm" variant="light">
                         수료
                     </Badge>
                 </Group>
                 <Group gap={12} justify="space-between" wrap="nowrap">
-                    <Text c="dimmed" size="xs">
+                    <Text c="dimmed" size="sm">
                         발급일 {date}
                     </Text>
-                    <Text c="dimmed" size="xs">
+                    <Text c="dimmed" size="sm">
                         #{serialNo}
                     </Text>
                 </Group>
                 {!compact && (
-                    <Text c="dimmed" lineClamp={2} size="xs">
+                    <Text c="dimmed" lineClamp={2} size="sm">
                         해당 강의 수료를 완료하여 발급된 인증서입니다. PDF 다운로드 또는 상세 페이지에서 검증 정보를 확인할 수 있습니다.
                     </Text>
                 )}
                 <Group gap={8} mt={4} wrap="nowrap">
-                    <Button component={Link} leftSection={<ArrowRight size={14} />} size="xs" to={`/certificate/${id}`} variant="light">
+                    <Button component={Link} leftSection={<ArrowRight size={14} />} size="sm" to={`/certificate/${id}`} variant="light">
                         상세 보기
                     </Button>
                     <Button
                         leftSection={<Download size={14} />}
-                        size="xs"
+                        size="sm"
                         variant="outline"
                         onClick={() => {
                             const cert = findCertificateById(id);

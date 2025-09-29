@@ -2,7 +2,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { togglePin, deleteNotice, useNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
 import EmptyState from '@main/components/EmptyState';
-import { Badge, Group, Stack, Text, Anchor, Paper, Divider, ActionIcon, Tooltip, Title } from '@mantine/core';
+import { Badge, Group, Stack, Anchor, Paper, Divider, ActionIcon, Tooltip, Title } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import MarkdownView from '@main/components/markdown/MarkdownView';
 import { formatDate } from '@main/utils/format';
 import { ChevronLeft, Pin, Share2, Copy, Pencil, Trash2 } from 'lucide-react';
@@ -66,7 +67,7 @@ export default function NoticeDetailPage() {
             radius: 'md',
             title: '공지 삭제',
             centered: true,
-            children: <Text size="sm">정말로 이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</Text>,
+            children: <TextBody>정말로 이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</TextBody>,
             labels: { confirm: '삭제', cancel: '취소' },
             confirmProps: { color: 'red' },
             onConfirm: () => {
@@ -97,9 +98,7 @@ export default function NoticeDetailPage() {
                         <ActionIcon aria-hidden="true" size="sm" variant="subtle">
                             <ChevronLeft size={16} />
                         </ActionIcon>
-                        <Text c="dimmed" size="sm">
-                            공지사항
-                        </Text>
+                        <TextMeta sizeOverride="sm">공지사항</TextMeta>
                     </Anchor>
                     <Group gap={4} wrap="nowrap">
                         {isAdmin && (
@@ -147,9 +146,7 @@ export default function NoticeDetailPage() {
                                     PIN
                                 </Badge>
                             )}
-                            <Text c="dimmed" size="xs">
-                                게시일 {formatDate(notice.created_at)}
-                            </Text>
+                            <TextMeta>게시일 {formatDate(notice.created_at)}</TextMeta>
                         </Group>
                         <Divider my="xs" />
                         <MarkdownView source={notice.body} />

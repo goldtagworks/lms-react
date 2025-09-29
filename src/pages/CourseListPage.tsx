@@ -1,4 +1,4 @@
-import { Card, Text, Button, Group, Select, TextInput, Badge } from '@mantine/core';
+import { Card, Button, Group, Select, TextInput, Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { TagChip } from '@main/components/TagChip';
@@ -12,6 +12,7 @@ import PriceText from '@main/components/price/PriceText';
 import { useCourses, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import EmptyState from '@main/components/EmptyState';
+import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
 import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
 
@@ -111,7 +112,7 @@ const CourseListPage = () => {
                         size="sm"
                     />
                     <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="sm" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
-                    <Button disabled size="xs" variant="outline">
+                    <Button disabled size="sm" variant="outline">
                         정렬(스텁)
                     </Button>
                 </Group>
@@ -124,9 +125,7 @@ const CourseListPage = () => {
                             <Card key={course.id} withBorder p="lg" radius="md" shadow="sm">
                                 <AppImage alt={course.title} height={140} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
-                                    <Text fw={700} size="md">
-                                        {course.title}
-                                    </Text>
+                                    <TextTitle>{course.title}</TextTitle>
                                     <Group gap={4}>
                                         {enrolled && (
                                             <Badge color="green" size="xs">
@@ -151,28 +150,24 @@ const CourseListPage = () => {
                                     ))}
                                 </Group>
                                 {course.summary && (
-                                    <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                    <TextBody c="dimmed" lineClamp={2} mb={6}>
                                         {course.summary}
-                                    </Text>
+                                    </TextBody>
                                 )}
                                 <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} />
                                 <Group gap={8} mb="md" mt={4}>
-                                    <Text c="yellow.7" size="xs">
-                                        ★ 4.8
-                                    </Text>
-                                    <Text c="dimmed" size="xs">
-                                        수강생 1,200명
-                                    </Text>
+                                    <TextMeta c="yellow.7">★ 4.8</TextMeta>
+                                    <TextMeta>수강생 1,200명</TextMeta>
                                 </Group>
                                 <EnrollWishlistActions
                                     enrolled={enrolled}
-                                    size="xs"
+                                    size="sm"
                                     userId={userId}
                                     wish={wish}
                                     onEnroll={() => handleEnroll(course.id, enrolled)}
                                     onToggleWish={() => handleWishlist(course.id)}
                                 />
-                                <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt="sm" radius="md" size="xs" to={`/course/${course.id}`} variant="light">
+                                <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt="sm" radius="md" size="sm" to={`/course/${course.id}`} variant="light">
                                     자세히 보기
                                 </Button>
                             </Card>

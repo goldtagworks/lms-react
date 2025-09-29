@@ -24,7 +24,7 @@ const InstructorCoursesPage = () => {
         <PageContainer roleMain py={48}>
             <Group justify="space-between" mb="lg">
                 <Title order={2}>강의 관리</Title>
-                <Button component={Link} size="xs" to="/instructor/courses/new" variant="light">
+                <Button component={Link} size="sm" to="/instructor/courses/new" variant="light">
                     새 강의 만들기
                 </Button>
             </Group>
@@ -57,16 +57,16 @@ const InstructorCoursesPage = () => {
                                 ))}
                             </Group>
                             {c.summary && (
-                                <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                <Text c="dimmed" lineClamp={2} mb={6} size="sm">
                                     {c.summary}
                                 </Text>
                             )}
                             <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} size="sm" />
                             <Group grow gap={8} mt="sm">
-                                <Button component={Link} leftSection={<Eye size={14} />} radius="md" size="xs" to={`/course/${c.id}`} variant="filled">
+                                <Button component={Link} leftSection={<Eye size={14} />} radius="md" size="sm" to={`/course/${c.id}`} variant="filled">
                                     보기
                                 </Button>
-                                <Button component={Link} leftSection={<Edit size={14} />} radius="md" size="xs" to={`/instructor/courses/${c.id}/edit`} variant="outline">
+                                <Button component={Link} leftSection={<Edit size={14} />} radius="md" size="sm" to={`/instructor/courses/${c.id}/edit`} variant="outline">
                                     수정
                                 </Button>
                             </Group>

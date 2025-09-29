@@ -1,4 +1,5 @@
 import { Anchor, Checkbox, Divider, Group, Stack, Text, Modal, Tabs, ScrollArea } from '@mantine/core';
+import { TextMeta } from '@main/components/typography';
 import { instructorPolicyKo } from '@main/lib/legalTexts';
 import { loadMarketingConsent, saveMarketingConsent } from '@main/lib/consentStore';
 import { useState, useEffect, ChangeEvent } from 'react';
@@ -151,7 +152,7 @@ export function ConsentCheckboxes({ onChange, showMarketing = true, requireAge =
 
 const LabelWithLink = ({ label, onOpen }: { label: string; onOpen?: () => void }) => (
     <Group gap={6} wrap="nowrap">
-        <Text size="xs">{label}</Text>
+        <TextMeta>{label}</TextMeta>
         <Anchor
             fz={12}
             href="#"

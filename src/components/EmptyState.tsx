@@ -33,7 +33,7 @@ export function EmptyState({ title, message, actionLabel, to, onActionClick }: E
                     </Text>
                 )}
                 {hasAction && (
-                    <Button component={ActionWrapper} mt={4} size="xs" to={to} variant="light" onClick={onActionClick}>
+                    <Button component={ActionWrapper} mt={4} size="sm" to={to} variant="light" onClick={onActionClick}>
                         {actionLabel}
                     </Button>
                 )}

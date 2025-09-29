@@ -199,7 +199,7 @@ const CourseEditPage = () => {
             <Group justify="space-between" mb="lg">
                 <Title order={2}>{id ? '코스 수정' : '새 코스 작성'}</Title>
                 {id && (
-                    <Button component={Link} size="xs" to={`/course/${id}`} variant="light">
+                    <Button component={Link} size="sm" to={`/course/${id}`} variant="light">
                         상세 보기
                     </Button>
                 )}
@@ -221,7 +221,7 @@ const CourseEditPage = () => {
                             )}
                         </Group>
                         {!course && (
-                            <Text c="dimmed" size="xs">
+                            <Text c="dimmed" size="sm">
                                 코스를 먼저 저장하면 레슨/섹션을 추가할 수 있습니다.
                             </Text>
                         )}
@@ -237,10 +237,10 @@ const CourseEditPage = () => {
                                         value={newLessonTitle}
                                         onChange={(e) => setNewLessonTitle(e.currentTarget.value)}
                                     />
-                                    <Button leftSection={<Plus size={14} />} size="xs" variant="light" onClick={handleAddLesson}>
+                                    <Button leftSection={<Plus size={14} />} size="sm" variant="light" onClick={handleAddLesson}>
                                         레슨 추가
                                     </Button>
-                                    <Button leftSection={<Split size={14} />} size="xs" variant="default" onClick={openSectionModal}>
+                                    <Button leftSection={<Split size={14} />} size="sm" variant="default" onClick={openSectionModal}>
                                         섹션 구분 추가
                                     </Button>
                                 </Group>

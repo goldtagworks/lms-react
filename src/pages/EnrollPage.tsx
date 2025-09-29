@@ -1,4 +1,5 @@
-import { Alert, Badge, Box, Button, Card, Divider, Grid, Group, Stack, Text, Title } from '@mantine/core';
+import { Alert, Badge, Box, Button, Card, Divider, Grid, Group, Stack, Title } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { CheckCircle2, CreditCard, Info, Tag } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -42,12 +43,10 @@ export default function EnrollPage() {
                     <Card withBorder aria-label="수강 액션" component="aside" p="lg" radius="md" shadow="sm">
                         <Stack gap="sm">
                             <Box>
-                                <Text fw={700} size="lg">
+                                <TextBody fw={700} sizeOverride="lg">
                                     {course.title}
-                                </Text>
-                                <Text c="dimmed" mt={2} size="xs">
-                                    강사: (샘플) Instructor
-                                </Text>
+                                </TextBody>
+                                <TextMeta mt={2}>강사: (샘플) Instructor</TextMeta>
                             </Box>
                             {!already && (
                                 <Box>
@@ -71,12 +70,10 @@ export default function EnrollPage() {
                                 {already ? '학습하러 가기' : '수강 시작'}
                             </Button>
                             <Group gap={8} justify="space-between">
-                                <Button component={Link} leftSection={<Info size={14} />} size="xs" to={`/course/${course.id}`} variant="subtle">
+                                <Button component={Link} leftSection={<Info size={14} />} size="sm" to={`/course/${course.id}`} variant="subtle">
                                     코스 상세
                                 </Button>
-                                <Text c="dimmed" size="10px">
-                                    * 가격/할인 계산은 서버 기준 (클라이언트 재계산 금지)
-                                </Text>
+                                <TextMeta sizeOverride="10px">* 가격/할인 계산은 서버 기준 (클라이언트 재계산 금지)</TextMeta>
                             </Group>
                         </Stack>
                     </Card>
@@ -90,9 +87,9 @@ export default function EnrollPage() {
                                 수강신청
                             </Title>
                             {course.summary && (
-                                <Text c="dimmed" mt="sm" size="sm" style={{ maxWidth: 680 }}>
+                                <TextBody mt="sm" style={{ maxWidth: 680 }}>
                                     {course.summary}
-                                </Text>
+                                </TextBody>
                             )}
                         </header>
                         <section aria-label="코스 메타">
@@ -117,15 +114,7 @@ export default function EnrollPage() {
                             <Title mb={8} order={3} size="h5">
                                 코스 소개
                             </Title>
-                            {course.description ? (
-                                <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
-                                    {course.description}
-                                </Text>
-                            ) : (
-                                <Text c="dimmed" size="sm">
-                                    상세 설명이 아직 준비되지 않았습니다.
-                                </Text>
-                            )}
+                            {course.description ? <TextBody style={{ whiteSpace: 'pre-line' }}>{course.description}</TextBody> : <TextMeta>상세 설명이 아직 준비되지 않았습니다.</TextMeta>}
                         </section>
                     </Stack>
                 </Grid.Col>
@@ -144,12 +133,10 @@ function MetaItem({ icon, label, value }: MetaItemProps) {
     return (
         <Group align="center" gap={6}>
             {icon}
-            <Text c="dimmed" size="xs">
-                {label}
-            </Text>
-            <Text fw={600} size="xs">
+            <TextMeta>{label}</TextMeta>
+            <TextMeta c="inherit" fw={600} sizeOverride="xs">
                 {value}
-            </Text>
+            </TextMeta>
         </Group>
     );
 }

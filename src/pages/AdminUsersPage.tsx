@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Button, Group, Modal, Select, Stack, Table, Text, TextInput, Tooltip, Notification } from '@mantine/core';
+import { ActionIcon, Badge, Button, Group, Modal, Select, Stack, Table, TextInput, Tooltip, Notification } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { useEffect, useMemo, useState } from 'react';
 import PageContainer from '@main/components/layout/PageContainer';
 import { upsertUserRole, removeUser, useUsers, ensureUser, initiatePasswordReset } from '@main/lib/repository';
@@ -158,24 +159,24 @@ const AdminUsersPage = () => {
                         {paged.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
-                                    <Text c="dimmed" py={20} size="sm" ta="center">
+                                    <TextMeta py={20} ta="center">
                                         사용자가 없습니다.
-                                    </Text>
+                                    </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
                         )}
                         {paged.map((u) => (
                             <Table.Tr key={u.id}>
                                 <Table.Td>
-                                    <Text fw={500} size="xs">
+                                    <TextBody fw={500} sizeOverride="sm">
                                         {u.id}
-                                    </Text>
+                                    </TextBody>
                                 </Table.Td>
                                 <Table.Td>
-                                    <Text size="sm">{u.name}</Text>
+                                    <TextBody>{u.name}</TextBody>
                                 </Table.Td>
                                 <Table.Td>
-                                    <Text size="sm">{u.email}</Text>
+                                    <TextBody>{u.email}</TextBody>
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Badge color={u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'blue' : 'gray'} size="sm" variant="light">
@@ -220,7 +221,7 @@ const AdminUsersPage = () => {
                         ))}
                     </Table.Tbody>
                 </Table>
-                <PaginationBar align="right" page={page} size="xs" totalPages={totalPages} onChange={(p) => setPage(p)} />
+                <PaginationBar align="right" page={page} size="sm" totalPages={totalPages} onChange={(p) => setPage(p)} />
             </Stack>
             <Modal centered opened={!!editUserId} radius="md" title="역할 변경" onClose={() => setEditUserId(null)}>
                 <Stack gap="sm" mt="xs">
@@ -234,22 +235,22 @@ const AdminUsersPage = () => {
                         onChange={(v) => v && setEditRole(v as UserRole)}
                     />
                     <Group justify="flex-end" mt="sm">
-                        <Button leftSection={<Save size={14} />} size="xs" onClick={saveRole}>
+                        <Button leftSection={<Save size={14} />} size="sm" onClick={saveRole}>
                             저장
                         </Button>
-                        <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setEditUserId(null)}>
+                        <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditUserId(null)}>
                             취소
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
             <Modal centered opened={!!confirmRemove} radius="md" title="사용자 비활성화" onClose={() => setConfirmRemove(null)}>
-                <Text size="sm">이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)</Text>
+                <TextBody>이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)</TextBody>
                 <Group justify="flex-end" mt="md">
-                    <Button color="red" leftSection={<Trash2 size={14} />} size="xs" onClick={handleRemove}>
+                    <Button color="red" leftSection={<Trash2 size={14} />} size="sm" onClick={handleRemove}>
                         비활성화
                     </Button>
-                    <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setConfirmRemove(null)}>
+                    <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setConfirmRemove(null)}>
                         취소
                     </Button>
                 </Group>
@@ -267,12 +268,12 @@ const AdminUsersPage = () => {
                 <Stack gap="sm">
                     {!resetDone && (
                         <>
-                            <Text size="sm">해당 사용자의 비밀번호를 초기화하고 재설정 안내 메일을 발송합니다. 진행하시겠습니까?</Text>
+                            <TextBody>해당 사용자의 비밀번호를 초기화하고 재설정 안내 메일을 발송합니다. 진행하시겠습니까?</TextBody>
                             <Group justify="flex-end" mt="sm">
                                 <Button
                                     color="grape"
                                     leftSection={<RefreshCw size={14} />}
-                                    size="xs"
+                                    size="sm"
                                     onClick={() => {
                                         if (resetTarget) {
                                             initiatePasswordReset(resetTarget);
@@ -282,7 +283,7 @@ const AdminUsersPage = () => {
                                 >
                                     초기화 및 발송
                                 </Button>
-                                <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setResetTarget(null)}>
+                                <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setResetTarget(null)}>
                                     취소
                                 </Button>
                             </Group>

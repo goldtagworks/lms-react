@@ -1,4 +1,5 @@
-import { Badge, Button, Group, Stack, Text, Anchor, Divider, ScrollArea, Textarea, ThemeIcon, Box, Tooltip, Card } from '@mantine/core';
+import { Badge, Button, Group, Stack, Anchor, Divider, ScrollArea, Textarea, ThemeIcon, Box, Tooltip, Card } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { notifications } from '@mantine/notifications';
 import { approveInstructorApplication, rejectInstructorApplication, revokeInstructorApplication, useInstructorApplication } from '@main/lib/repository';
 import { CheckCircle2, XCircle, Link as LinkIcon, User, CalendarClock, FileText, X, ShieldAlert } from 'lucide-react';
@@ -24,10 +25,8 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
     if (!app) {
         return (
             <Stack p="md">
-                <Text c="dimmed" size="sm">
-                    데이터를 불러올 수 없습니다.
-                </Text>
-                <Button mt="sm" size="xs" variant="default" onClick={onClose}>
+                <TextMeta>데이터를 불러올 수 없습니다.</TextMeta>
+                <Button mt="sm" size="sm" variant="default" onClick={onClose}>
                     닫기
                 </Button>
             </Stack>
@@ -65,9 +64,9 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                     <ThemeIcon color={statusColor[app.status]} radius="md" size={26}>
                         <User size={16} />
                     </ThemeIcon>
-                    <Text fw={700} size="lg">
+                    <TextBody fw={700} sizeOverride="lg">
                         {app.display_name}
-                    </Text>
+                    </TextBody>
                 </Group>
                 <Group gap={12}>
                     <Badge color={statusColor[app.status]} variant="light">
@@ -87,14 +86,12 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 <FileText size={14} />
                             </ThemeIcon>
 
-                            <Text c="dimmed" fw={600} size="xs" tt="uppercase">
+                            <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
                                 소개
-                            </Text>
+                            </TextMeta>
                         </Group>
                         <Card withBorder w="100%">
-                            <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>
-                                {app.bio_md || '소개가 없습니다.'}
-                            </Text>
+                            <TextBody style={{ whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{app.bio_md || '소개가 없습니다.'}</TextBody>
                         </Card>
                     </Box>
                     <Box>
@@ -102,9 +99,9 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                             <ThemeIcon color="indigo" size={22} variant="light">
                                 <LinkIcon size={14} />
                             </ThemeIcon>
-                            <Text c="dimmed" fw={600} size="xs" tt="uppercase">
+                            <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
                                 링크
-                            </Text>
+                            </TextMeta>
                         </Group>
                         {app.links && app.links.length > 0 ? (
                             <Stack gap={4}>
@@ -115,29 +112,27 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 ))}
                             </Stack>
                         ) : (
-                            <Text c="dimmed" size="xs">
-                                등록된 링크 없음
-                            </Text>
+                            <TextMeta>등록된 링크 없음</TextMeta>
                         )}
                     </Box>
                     <Group gap="xl" wrap="nowrap">
                         <Stack flex={1} gap={2} style={{ minWidth: 140 }}>
                             <Group gap={4}>
                                 <CalendarClock size={14} />
-                                <Text c="dimmed" fw={600} size="xs">
+                                <TextMeta fw={600} sizeOverride="sm">
                                     신청일
-                                </Text>
+                                </TextMeta>
                             </Group>
-                            <Text size="sm">{dt(app.created_at)}</Text>
+                            <TextMeta>{dt(app.created_at)}</TextMeta>
                         </Stack>
                         <Stack flex={1} gap={2} style={{ minWidth: 140 }}>
                             <Group gap={4}>
                                 <CalendarClock size={14} />
-                                <Text c="dimmed" fw={600} size="xs">
+                                <TextMeta fw={600} sizeOverride="sm">
                                     결정일
-                                </Text>
+                                </TextMeta>
                             </Group>
-                            <Text size="sm">{dt(app.decided_at)}</Text>
+                            <TextMeta>{dt(app.decided_at)}</TextMeta>
                         </Stack>
                     </Group>
                     {app.rejection_reason && (
@@ -146,13 +141,11 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 <ThemeIcon color="red" size={22} variant="light">
                                     <XCircle size={14} />
                                 </ThemeIcon>
-                                <Text c="dimmed" fw={600} size="xs" tt="uppercase">
+                                <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
                                     반려 사유
-                                </Text>
+                                </TextMeta>
                             </Group>
-                            <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-                                {app.rejection_reason}
-                            </Text>
+                            <TextBody style={{ whiteSpace: 'pre-wrap' }}>{app.rejection_reason}</TextBody>
                         </Box>
                     )}
                     {app.status === 'REVOKED' && (
@@ -161,18 +154,12 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 <ThemeIcon color="gray" size={22} variant="light">
                                     <ShieldAlert size={14} />
                                 </ThemeIcon>
-                                <Text c="dimmed" fw={600} size="xs" tt="uppercase">
+                                <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
                                     회수 정보
-                                </Text>
+                                </TextMeta>
                             </Group>
-                            <Text c="dimmed" size="sm">
-                                회수일: {dt(app.revoked_at)}
-                            </Text>
-                            {app.revoke_reason && (
-                                <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-                                    사유: {app.revoke_reason}
-                                </Text>
-                            )}
+                            <TextMeta>회수일: {dt(app.revoked_at)}</TextMeta>
+                            {app.revoke_reason && <TextBody style={{ whiteSpace: 'pre-wrap' }}>사유: {app.revoke_reason}</TextBody>}
                         </Box>
                     )}
                 </Stack>
@@ -187,7 +174,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                         maxRows={5}
                         minRows={2}
                         placeholder="사유를 입력하거나 비워둘 수 있습니다"
-                        size="xs"
+                        size="sm"
                         value={reason}
                         onChange={(e) => setReason(e.currentTarget.value)}
                     />
@@ -199,7 +186,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                         maxRows={4}
                         minRows={2}
                         placeholder="정책 위반/법적 문제 등 (비워두면 사유 미표시)"
-                        size="xs"
+                        size="sm"
                         value={reason}
                         onChange={(e) => setReason(e.currentTarget.value)}
                     />
@@ -208,12 +195,12 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                     {app.status === 'PENDING' && !rejectMode && (
                         <>
                             <Tooltip withArrow label="신청 승인">
-                                <Button color="teal" leftSection={<CheckCircle2 size={14} />} size="xs" onClick={approve}>
+                                <Button color="teal" leftSection={<CheckCircle2 size={14} />} size="sm" onClick={approve}>
                                     승인
                                 </Button>
                             </Tooltip>
                             <Tooltip withArrow label="신청 반려">
-                                <Button color="red" leftSection={<XCircle size={14} />} size="xs" onClick={() => setRejectMode(true)}>
+                                <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={() => setRejectMode(true)}>
                                     반려
                                 </Button>
                             </Tooltip>
@@ -221,20 +208,20 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                     )}
                     {app.status === 'PENDING' && rejectMode && (
                         <>
-                            <Button color="red" leftSection={<XCircle size={14} />} size="xs" onClick={reject}>
+                            <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={reject}>
                                 반려 확정
                             </Button>
-                            <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setRejectMode(false)}>
+                            <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setRejectMode(false)}>
                                 취소
                             </Button>
                         </>
                     )}
                     {app.status === 'APPROVED' && (
-                        <Button color="gray" leftSection={<ShieldAlert size={14} />} size="xs" onClick={revoke}>
+                        <Button color="gray" leftSection={<ShieldAlert size={14} />} size="sm" onClick={revoke}>
                             권한 회수
                         </Button>
                     )}
-                    <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={onClose}>
+                    <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
                         닫기
                     </Button>
                 </Group>

@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Button, Group, Modal, Notification, Stack, Table, Text, TextInput, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Button, Group, Modal, Notification, Stack, Table, TextInput, Tooltip } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { RefreshCw, RotateCcw, Search, Save, X } from 'lucide-react';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
@@ -84,9 +85,9 @@ export default function AdminCertificatesPage() {
                         {paged.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={6}>
-                                    <Text c="dimmed" py={20} size="sm" ta="center">
+                                    <TextMeta py={20} ta="center">
                                         수료증이 없습니다.
-                                    </Text>
+                                    </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
                         )}
@@ -96,18 +97,18 @@ export default function AdminCertificatesPage() {
                             return (
                                 <Table.Tr key={c.id} style={{ opacity: isDeact ? 0.55 : 1 }}>
                                     <Table.Td>
-                                        <Text fw={600} size="sm">
+                                        <TextBody fw={600} sizeOverride="sm">
                                             {c.serial_no}
-                                        </Text>
+                                        </TextBody>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="xs">{c.issued_at.slice(0, 10)}</Text>
+                                        <TextMeta>{c.issued_at.slice(0, 10)}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="xs">{c.enrollment_id.slice(0, 8)}</Text>
+                                        <TextMeta>{c.enrollment_id.slice(0, 8)}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="xs">{c.exam_attempt_id.slice(0, 8)}</Text>
+                                        <TextMeta>{c.exam_attempt_id.slice(0, 8)}</TextMeta>
                                     </Table.Td>
                                     <Table.Td ta="center">
                                         <Badge color={isDeact ? 'gray' : 'green'} size="sm" variant="light">
@@ -144,15 +145,13 @@ export default function AdminCertificatesPage() {
                                 {reissueErr}
                             </Notification>
                         )}
-                        <Text c="dimmed" size="xs">
-                            기존 일련번호: {reissueTarget.serial_no}
-                        </Text>
+                        <TextMeta>기존 일련번호: {reissueTarget.serial_no}</TextMeta>
                         <TextInput aria-label="메모" label="관리 메모 (옵션)" placeholder="사유/메모" value={reissueNote} onChange={(e) => setReissueNote(e.currentTarget.value)} />
                         <Group justify="flex-end" mt="sm">
-                            <Button leftSection={<RotateCcw size={14} />} size="xs" onClick={commitReissue}>
+                            <Button leftSection={<RotateCcw size={14} />} size="sm" onClick={commitReissue}>
                                 재발급
                             </Button>
-                            <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setReissueErr(null)}>
+                            <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setReissueErr(null)}>
                                 취소
                             </Button>
                         </Group>

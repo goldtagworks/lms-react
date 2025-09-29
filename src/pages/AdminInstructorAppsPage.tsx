@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Badge, Button, Group, Stack, Table, Text, Textarea, Modal, Tabs, TextInput, ActionIcon, Tooltip, Divider } from '@mantine/core';
+import { Badge, Button, Group, Stack, Table, Textarea, Modal, Tabs, TextInput, ActionIcon, Tooltip, Divider } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { notifications } from '@mantine/notifications';
 import { approveInstructorApplication, rejectInstructorApplication, revokeInstructorApplication, useInstructorApplications } from '@main/lib/repository';
 import InstructorAppDetail from '@main/components/instructors/InstructorAppDetail';
@@ -168,7 +169,7 @@ export default function AdminInstructorAppsPage() {
                         leftSection={<Search size={14} />}
                         placeholder="검색: 사용자/표시 이름"
                         radius="md"
-                        size="xs"
+                        size="sm"
                         value={search}
                         w={260}
                         onChange={(e) => {
@@ -207,22 +208,22 @@ export default function AdminInstructorAppsPage() {
                                     return (
                                         <Table.Tr key={a.id} style={{ cursor: 'pointer' }} onClick={() => setDetailId(a.id)}>
                                             <Table.Td>
-                                                <Text fw={500} lineClamp={1} size="xs" title={a.user_id}>
+                                                <TextBody fw={500} lineClamp={1} sizeOverride="sm" title={a.user_id}>
                                                     {a.user_id}
-                                                </Text>
+                                                </TextBody>
                                             </Table.Td>
                                             <Table.Td>
-                                                <Text fw={500} lineClamp={1} size="sm" title={a.display_name}>
+                                                <TextBody fw={500} lineClamp={1} sizeOverride="sm" title={a.display_name}>
                                                     {a.display_name}
-                                                </Text>
+                                                </TextBody>
                                             </Table.Td>
                                             <Table.Td>
-                                                <Text c="dimmed" lineClamp={1} size="xs" title={linkLabels}>
+                                                <TextMeta lineClamp={1} title={linkLabels}>
                                                     {linkLabels || '-'}
-                                                </Text>
+                                                </TextMeta>
                                             </Table.Td>
                                             <Table.Td>
-                                                <Text size="xs">{a.created_at.slice(0, 10)}</Text>
+                                                <TextMeta>{a.created_at.slice(0, 10)}</TextMeta>
                                             </Table.Td>
                                             <Table.Td>
                                                 <Group gap={4} justify="center">
@@ -260,15 +261,15 @@ export default function AdminInstructorAppsPage() {
                                 {pending.length === 0 && (
                                     <Table.Tr>
                                         <Table.Td colSpan={5}>
-                                            <Text c="dimmed" py={20} size="sm" ta="center">
+                                            <TextMeta py={20} ta="center">
                                                 대기중 신청이 없습니다.
-                                            </Text>
+                                            </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={pendingPage} size="xs" totalPages={Math.max(1, Math.ceil(filteredPending.length / pageSize))} onChange={setPendingPage} />
+                        <PaginationBar align="right" page={pendingPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredPending.length / pageSize))} onChange={setPendingPage} />
                     </Stack>
                 )}
                 {activeTab === 'DECIDED' && (
@@ -295,9 +296,9 @@ export default function AdminInstructorAppsPage() {
                                 {decided.map((a) => (
                                     <Table.Tr key={a.id} style={{ cursor: 'pointer' }} onClick={() => setDetailId(a.id)}>
                                         <Table.Td>
-                                            <Text fw={500} lineClamp={1} size="sm" title={a.display_name}>
+                                            <TextBody fw={500} lineClamp={1} sizeOverride="sm" title={a.display_name}>
                                                 {a.display_name}
-                                            </Text>
+                                            </TextBody>
                                         </Table.Td>
                                         <Table.Td>
                                             <Badge color={statusColor[a.status]} size="sm" variant="light">
@@ -305,16 +306,16 @@ export default function AdminInstructorAppsPage() {
                                             </Badge>
                                         </Table.Td>
                                         <Table.Td>
-                                            <Text size="xs">{a.decided_at?.slice(0, 10) || '-'}</Text>
+                                            <TextMeta>{a.decided_at?.slice(0, 10) || '-'}</TextMeta>
                                         </Table.Td>
                                         <Table.Td>
                                             {(() => {
                                                 const note = a.status === 'REJECTED' ? a.rejection_reason : undefined;
 
                                                 return (
-                                                    <Text c="dimmed" lineClamp={1} size="xs" title={note || ''}>
+                                                    <TextMeta lineClamp={1} title={note || ''}>
                                                         {note || '-'}
-                                                    </Text>
+                                                    </TextMeta>
                                                 );
                                             })()}
                                         </Table.Td>
@@ -342,15 +343,15 @@ export default function AdminInstructorAppsPage() {
                                 {decided.length === 0 && (
                                     <Table.Tr>
                                         <Table.Td colSpan={5}>
-                                            <Text c="dimmed" py={20} size="sm" ta="center">
+                                            <TextMeta py={20} ta="center">
                                                 완료된 신청이 없습니다.
-                                            </Text>
+                                            </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={decidedPage} size="xs" totalPages={Math.max(1, Math.ceil(filteredDecided.length / pageSize))} onChange={setDecidedPage} />
+                        <PaginationBar align="right" page={decidedPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredDecided.length / pageSize))} onChange={setDecidedPage} />
                     </Stack>
                 )}
                 {activeTab === 'REVOKED' && (
@@ -371,32 +372,32 @@ export default function AdminInstructorAppsPage() {
                                 {revoked.map((a) => (
                                     <Table.Tr key={a.id} style={{ cursor: 'pointer' }} onClick={() => setDetailId(a.id)}>
                                         <Table.Td>
-                                            <Text fw={500} lineClamp={1} size="sm" title={a.display_name}>
+                                            <TextBody fw={500} lineClamp={1} sizeOverride="sm" title={a.display_name}>
                                                 {a.display_name}
-                                            </Text>
+                                            </TextBody>
                                         </Table.Td>
                                         <Table.Td>
-                                            <Text size="xs">{a.revoked_at?.slice(0, 10) || '-'}</Text>
+                                            <TextMeta>{a.revoked_at?.slice(0, 10) || '-'}</TextMeta>
                                         </Table.Td>
                                         <Table.Td>
-                                            <Text c="dimmed" lineClamp={1} size="xs" title={a.revoke_reason || ''}>
+                                            <TextMeta lineClamp={1} title={a.revoke_reason || ''}>
                                                 {a.revoke_reason || '-'}
-                                            </Text>
+                                            </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
                                 ))}
                                 {revoked.length === 0 && (
                                     <Table.Tr>
                                         <Table.Td colSpan={3}>
-                                            <Text c="dimmed" py={20} size="sm" ta="center">
+                                            <TextMeta py={20} ta="center">
                                                 회수된 신청이 없습니다.
-                                            </Text>
+                                            </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={revokedPage} size="xs" totalPages={Math.max(1, Math.ceil(filteredRevoked.length / pageSize))} onChange={setRevokedPage} />
+                        <PaginationBar align="right" page={revokedPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredRevoked.length / pageSize))} onChange={setRevokedPage} />
                     </Stack>
                 )}
             </Stack>
@@ -408,10 +409,10 @@ export default function AdminInstructorAppsPage() {
                 <Stack>
                     <Textarea minRows={3} placeholder="사유 (선택)" value={reason} onChange={(e) => setReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
-                        <Button color="red" leftSection={<XCircle size={14} />} size="xs" onClick={submitReject}>
+                        <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={submitReject}>
                             반려 확정
                         </Button>
-                        <Button leftSection={<CheckCircle2 size={14} />} size="xs" variant="default" onClick={() => setRejectingId(null)}>
+                        <Button leftSection={<CheckCircle2 size={14} />} size="sm" variant="default" onClick={() => setRejectingId(null)}>
                             취소
                         </Button>
                     </Group>
@@ -419,15 +420,13 @@ export default function AdminInstructorAppsPage() {
             </Modal>
             <Modal centered opened={!!revokingId} radius="md" title="강사 권한 회수" onClose={() => setRevokingId(null)}>
                 <Stack>
-                    <Text c="dimmed" size="sm">
-                        승인된 강사의 권한을 회수합니다. 이미 생성된 코스 처리 등은 후속 정책에 따릅니다.
-                    </Text>
+                    <TextBody c="dimmed">승인된 강사의 권한을 회수합니다. 이미 생성된 코스 처리 등은 후속 정책에 따릅니다.</TextBody>
                     <Textarea minRows={3} placeholder="회수 사유 (선택) - 예: 부적절한 콘텐츠, 정책 위반" value={revokeReason} onChange={(e) => setRevokeReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
-                        <Button color="gray" leftSection={<ShieldAlert size={14} />} size="xs" onClick={confirmRevoke}>
+                        <Button color="gray" leftSection={<ShieldAlert size={14} />} size="sm" onClick={confirmRevoke}>
                             회수 확정
                         </Button>
-                        <Button leftSection={<CheckCircle2 size={14} />} size="xs" variant="default" onClick={() => setRevokingId(null)}>
+                        <Button leftSection={<CheckCircle2 size={14} />} size="sm" variant="default" onClick={() => setRevokingId(null)}>
                             취소
                         </Button>
                     </Group>

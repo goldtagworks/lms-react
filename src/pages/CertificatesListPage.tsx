@@ -60,7 +60,7 @@ const CertificatesListPage = () => {
                 actions={
                     userId && (
                         <Group gap="xs">
-                            <Button size="xs" variant="light" onClick={handleIssueOne}>
+                            <Button size="sm" variant="light" onClick={handleIssueOne}>
                                 수료증 발급
                             </Button>
                         </Group>
@@ -91,7 +91,7 @@ const CertificatesListPage = () => {
                         </CourseGrid>
                     )}
                     {userId && (
-                        <Text c="dimmed" mt="sm" size="xs">
+                        <Text c="dimmed" mt="sm" size="sm">
                             발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
                         </Text>
                     )}

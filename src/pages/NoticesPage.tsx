@@ -1,4 +1,5 @@
-import { Card, Group, Badge, Text, Stack, Button, Tooltip, ActionIcon, Modal } from '@mantine/core';
+import { Card, Group, Badge, Stack, Button, Tooltip, ActionIcon, Modal } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { useNavigate } from 'react-router-dom';
 import { useNotices, togglePin, deleteNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -62,7 +63,7 @@ export default function NoticesPage() {
             radius: 'md',
             title: '공지 삭제',
             centered: true,
-            children: <Text size="sm">정말로 삭제하시겠습니까? ({n?.title})</Text>,
+            children: <TextBody>정말로 삭제하시겠습니까? ({n?.title})</TextBody>,
             labels: { cancel: '취소', confirm: '삭제' },
             confirmProps: { color: 'red' },
             onConfirm: () => {
@@ -82,7 +83,7 @@ export default function NoticesPage() {
             <Group justify="space-between" mb="md">
                 <PageHeader description="서비스 업데이트 및 점검 안내" title="공지사항" />
                 {isAdmin && (
-                    <Button size="xs" variant="light" onClick={openCreate}>
+                    <Button size="sm" variant="light" onClick={openCreate}>
                         새 공지 작성
                     </Button>
                 )}
@@ -90,7 +91,7 @@ export default function NoticesPage() {
             {notices.length === 0 && <EmptyState message="등록된 공지사항이 없습니다." />}
             <Stack gap="md">
                 {paged.map((n) => (
-                    <Card key={n.id} withBorder aria-label={n.title} component="article" radius="md" shadow="xs" style={{ cursor: 'pointer' }}>
+                    <Card key={n.id} withBorder aria-label={n.title} component="article" radius="md" shadow="sm" style={{ cursor: 'pointer' }}>
                         <Group align="flex-start" justify="space-between">
                             <Stack gap={4} style={{ flex: 1 }} onClick={() => navigate(`/notices/${n.id}`)}>
                                 <Group gap="xs">
@@ -99,15 +100,15 @@ export default function NoticesPage() {
                                             PIN
                                         </Badge>
                                     )}
-                                    <Text fw={600}>{n.title}</Text>
+                                    <TextBody fw={600} sizeOverride="sm">
+                                        {n.title}
+                                    </TextBody>
                                 </Group>
-                                <Text c="dimmed" size="xs">
-                                    {formatDate(n.created_at)}
-                                </Text>
+                                <TextMeta>{formatDate(n.created_at)}</TextMeta>
                                 {n.body && (
-                                    <Text aria-label="본문 요약" c="dimmed" lineClamp={3} size="sm">
+                                    <TextMeta aria-label="본문 요약" lineClamp={3}>
                                         {n.body}
-                                    </Text>
+                                    </TextMeta>
                                 )}
                             </Stack>
                             {isAdmin && (

@@ -35,16 +35,16 @@ export default function MyPage() {
             <PageHeader
                 actions={
                     <Group gap="xs">
-                        <Button color="orange" component={Link} leftSection={<List size={16} />} size="xs" to="/courses" variant="light">
+                        <Button color="orange" component={Link} leftSection={<List size={16} />} size="sm" to="/courses" variant="light">
                             코스 목록
                         </Button>
-                        <Button color="green" component={Link} leftSection={<Heart size={16} />} size="xs" to="/my/wishlist" variant="light">
+                        <Button color="green" component={Link} leftSection={<Heart size={16} />} size="sm" to="/my/wishlist" variant="light">
                             위시리스트
                         </Button>
-                        <Button color="violet" component={Link} leftSection={<Award size={16} />} size="xs" to="/my/certificates" variant="light">
+                        <Button color="violet" component={Link} leftSection={<Award size={16} />} size="sm" to="/my/certificates" variant="light">
                             수료증
                         </Button>
-                        <Button component={Link} leftSection={<Home size={16} />} size="xs" to="/" variant="outline">
+                        <Button component={Link} leftSection={<Home size={16} />} size="sm" to="/" variant="outline">
                             홈으로
                         </Button>
                     </Group>
@@ -98,14 +98,14 @@ export default function MyPage() {
                                             ))}
                                         </Group>
                                         {course.summary && (
-                                            <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                            <Text c="dimmed" lineClamp={2} mb={6} size="sm">
                                                 {course.summary}
                                             </Text>
                                         )}
                                         <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} />
                                         <EnrollWishlistActions
                                             enrolled={enrolled}
-                                            size="xs"
+                                            size="sm"
                                             userId={userId}
                                             wish={wish}
                                             onEnroll={() => {
@@ -122,7 +122,7 @@ export default function MyPage() {
                                             leftSection={<ArrowRight size={14} />}
                                             mt={8}
                                             radius="md"
-                                            size="xs"
+                                            size="sm"
                                             to={`/course/${course.id}`}
                                             variant="light"
                                         >

@@ -80,10 +80,10 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
                     ))}
                 </Stack>
                 <Group justify="flex-end" mt="sm">
-                    <Button disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} size="xs" onClick={handleSave}>
+                    <Button disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
                         저장
                     </Button>
-                    <Button leftSection={<X size={16} />} size="xs" variant="default" onClick={onClose}>
+                    <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
                         취소
                     </Button>
                 </Group>

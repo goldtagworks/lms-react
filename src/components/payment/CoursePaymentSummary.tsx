@@ -10,7 +10,7 @@ import { Course } from '@main/types/course';
 export function CoursePaymentSummary({ course }: { course: Course }) {
     // TODO: 서버 EPP 응답 구조 반영 시 (할인/쿠폰/세금/통화) 여기서만 UI 확장
     return (
-        <Text c="dimmed" size="xs">
+        <Text c="dimmed" size="sm">
             (결제 상세: 향후 쿠폰/세금 계산 UI 위치) - 코스 ID: {course.id}
         </Text>
     );

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Pagination, Stack, Switch, Text, Textarea, TextInput } from '@mantine/core';
+import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Pagination, Stack, Switch, Textarea, TextInput } from '@mantine/core';
+import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
 import { useAnswerQuestion, useAskQuestion, useCourseQuestions, useQuestionAnswers, useResolveQuestion, useUpdateQuestion, useQuestionPrivacy } from '@main/hooks/useCourseQnA';
 import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -41,33 +42,29 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
     return (
         <Stack gap="lg">
             <Group justify="space-between">
-                <Text fw={600} size="sm">
+                <TextTitle fw={600} sizeOverride="md">
                     전체 질문 {total}개
-                </Text>
-                {pageCount > 1 && <Pagination size="xs" total={pageCount} value={page} onChange={setPage} />}
+                </TextTitle>
+                {pageCount > 1 && <Pagination size="sm" total={pageCount} value={page} onChange={setPage} />}
             </Group>
             <Box>
-                <Text fw={600} mb={6} size="sm">
+                <TextTitle fw={600} mb={6}>
                     질문 작성
-                </Text>
-                {!canAsk && (
-                    <Text c="dimmed" size="xs">
-                        수강 중인 사용자만 질문을 작성할 수 있습니다.
-                    </Text>
-                )}
+                </TextTitle>
+                {!canAsk && <TextBody c="dimmed">수강 중인 사용자만 질문을 작성할 수 있습니다.</TextBody>}
                 {canAsk && (
                     <Card withBorder p="md" radius="md">
-                        <TextInput mb="xs" placeholder="제목" size="xs" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+                        <TextInput mb="xs" placeholder="제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
                         <Textarea autosize minRows={3} placeholder="본문을 입력하세요" value={body} onChange={(e) => setBody(e.currentTarget.value)} />
                         <Group justify="space-between" mt="xs">
-                            <Switch checked={isPrivate} label="비공개 (나만 보기)" size="xs" onChange={(e) => setIsPrivate(e.currentTarget.checked)} />
+                            <Switch checked={isPrivate} label="비공개 (나만 보기)" size="sm" onChange={(e) => setIsPrivate(e.currentTarget.checked)} />
                             <Group gap="xs">
                                 {askError && (
                                     <Badge color="red" size="xs" variant="light">
                                         {askError}
                                     </Badge>
                                 )}
-                                <Button disabled={!title.trim() || !body.trim()} size="xs" onClick={handleAsk}>
+                                <Button disabled={!title.trim() || !body.trim()} size="sm" onClick={handleAsk}>
                                     등록
                                 </Button>
                             </Group>
@@ -77,11 +74,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
             </Box>
             <Divider />
             <Stack gap="sm">
-                {questions.length === 0 && (
-                    <Text c="dimmed" size="sm">
-                        아직 질문이 없습니다.
-                    </Text>
-                )}
+                {questions.length === 0 && <TextBody c="dimmed">아직 질문이 없습니다.</TextBody>}
                 {questions.map((q) => {
                     return (
                         <QuestionItem
@@ -170,11 +163,11 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                 <Box style={{ flex: 1 }}>
                     <Group align="center" gap={6} mb={4} wrap="nowrap">
                         {!editMode && (
-                            <Text fw={600} size="sm" style={{ lineHeight: 1.2 }}>
+                            <TextBody fw={600} style={{ lineHeight: 1.2 }}>
                                 {title}
-                            </Text>
+                            </TextBody>
                         )}
-                        {editMode && <TextInput size="xs" value={editTitle} onChange={(e) => setEditTitle(e.currentTarget.value)} />}
+                        {editMode && <TextInput size="sm" value={editTitle} onChange={(e) => setEditTitle(e.currentTarget.value)} />}
                         {isResolved && (
                             <Badge color="green" leftSection={<CheckCircle2 size={12} />} size="xs" variant="light">
                                 해결됨
@@ -187,15 +180,13 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                         )}
                         {editMode && <Switch checked={localPrivate} label="비공개" size="xs" onChange={(e) => setLocalPrivate(e.currentTarget.checked)} />}
                     </Group>
-                    <Text c="dimmed" mb={6} size="xs">
-                        {new Date(createdAt).toLocaleDateString()}
-                    </Text>
+                    <TextMeta mb={6}>{new Date(createdAt).toLocaleDateString()}</TextMeta>
                     {!editMode && (
-                        <Text lh={1.5} size="sm" style={{ whiteSpace: 'pre-line' }}>
+                        <TextBody lh={1.5} style={{ whiteSpace: 'pre-line' }}>
                             {body}
-                        </Text>
+                        </TextBody>
                     )}
-                    {editMode && <Textarea autosize minRows={3} size="xs" value={editBody} onChange={(e) => setEditBody(e.currentTarget.value)} />}
+                    {editMode && <Textarea autosize minRows={3} size="sm" value={editBody} onChange={(e) => setEditBody(e.currentTarget.value)} />}
                     {editMode && (updateError || privacyError) && (
                         <Badge color="red" mt={4} size="xs" variant="light">
                             {updateError || privacyError}
@@ -204,21 +195,21 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                 </Box>
                 <Group gap={4} wrap="nowrap">
                     {canResolve && !isResolved && (
-                        <Button size="xs" variant="light" onClick={onResolve}>
+                        <Button size="sm" variant="light" onClick={onResolve}>
                             해결
                         </Button>
                     )}
                     {!isResolved && !editMode && isPrivate !== undefined && (
-                        <Button size="xs" variant="subtle" onClick={startEdit}>
+                        <Button size="sm" variant="subtle" onClick={startEdit}>
                             수정
                         </Button>
                     )}
                     {editMode && (
                         <Group gap={4} wrap="nowrap">
-                            <Button color="gray" size="xs" variant="subtle" onClick={cancelEdit}>
+                            <Button color="gray" size="sm" variant="subtle" onClick={cancelEdit}>
                                 취소
                             </Button>
-                            <Button size="xs" variant="light" onClick={saveEdit}>
+                            <Button size="sm" variant="light" onClick={saveEdit}>
                                 저장
                             </Button>
                         </Group>
@@ -239,13 +230,9 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                                         강사
                                     </Badge>
                                 )}
-                                <Text c="dimmed" size="xs">
-                                    {new Date(a.created_at).toLocaleDateString()}
-                                </Text>
+                                <TextMeta>{new Date(a.created_at).toLocaleDateString()}</TextMeta>
                             </Group>
-                            <Text lh={1.4} size="sm">
-                                {a.body}
-                            </Text>
+                            <TextBody lh={1.4}>{a.body}</TextBody>
                         </Card>
                     ))}
                     {canAnswer && (
@@ -257,7 +244,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                                         {error}
                                     </Badge>
                                 )}
-                                <Button disabled={!answerBody.trim()} size="xs" onClick={submitAnswer}>
+                                <Button disabled={!answerBody.trim()} size="sm" onClick={submitAnswer}>
                                     등록
                                 </Button>
                             </Group>

@@ -35,7 +35,7 @@ export default function SignUpPage() {
                             <Title fw={700} order={3} size={26}>
                                 회원가입
                             </Title>
-                            <Text c="dimmed" mt={4} size="xs">
+                            <Text c="dimmed" mt={4} size="sm">
                                 지금 계정을 만들고 학습을 시작하세요.
                             </Text>
                         </div>
@@ -60,14 +60,14 @@ export default function SignUpPage() {
                             </Text>
                         )}
                         <ConsentCheckboxes requireAge onChange={setConsent} />
-                        <Button disabled={!canSubmit} leftSection={<UserPlus size={14} />} loading={loading} size="xs" type="submit">
+                        <Button disabled={!canSubmit} leftSection={<UserPlus size={14} />} loading={loading} size="sm" type="submit">
                             회원가입
                         </Button>
                         <Divider label="이미 계정이 있나요?" labelPosition="center" my="xs" />
                         <Group justify="space-between">
-                            <Text c="dimmed" size="xs">
+                            <Text c="dimmed" size="sm">
                                 이미 계정이 있나요?{' '}
-                                <Text component={Link} fw={600} size="xs" to="/signin">
+                                <Text component={Link} fw={600} size="sm" to="/signin">
                                     로그인
                                 </Text>
                             </Text>

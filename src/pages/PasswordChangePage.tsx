@@ -46,7 +46,7 @@ export default function PasswordChangePage() {
                         <Text fw={600} size="lg">
                             비밀번호 변경
                         </Text>
-                        <Text c="dimmed" mt={4} size="xs">
+                        <Text c="dimmed" mt={4} size="sm">
                             계정 보안을 위해 주기적으로 변경하세요.
                         </Text>
                     </div>
@@ -64,11 +64,11 @@ export default function PasswordChangePage() {
                     <PasswordInput disabled={!user} label="새 비밀번호" placeholder="새 비밀번호 (8자 이상)" size="sm" value={newPw} onChange={(e) => setNewPw(e.currentTarget.value)} />
                     <PasswordInput disabled={!user} label="비밀번호 확인" placeholder="새 비밀번호 확인" size="sm" value={confirmPw} onChange={(e) => setConfirmPw(e.currentTarget.value)} />
                     {error && (
-                        <Text c="red" size="xs">
+                        <Text c="red" size="sm">
                             {error}
                         </Text>
                     )}
-                    <Button disabled={!user} size="xs" onClick={submit}>
+                    <Button disabled={!user} size="sm" onClick={submit}>
                         변경
                     </Button>
                 </Stack>

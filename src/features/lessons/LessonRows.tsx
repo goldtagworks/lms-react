@@ -84,7 +84,7 @@ export const SectionRow = memo(function SectionRow({
                         ref={inputRef}
                         aria-label="섹션 제목 입력"
                         flex={1}
-                        size="xs"
+                        size="sm"
                         value={renameDraft}
                         onChange={(e) => onRenameChange?.(e.currentTarget.value)}
                         onKeyDown={(e) => {
@@ -167,7 +167,7 @@ export const LessonRow = memo(function LessonRow({
                         ref={inputRef}
                         aria-label="레슨 제목 입력"
                         flex={1}
-                        size="xs"
+                        size="sm"
                         value={renameDraft}
                         onChange={(e) => onRenameChange?.(e.currentTarget.value)}
                         onKeyDown={(e) => {
@@ -190,7 +190,7 @@ export const LessonRow = memo(function LessonRow({
                             미리보기
                         </Badge>
                     )}
-                    <Text c="dimmed" component="span" ml={6} size="xs">
+                    <Text c="dimmed" component="span" ml={6} size="sm">
                         {videoLabel} {lesson.duration_seconds ? `• ${lesson.duration_seconds}s` : ''}
                     </Text>
                 </Text>

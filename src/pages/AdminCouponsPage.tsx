@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Button, Divider, Group, Modal, NumberInput, Notification, Select, Stack, Switch, Table, Text, TextInput, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Button, Divider, Group, Modal, NumberInput, Notification, Select, Stack, Switch, Table, TextInput, Tooltip } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
@@ -89,7 +90,7 @@ const AdminCouponsPage = () => {
                                 <RefreshCw size={16} />
                             </ActionIcon>
                         </Tooltip>
-                        <Button leftSection={<Plus size={16} />} size="xs" onClick={() => setCreateOpen(true)}>
+                        <Button leftSection={<Plus size={16} />} size="sm" onClick={() => setCreateOpen(true)}>
                             새 쿠폰
                         </Button>
                     </Group>
@@ -117,9 +118,9 @@ const AdminCouponsPage = () => {
                         {paged.items.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={7}>
-                                    <Text c="dimmed" py={20} size="sm" ta="center">
+                                    <TextMeta py={20} ta="center">
                                         쿠폰이 없습니다.
-                                    </Text>
+                                    </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
                         )}
@@ -129,9 +130,9 @@ const AdminCouponsPage = () => {
                             return (
                                 <Table.Tr key={c.id} style={{ opacity: c.active ? 1 : 0.55 }}>
                                     <Table.Td>
-                                        <Text fw={600} size="sm">
+                                        <TextBody fw={600} sizeOverride="sm">
                                             {c.code}
-                                        </Text>
+                                        </TextBody>
                                     </Table.Td>
                                     <Table.Td>
                                         <Badge color={c.type === 'percent' ? 'indigo' : 'teal'} size="sm" variant="light">
@@ -139,15 +140,15 @@ const AdminCouponsPage = () => {
                                         </Badge>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="sm">{c.type === 'percent' ? `${c.value}%` : `${c.value.toLocaleString()} ${c.currency_code || ''}`}</Text>
+                                        <TextMeta>{c.type === 'percent' ? `${c.value}%` : `${c.value.toLocaleString()} ${c.currency_code || ''}`}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="xs">{period}</Text>
+                                        <TextMeta>{period}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="xs">
+                                        <TextMeta>
                                             {c.used_count}/{c.max_uses ?? '∞'}
-                                        </Text>
+                                        </TextMeta>
                                     </Table.Td>
                                     <Table.Td>
                                         <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
@@ -215,10 +216,10 @@ const AdminCouponsPage = () => {
                     </Group>
                     <Divider my="xs" />
                     <Group justify="flex-end" mt="sm">
-                        <Button leftSection={<Save size={14} />} size="xs" onClick={createNew}>
+                        <Button leftSection={<Save size={14} />} size="sm" onClick={createNew}>
                             생성
                         </Button>
-                        <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setCreateOpen(false)}>
+                        <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setCreateOpen(false)}>
                             취소
                         </Button>
                     </Group>
@@ -291,10 +292,10 @@ const AdminCouponsPage = () => {
                         </Group>
                         <Switch checked={!!editDraft.active} label="활성 상태" onChange={(e) => setEditDraft((d) => ({ ...d, active: e.currentTarget.checked }))} />
                         <Group justify="flex-end" mt="sm">
-                            <Button leftSection={<Save size={14} />} size="xs" onClick={commitEdit}>
+                            <Button leftSection={<Save size={14} />} size="sm" onClick={commitEdit}>
                                 저장
                             </Button>
-                            <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setEditId(null)}>
+                            <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditId(null)}>
                                 취소
                             </Button>
                         </Group>

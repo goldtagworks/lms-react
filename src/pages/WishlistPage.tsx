@@ -72,12 +72,12 @@ export default function WishlistPage() {
                                             </Text>
                                             <Group gap={4}>
                                                 {enrolled && (
-                                                    <Badge color="green" size="xs">
+                                                    <Badge color="green" size="sm">
                                                         수강중
                                                     </Badge>
                                                 )}
                                                 {wish && (
-                                                    <Badge color="pink" size="xs">
+                                                    <Badge color="pink" size="sm">
                                                         위시
                                                     </Badge>
                                                 )}
@@ -89,20 +89,20 @@ export default function WishlistPage() {
                                             ))}
                                         </Group>
                                         {course.summary && (
-                                            <Text c="dimmed" lineClamp={2} mb={6} size="xs">
+                                            <Text c="dimmed" lineClamp={2} mb={6} size="sm">
                                                 {course.summary}
                                             </Text>
                                         )}
                                         <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} />
                                         <EnrollWishlistActions
                                             enrolled={enrolled}
-                                            size="xs"
+                                            size="sm"
                                             userId={userId}
                                             wish={wish}
                                             onEnroll={() => handleEnroll(course.id)}
                                             onToggleWish={() => handleToggle(course.id)}
                                         />
-                                        <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt={8} radius="md" size="xs" to={`/course/${course.id}`} variant="default">
+                                        <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt={8} radius="md" size="md" to={`/course/${course.id}`} variant="default">
                                             자세히 보기
                                         </Button>
                                     </Card>

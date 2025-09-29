@@ -30,7 +30,7 @@ export default function SignInPage() {
                             <Title fw={700} order={3} size={26}>
                                 로그인
                             </Title>
-                            <Text c="dimmed" mt={4} size="xs">
+                            <Text c="dimmed" mt={4} size="sm">
                                 계정에 로그인하여 학습을 이어가세요.
                             </Text>
                         </div>
@@ -38,18 +38,18 @@ export default function SignInPage() {
                             <TextInput autoComplete="email" label="이메일" placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <TextInput autoComplete="current-password" label="비밀번호" placeholder="••••••" size="sm" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </Stack>
-                        <Button disabled={disabled} leftSection={<LogIn size={14} />} loading={loading} size="xs" type="submit">
+                        <Button disabled={disabled} leftSection={<LogIn size={14} />} loading={loading} size="sm" type="submit">
                             로그인
                         </Button>
                         <Divider label="이메일로 계속" labelPosition="center" my="xs" />
                         <Group justify="space-between">
-                            <Text c="dimmed" size="xs">
+                            <Text c="dimmed" size="sm">
                                 아직 계정이 없나요?{' '}
-                                <Text component={Link} fw={600} size="xs" to="/signup">
+                                <Text component={Link} fw={600} size="sm" to="/signup">
                                     회원가입
                                 </Text>
                             </Text>
-                            <Text c="dimmed" component={Link} size="xs" style={{ textDecoration: 'underline' }} to="/password/reset">
+                            <Text c="dimmed" component={Link} size="sm" style={{ textDecoration: 'underline' }} to="/password/reset">
                                 비밀번호 재설정
                             </Text>
                         </Group>

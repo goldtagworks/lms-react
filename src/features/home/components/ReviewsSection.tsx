@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useState } from 'react';
-import { Container, Title, SimpleGrid, Card, Text, Group, Button, Tooltip } from '@mantine/core';
+import { Container, Title, SimpleGrid, Card, Group, Button, Tooltip } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 
 import { ReviewVM } from '../../../viewmodels/home';
 import { selectBestReviews } from '../utils/reviewScoring';
@@ -31,12 +32,9 @@ function StarRating({ value }: { value: number }) {
     const stars = Array.from({ length: 5 }, (_, i) => (i < full ? '★' : '☆')).join(' ');
 
     return (
-        <Text aria-label={`평점 ${value}점 (5점 만점)`} c="yellow.7" fw={600} size="sm" style={{ letterSpacing: 1 }}>
-            {stars}{' '}
-            <Text component="span" fw={400} size="xs" style={{ marginLeft: 4 }}>
-                {value.toFixed(1)}
-            </Text>
-        </Text>
+        <TextBody aria-label={`평점 ${value}점 (5점 만점)`} c="yellow.7" fw={600} sizeOverride="sm" style={{ letterSpacing: 1 }}>
+            {stars} <span style={{ fontWeight: 400, marginLeft: 4 }}>{value.toFixed(1)}</span>
+        </TextBody>
     );
 }
 
@@ -68,30 +66,24 @@ function ReviewsSectionBase({ reviews, title = '실제 수강생 후기', limit 
                     return (
                         <Card key={r.id} withBorder aria-labelledby={`review-${r.id}-user`} component="article" p="lg" radius="md" shadow="sm">
                             <Group justify="space-between" mb={4}>
-                                <Text fw={700} id={`review-${r.id}-user`} size="sm">
+                                <TextBody fw={700} sizeOverride="sm">
                                     {r.user_name || r.user_id}
-                                </Text>
+                                </TextBody>
                                 <StarRating value={r.rating} />
                             </Group>
                             <Tooltip withArrow label={new Date(r.created_at).toISOString().slice(0, 10)}>
-                                <Text c="dimmed" mb={8} size="xs">
-                                    {formatRelative(r.created_at)}
-                                </Text>
+                                <TextMeta mb={8}>{formatRelative(r.created_at)}</TextMeta>
                             </Tooltip>
-                            {displayComment && (
-                                <Text size="sm" style={{ lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
-                                    {displayComment}
-                                </Text>
-                            )}
+                            {displayComment && <TextBody style={{ lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{displayComment}</TextBody>}
                             {isLong && (
                                 <Button mt={6} size="compact-xs" variant="subtle" onClick={() => toggle(r.id)}>
                                     {showFull ? '접기' : '더보기'}
                                 </Button>
                             )}
                             {r.course_title && (
-                                <Text c="blue.6" fw={500} mt={10} size="xs">
+                                <TextBody c="blue.6" fw={500} mt={10} sizeOverride="sm">
                                     {r.course_title}
-                                </Text>
+                                </TextBody>
                             )}
                         </Card>
                     );

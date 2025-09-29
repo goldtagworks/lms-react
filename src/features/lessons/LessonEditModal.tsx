@@ -137,10 +137,10 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                     </>
                 )}
                 <Group justify="flex-end" mt="sm">
-                    <Button leftSection={<Save size={16} />} size="xs" onClick={handleSave}>
+                    <Button leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
                         저장
                     </Button>
-                    <Button leftSection={<X size={16} />} size="xs" variant="default" onClick={onClose}>
+                    <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
                         닫기
                     </Button>
                 </Group>

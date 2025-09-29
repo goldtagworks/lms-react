@@ -50,12 +50,12 @@ function CourseCardBase({ course, to }: CourseCardProps) {
                     </Text>
                 )}
                 {course.student_count && (
-                    <Text c="dimmed" size="xs">
+                    <Text c="dimmed" size="sm">
                         수강생 {course.student_count.toLocaleString()}명
                     </Text>
                 )}
             </Group>
-            <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" size="xs" to={finalLink} variant="light">
+            <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" size="sm" to={finalLink} variant="light">
                 자세히 보기
             </Button>
         </Card>

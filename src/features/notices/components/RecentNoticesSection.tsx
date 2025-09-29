@@ -17,7 +17,7 @@ export function RecentNoticesSection({ limit = 2 }: Props) {
         <PageSection withGapTop title="공지사항">
             <Stack gap="sm">
                 {notices.map((n) => (
-                    <Card key={n.id} withBorder aria-label={n.title} component={Link} p="sm" radius="md" shadow="xs" to={`/notices/${n.id}`}>
+                    <Card key={n.id} withBorder aria-label={n.title} component={Link} p="sm" radius="md" shadow="sm" to={`/notices/${n.id}`}>
                         <Group gap="xs" justify="space-between" wrap="nowrap">
                             <Group gap="xs" wrap="nowrap">
                                 {n.pinned && (
@@ -29,7 +29,7 @@ export function RecentNoticesSection({ limit = 2 }: Props) {
                                     {n.title}
                                 </Text>
                             </Group>
-                            <Text c="dimmed" size="xs">
+                            <Text c="dimmed" size="sm">
                                 {formatDate(n.created_at)}
                             </Text>
                         </Group>

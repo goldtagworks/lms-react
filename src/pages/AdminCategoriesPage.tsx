@@ -1,4 +1,5 @@
-import { ActionIcon, Badge, Button, Group, Modal, Stack, Table, Text, TextInput, Tooltip, Switch, Notification } from '@mantine/core';
+import { ActionIcon, Badge, Button, Group, Modal, Stack, Table, TextInput, Tooltip, Switch, Notification } from '@mantine/core';
+import { TextBody, TextMeta } from '@main/components/typography';
 import { ArrowDown, ArrowUp, Edit3, Plus, Save, X, RefreshCw } from 'lucide-react';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
@@ -58,7 +59,7 @@ export default function AdminCategoriesPage() {
                                 <RefreshCw size={16} />
                             </ActionIcon>
                         </Tooltip>
-                        <Button leftSection={<Plus size={16} />} size="xs" onClick={() => setCreateOpen(true)}>
+                        <Button leftSection={<Plus size={16} />} size="sm" onClick={() => setCreateOpen(true)}>
                             새 카테고리
                         </Button>
                     </Group>
@@ -92,9 +93,9 @@ export default function AdminCategoriesPage() {
                         {paged.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
-                                    <Text c="dimmed" py={20} size="sm" ta="center">
+                                    <TextMeta py={20} ta="center">
                                         카테고리가 없습니다.
-                                    </Text>
+                                    </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
                         )}
@@ -113,7 +114,7 @@ export default function AdminCategoriesPage() {
                                 <Table.Td>
                                     {renameId === c.id ? (
                                         <Group gap={4} wrap="nowrap">
-                                            <TextInput aria-label="카테고리 이름" size="xs" style={{ flexGrow: 1 }} value={renameValue} onChange={(e) => setRenameValue(e.currentTarget.value)} />
+                                            <TextInput aria-label="카테고리 이름" size="sm" style={{ flexGrow: 1 }} value={renameValue} onChange={(e) => setRenameValue(e.currentTarget.value)} />
                                             <ActionIcon aria-label="저장" color="green" size="sm" variant="light" onClick={commitRename}>
                                                 <Save size={14} />
                                             </ActionIcon>
@@ -123,9 +124,9 @@ export default function AdminCategoriesPage() {
                                         </Group>
                                     ) : (
                                         <Group gap={6} wrap="nowrap">
-                                            <Text c={c.active ? undefined : 'dimmed'} fw={500} size="sm">
+                                            <TextBody c={c.active ? undefined : 'dimmed'} fw={500} sizeOverride="sm">
                                                 {c.name}
-                                            </Text>
+                                            </TextBody>
                                             <ActionIcon aria-label="이름 변경" size="sm" variant="subtle" onClick={() => startRename(c)}>
                                                 <Edit3 size={14} />
                                             </ActionIcon>
@@ -133,7 +134,7 @@ export default function AdminCategoriesPage() {
                                     )}
                                 </Table.Td>
                                 <Table.Td>
-                                    <Text size="xs">{c.slug}</Text>
+                                    <TextMeta>{c.slug}</TextMeta>
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
@@ -143,7 +144,7 @@ export default function AdminCategoriesPage() {
                                 <Table.Td ta="center">
                                     <Group gap={4} justify="center">
                                         <Tooltip label={c.active ? '비활성화' : '활성화'}>
-                                            <Switch aria-label="활성 토글" checked={c.active} size="xs" onChange={() => toggleActive(c)} />
+                                            <Switch aria-label="활성 토글" checked={c.active} size="sm" onChange={() => toggleActive(c)} />
                                         </Tooltip>
                                         {c.active && (
                                             <Tooltip label="즉시 비활성 (soft)">
@@ -171,10 +172,10 @@ export default function AdminCategoriesPage() {
                     )}
                     <TextInput aria-label="카테고리 이름" label="이름" placeholder="예: 개발" radius="md" value={newName} onChange={(e) => setNewName(e.currentTarget.value)} />
                     <Group justify="flex-end" mt="sm">
-                        <Button leftSection={<Save size={14} />} size="xs" onClick={handleCreate}>
+                        <Button leftSection={<Save size={14} />} size="sm" onClick={handleCreate}>
                             생성
                         </Button>
-                        <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => setCreateOpen(false)}>
+                        <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setCreateOpen(false)}>
                             취소
                         </Button>
                     </Group>

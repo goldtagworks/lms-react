@@ -45,10 +45,10 @@ export default function SectionHeaderAddModal({ opened, onClose, onAdd }: Sectio
                     }}
                 />
                 <Group gap="xs" justify="flex-end">
-                    <Button disabled={!trimmed} leftSection={<Plus size={14} />} size="xs" onClick={handleSubmit}>
+                    <Button disabled={!trimmed} leftSection={<Plus size={14} />} size="sm" onClick={handleSubmit}>
                         추가
                     </Button>
-                    <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={onClose}>
+                    <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
                         취소
                     </Button>
                 </Group>
