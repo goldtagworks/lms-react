@@ -61,7 +61,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     return (
         <AppShell
             bg="light-dark(#f8fafc, #181c1f)"
-            footer={{ height: 80 }}
+            footer={{ height: isMobile ? 110 : 90 }}
             header={{ height: 64 }}
             // 데스크탑에서는 navbar prop 자체를 제거하여 메인 offset 깨짐 방지
             {...(appShellNavbarProp ? { navbar: appShellNavbarProp } : {})}
