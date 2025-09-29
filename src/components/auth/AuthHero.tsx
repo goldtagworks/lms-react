@@ -1,4 +1,4 @@
-import { Box, List, rem, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Card, List, rem, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { CheckCircle2 } from 'lucide-react';
 
 interface AuthHeroProps {
@@ -11,7 +11,7 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
     const isChange = variant === 'change';
 
     return (
-        <Box p={{ base: 'lg', md: 'xl' }} style={{ background: 'var(--mantine-color-gray-0)', borderRadius: 'var(--mantine-radius-lg)' }}>
+        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
             <Stack gap="lg">
                 <div>
                     <Title fw={800} mb={rem(4)} order={2} size={28}>
@@ -73,7 +73,7 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
                     </List>
                 )}
             </Stack>
-        </Box>
+        </Card>
     );
 }
 
