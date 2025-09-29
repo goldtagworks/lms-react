@@ -65,6 +65,7 @@
     "home": {
         "heroTitle": "Whenever, wherever, 배움은 계속됩니다",
         "heroSubtitle": "입문부터 비즈니스까지, 수준별 커리큘럼을 만나보세요.",
+        "heroSubtitleStandard": "실무 중심의 강의 목차, 검증된 강사 소개, 다양한 할인 혜택까지!\n지금 바로 원하는 강의를 찾아보세요.",
         "browseCourses": "코스 둘러보기",
         "seeGuide": "이용 가이드",
         "featured": "추천 코스",
@@ -182,6 +183,14 @@
         "count": "리뷰 {{count}}개",
         "rating": "평점 {{rating}} / 5"
     },
+    "status": {
+        "approved": "승인됨",
+        "pending": "승인 대기중",
+        "rejected": "거절됨"
+    },
+    "reviewExtra": {
+        "popular": "인기 후기"
+    },
     "qna": {
         "ask": "질문하기",
         "answer": "답변하기",
@@ -192,6 +201,18 @@
         "add": "위시리스트 추가",
         "remove": "위시리스트 제거",
         "empty": "위시리스트에 담긴 코스가 없습니다"
+    },
+    "_terms_meta": {
+        "standardizedAt": "2025-09-29",
+        "notes": "커리큘럼=>강의 목차; 위시(리스트)=>찜; 강사진=>강사 소개; 상세 보기=>자세히 보기; 프로필 수정=>프로필 편집"
+    },
+    "terms": {
+        "courseOutline": "강의 목차",
+        "instructors": "강사 소개",
+        "viewDetails": "자세히 보기",
+        "favoriteAdd": "찜하기",
+        "favoriteRemove": "찜 해제",
+        "profileEdit": "프로필 편집"
     },
     "instructor": {
         "applyTitle": "강사 신청",
@@ -219,5 +240,26 @@
     "category": {
         "manage": "카테고리 관리",
         "empty": "등록된 카테고리가 없습니다"
+    },
+    "_en": {
+        "home": {
+            "heroSubtitleStandard": "Practical course outlines, trusted instructors, and various discounts!\nStart finding the course you need now."
+        },
+        "terms": {
+            "courseOutline": "Course Outline",
+            "instructors": "Instructors",
+            "viewDetails": "View Details",
+            "favoriteAdd": "Add to Favorites",
+            "favoriteRemove": "Remove Favorite",
+            "profileEdit": "Edit Profile"
+        },
+        "status": {
+            "approved": "Approved",
+            "pending": "Pending",
+            "rejected": "Rejected"
+        },
+        "reviewExtra": {
+            "popular": "Popular Reviews"
+        }
     }
 }
