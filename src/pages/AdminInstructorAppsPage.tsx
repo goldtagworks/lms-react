@@ -8,6 +8,7 @@ import { Search, XCircle, CheckCircle2, Clock, Check, X, ShieldAlert } from 'luc
 import PageContainer from '@main/components/layout/PageContainer';
 import PaginationBar from '@main/components/PaginationBar';
 import PageHeader from '@main/components/layout/PageHeader';
+import { useI18n } from '@main/lib/i18n';
 
 const statusColor: Record<string, string> = {
     PENDING: 'yellow',
@@ -17,6 +18,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function AdminInstructorAppsPage() {
+    const { t } = useI18n();
     const apps = useInstructorApplications();
     const [rejectingId, setRejectingId] = useState<string | null>(null);
     const [reason, setReason] = useState('');
@@ -75,7 +77,7 @@ export default function AdminInstructorAppsPage() {
         const app = apps.find((a) => a.id === id);
 
         if (app) {
-            notifications.show({ color: 'teal', title: '승인 완료', message: `${app.display_name} 승인됨` });
+            notifications.show({ color: 'teal', title: t('notify.success.approve'), message: t('admin.instructorApps.notify.approved', { name: app.display_name }) });
         }
     }
     function openReject(id: string) {
@@ -88,7 +90,7 @@ export default function AdminInstructorAppsPage() {
             const app = apps.find((a) => a.id === rejectingId);
 
             if (app) {
-                notifications.show({ color: 'red', title: '반려 처리', message: `${app.display_name} 반려됨` });
+                notifications.show({ color: 'red', title: t('notify.success.reject'), message: t('admin.instructorApps.notify.rejected', { name: app.display_name }) });
             }
             setRejectingId(null);
             setReason('');
@@ -101,7 +103,7 @@ export default function AdminInstructorAppsPage() {
         const app = apps.find((a) => a.id === revokingId);
 
         if (app) {
-            notifications.show({ color: 'gray', title: '권한 회수', message: `${app.display_name} 강사 권한 회수` });
+            notifications.show({ color: 'gray', title: t('notify.success.revoke'), message: t('admin.instructorApps.notify.revoked', { name: app.display_name }) });
         }
         setRevokingId(null);
         setRevokeReason('');
@@ -134,24 +136,24 @@ export default function AdminInstructorAppsPage() {
                 actions={
                     <Group gap={6} wrap="wrap">
                         <Badge color="grape" leftSection={<Clock size={12} />}>
-                            대기 {pendingAll.length}
+                            {t('admin.instructorApps.badge.pending')} {pendingAll.length}
                         </Badge>
                         <Badge color="teal" leftSection={<Check size={12} />}>
-                            승인 {decidedAll.filter((a) => a.status === 'APPROVED').length}
+                            {t('admin.instructorApps.badge.approved')} {decidedAll.filter((a) => a.status === 'APPROVED').length}
                         </Badge>
                         <Badge color="red" leftSection={<X size={12} />}>
-                            반려 {decidedAll.filter((a) => a.status === 'REJECTED').length}
+                            {t('admin.instructorApps.badge.rejected')} {decidedAll.filter((a) => a.status === 'REJECTED').length}
                         </Badge>
                         <Badge color="gray" leftSection={<ShieldAlert size={12} />}>
-                            회수 {revokedCount}
+                            {t('admin.instructorApps.badge.revoked')} {revokedCount}
                         </Badge>
                         <Badge color="gray" variant="outline">
-                            총 {apps.length}
+                            {t('admin.instructorApps.badge.total')} {apps.length}
                         </Badge>
                     </Group>
                 }
-                description="강사 신청을 검토/승인/반려/회수 관리합니다."
-                title="강사 신청 관리"
+                description={t('admin.instructorApps.description')}
+                title={t('admin.instructorApps.title')}
             />
 
             <Divider mb="md" />
@@ -160,14 +162,21 @@ export default function AdminInstructorAppsPage() {
                 <Group align="flex-end" justify="space-between">
                     <Tabs keepMounted={false} value={activeTab} onChange={(v) => setActiveTab((v as 'PENDING' | 'DECIDED' | 'REVOKED') || 'PENDING')}>
                         <Tabs.List>
-                            <Tabs.Tab value="PENDING">대기중 ({filteredPending.length})</Tabs.Tab>
-                            <Tabs.Tab value="DECIDED">승인 / 반려 ({filteredDecided.length})</Tabs.Tab>
-                            <Tabs.Tab value="REVOKED">회수 ({filteredRevoked.length})</Tabs.Tab>
+                            <Tabs.Tab value="PENDING">
+                                {t('admin.instructorApps.tabs.pending')} ({filteredPending.length})
+                            </Tabs.Tab>
+                            <Tabs.Tab value="DECIDED">
+                                {t('admin.instructorApps.tabs.decided')} ({filteredDecided.length})
+                            </Tabs.Tab>
+                            <Tabs.Tab value="REVOKED">
+                                {t('admin.instructorApps.tabs.revoked')} ({filteredRevoked.length})
+                            </Tabs.Tab>
                         </Tabs.List>
                     </Tabs>
                     <TextInput
+                        aria-label={t('a11y.admin.instructorAppsSearch')}
                         leftSection={<Search size={14} />}
-                        placeholder="검색: 사용자/표시 이름"
+                        placeholder={t('admin.instructorApps.searchPlaceholder')}
                         radius="md"
                         size="sm"
                         value={search}
@@ -187,17 +196,17 @@ export default function AdminInstructorAppsPage() {
                             <Table.Thead>
                                 <Table.Tr>
                                     <Table.Th style={{ width: 140 }} ta="center">
-                                        사용자
+                                        {t('admin.instructorApps.table.user')}
                                     </Table.Th>
                                     <Table.Th style={{ width: 170 }} ta="center">
-                                        표시 이름
+                                        {t('admin.instructorApps.table.displayName')}
                                     </Table.Th>
-                                    <Table.Th ta="center">링크</Table.Th>
+                                    <Table.Th ta="center">{t('admin.instructorApps.table.links')}</Table.Th>
                                     <Table.Th style={{ width: 110 }} ta="center">
-                                        신청일
+                                        {t('admin.instructorApps.table.appliedAt')}
                                     </Table.Th>
                                     <Table.Th style={{ width: 120 }} ta="center">
-                                        관리
+                                        {t('admin.instructorApps.table.actions')}
                                     </Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
@@ -227,7 +236,7 @@ export default function AdminInstructorAppsPage() {
                                             </Table.Td>
                                             <Table.Td>
                                                 <Group gap={4} justify="center">
-                                                    <Tooltip withArrow label="승인">
+                                                    <Tooltip withArrow label={t('admin.instructorApps.tooltip.approve')}>
                                                         <ActionIcon
                                                             color="teal"
                                                             size="sm"
@@ -240,7 +249,7 @@ export default function AdminInstructorAppsPage() {
                                                             <CheckCircle2 size={16} />
                                                         </ActionIcon>
                                                     </Tooltip>
-                                                    <Tooltip withArrow label="반려">
+                                                    <Tooltip withArrow label={t('admin.instructorApps.tooltip.reject')}>
                                                         <ActionIcon
                                                             color="red"
                                                             size="sm"
@@ -262,7 +271,7 @@ export default function AdminInstructorAppsPage() {
                                     <Table.Tr>
                                         <Table.Td colSpan={5}>
                                             <TextMeta py={20} ta="center">
-                                                대기중 신청이 없습니다.
+                                                {t('admin.instructorApps.empty.pending')}
                                             </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
@@ -278,17 +287,17 @@ export default function AdminInstructorAppsPage() {
                             <Table.Thead>
                                 <Table.Tr>
                                     <Table.Th style={{ width: 180 }} ta="center">
-                                        표시 이름
+                                        {t('admin.instructorApps.table.displayName')}
                                     </Table.Th>
                                     <Table.Th style={{ width: 110 }} ta="center">
-                                        상태
+                                        {t('admin.instructorApps.table.status')}
                                     </Table.Th>
                                     <Table.Th style={{ width: 110 }} ta="center">
-                                        결정일
+                                        {t('admin.instructorApps.table.decidedAt')}
                                     </Table.Th>
-                                    <Table.Th ta="center">비고</Table.Th>
+                                    <Table.Th ta="center">{t('admin.instructorApps.table.note')}</Table.Th>
                                     <Table.Th style={{ width: 80 }} ta="center">
-                                        관리
+                                        {t('admin.instructorApps.table.actions')}
                                     </Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
@@ -322,7 +331,7 @@ export default function AdminInstructorAppsPage() {
                                         <Table.Td>
                                             <Group gap={4} justify="center">
                                                 {a.status === 'APPROVED' && (
-                                                    <Tooltip withArrow label="권한 회수">
+                                                    <Tooltip withArrow label={t('admin.instructorApps.tooltip.revoke')}>
                                                         <ActionIcon
                                                             color="gray"
                                                             size="sm"
@@ -344,7 +353,7 @@ export default function AdminInstructorAppsPage() {
                                     <Table.Tr>
                                         <Table.Td colSpan={5}>
                                             <TextMeta py={20} ta="center">
-                                                완료된 신청이 없습니다.
+                                                {t('admin.instructorApps.empty.decided')}
                                             </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
@@ -360,12 +369,12 @@ export default function AdminInstructorAppsPage() {
                             <Table.Thead>
                                 <Table.Tr>
                                     <Table.Th style={{ width: 180 }} ta="center">
-                                        표시 이름
+                                        {t('admin.instructorApps.table.displayName')}
                                     </Table.Th>
                                     <Table.Th style={{ width: 110 }} ta="center">
-                                        회수일
+                                        {t('admin.instructorApps.table.revokedAt')}
                                     </Table.Th>
-                                    <Table.Th ta="center">사유</Table.Th>
+                                    <Table.Th ta="center">{t('admin.instructorApps.table.reason')}</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
@@ -390,7 +399,7 @@ export default function AdminInstructorAppsPage() {
                                     <Table.Tr>
                                         <Table.Td colSpan={3}>
                                             <TextMeta py={20} ta="center">
-                                                회수된 신청이 없습니다.
+                                                {t('admin.instructorApps.empty.revoked')}
                                             </TextMeta>
                                         </Table.Td>
                                     </Table.Tr>
@@ -402,32 +411,32 @@ export default function AdminInstructorAppsPage() {
                 )}
             </Stack>
 
-            <Modal centered opened={!!detailId} radius="md" size="lg" title="강사 신청 상세" onClose={() => setDetailId(null)}>
+            <Modal centered opened={!!detailId} radius="md" size="lg" title={t('admin.instructorApps.modal.detailTitle')} onClose={() => setDetailId(null)}>
                 {detailId && <InstructorAppDetail appId={detailId} onClose={() => setDetailId(null)} />}
             </Modal>
-            <Modal centered opened={!!rejectingId} radius="md" title="반려 사유" onClose={() => setRejectingId(null)}>
+            <Modal centered opened={!!rejectingId} radius="md" title={t('admin.instructorApps.modal.rejectTitle')} onClose={() => setRejectingId(null)}>
                 <Stack>
-                    <Textarea minRows={3} placeholder="사유 (선택)" value={reason} onChange={(e) => setReason(e.currentTarget.value)} />
+                    <Textarea minRows={3} placeholder={t('admin.instructorApps.modal.rejectReasonPlaceholder')} value={reason} onChange={(e) => setReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
                         <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={submitReject}>
-                            반려 확정
+                            {t('common.reject')} {t('common.confirm')}
                         </Button>
                         <Button leftSection={<CheckCircle2 size={14} />} size="sm" variant="default" onClick={() => setRejectingId(null)}>
-                            취소
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
-            <Modal centered opened={!!revokingId} radius="md" title="강사 권한 회수" onClose={() => setRevokingId(null)}>
+            <Modal centered opened={!!revokingId} radius="md" title={t('admin.instructorApps.modal.revokeTitle')} onClose={() => setRevokingId(null)}>
                 <Stack>
-                    <TextBody c="dimmed">승인된 강사의 권한을 회수합니다. 이미 생성된 코스 처리 등은 후속 정책에 따릅니다.</TextBody>
-                    <Textarea minRows={3} placeholder="회수 사유 (선택) - 예: 부적절한 콘텐츠, 정책 위반" value={revokeReason} onChange={(e) => setRevokeReason(e.currentTarget.value)} />
+                    <TextBody c="dimmed">{t('admin.instructorApps.modal.revokeInfo')}</TextBody>
+                    <Textarea minRows={3} placeholder={t('admin.instructorApps.modal.revokeReasonPlaceholder')} value={revokeReason} onChange={(e) => setRevokeReason(e.currentTarget.value)} />
                     <Group justify="flex-end">
                         <Button color="gray" leftSection={<ShieldAlert size={14} />} size="sm" onClick={confirmRevoke}>
-                            회수 확정
+                            {t('common.revoke')} {t('common.confirm')}
                         </Button>
                         <Button leftSection={<CheckCircle2 size={14} />} size="sm" variant="default" onClick={() => setRevokingId(null)}>
-                            취소
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>

@@ -6,8 +6,10 @@ export type UserRole = 'student' | 'instructor' | 'admin';
 
 export interface NavItem {
     id: string;
-    label: string; // TODO: i18n key 사용 예정 (051_copy_catalog.json)
-    labelKey?: string;
+    // label은 과도기(Dev)용 고정 문자열. 최종적으로 labelKey (예: 'nav.courses') 사용.
+    // 기존 주석에 있던 051_copy_catalog.json 의존 제거 -> 분리된 namespace JSON 기반.
+    label: string;
+    labelKey?: string; // 'nav.xxx'
     href: string;
     auth?: AuthVisibility; // 기본 public
     roles?: UserRole[]; // 비어있으면 모든 역할
@@ -36,64 +38,63 @@ export interface FilterContext {
 export const navGroups: NavGroup[] = [
     {
         id: 'catalog',
-        label: '카탈로그',
+        label: '',
+        labelKey: 'nav.catalog',
         order: 10,
         items: [
-            { id: 'courses', label: '코스 탐색', href: '/courses' },
-            { id: 'notices', label: '공지사항', href: '/notices' }
+            { id: 'courses', label: '', labelKey: 'nav.coursesExplore', href: '/courses' },
+            { id: 'notices', label: '', labelKey: 'nav.notices', href: '/notices' }
         ]
     },
     {
         id: 'learn',
-        label: '학습',
+        label: '',
+        labelKey: 'nav.learn',
         order: 20,
         auth: 'auth',
         items: [
-            { id: 'my', label: '내 학습', href: '/my', auth: 'auth' },
-            { id: 'wishlist', label: '위시 담기', href: '/my/wishlist', auth: 'auth' },
-            { id: 'certificates', label: '수료증', href: '/my/certificates', auth: 'auth' }
-            // 수료증/시험 기록 등 향후 추가 가능
+            { id: 'my', label: '', labelKey: 'nav.myLearning', href: '/my', auth: 'auth' },
+            { id: 'wishlist', label: '', labelKey: 'nav.wishlist', href: '/my/wishlist', auth: 'auth' },
+            { id: 'certificates', label: '', labelKey: 'nav.certificates', href: '/my/certificates', auth: 'auth' }
         ]
     },
     {
         id: 'instructor',
-        label: '강사',
+        label: '',
+        labelKey: 'nav.instructor',
         order: 30,
         auth: 'auth',
         roles: ['instructor'],
         items: [
-            { id: 'instructor-courses', label: '내 코스 관리', href: '/instructor/courses', auth: 'auth', roles: ['instructor'] },
-            // 사용자 로그인 후 Header/Navbar 에서 동적으로 userId 치환 (간단 구현)
-            { id: 'instructor-profile', label: '프로필', href: '/instructor/__USER_ID__', auth: 'auth', roles: ['instructor'] }
-            // TODO: 동적 ID 대체 필요
+            { id: 'instructor-courses', label: '', labelKey: 'nav.instructorCourses', href: '/instructor/courses', auth: 'auth', roles: ['instructor'] },
+            { id: 'instructor-profile', label: '', labelKey: 'nav.instructorProfile', href: '/instructor/__USER_ID__', auth: 'auth', roles: ['instructor'] }
         ]
     },
     {
         id: 'admin',
-        label: '관리자',
+        label: '',
+        labelKey: 'nav.admin',
         order: 40,
         auth: 'auth',
         roles: ['admin'],
         items: [
-            { id: 'admin-users', label: '사용자 관리', href: '/admin/users', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-categories', label: '카테고리', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-coupons', label: '쿠폰', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-certificates', label: '수료증', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
-            // 강사 신청 관리: 기존 Header/Navbar 하드코딩 제거 후 이곳으로 이동
-            { id: 'admin-instructor-apps', label: '강사 신청 관리', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
-            // 공지 관리는 공용 NoticesPage 에서 role=admin 시 액션 노출
+            { id: 'admin-users', label: '', labelKey: 'nav.adminUsers', href: '/admin/users', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-categories', label: '', labelKey: 'nav.adminCategories', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-coupons', label: '', labelKey: 'nav.adminCoupons', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-instructor-apps', label: '', labelKey: 'nav.adminInstructorApps', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
         ]
     },
-    // CTA (역할 전환/관리) 그룹: predicate 로 세밀 제어 가능
     {
         id: 'cta',
-        label: '전환',
+        label: '',
+        labelKey: 'nav.cta',
         order: 50,
         items: [
-            // 학생만 노출 (instructor/admin 은 숨김)
             {
                 id: 'apply-instructor',
-                label: '강사 신청',
+                label: '',
+                labelKey: 'nav.applyInstructor',
                 href: '/instructor/apply',
                 auth: 'auth',
                 roles: ['student'],
@@ -103,11 +104,12 @@ export const navGroups: NavGroup[] = [
     },
     {
         id: 'legal',
-        label: '정책',
+        label: '',
+        labelKey: 'nav.legal',
         order: 90,
         items: [
-            { id: 'terms', label: '이용약관', href: '/terms' },
-            { id: 'privacy', label: '개인정보처리방침', href: '/privacy' }
+            { id: 'terms', label: '', labelKey: 'nav.terms', href: '/terms' },
+            { id: 'privacy', label: '', labelKey: 'nav.privacy', href: '/privacy' }
         ]
     }
 ];

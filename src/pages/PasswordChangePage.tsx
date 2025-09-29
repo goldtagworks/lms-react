@@ -3,6 +3,7 @@ import { Alert, Button, Card, PasswordInput, Stack, Text } from '@mantine/core';
 import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useAuth } from '@main/lib/auth';
+import { useI18n } from '@main/lib/i18n';
 
 export default function PasswordChangePage() {
     const { user } = useAuth();
@@ -11,23 +12,24 @@ export default function PasswordChangePage() {
     const [confirmPw, setConfirmPw] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [done, setDone] = useState(false);
+    const { t } = useI18n();
 
     function submit() {
         setError(null);
         if (!currentPw || !newPw) {
-            setError('필수 입력이 비었습니다');
+            setError(t('auth.password.required'));
 
             return;
         }
 
         if (newPw.length < 8) {
-            setError('비밀번호는 8자 이상이어야 합니다');
+            setError(t('auth.password.min'));
 
             return;
         }
 
         if (newPw !== confirmPw) {
-            setError('비밀번호가 일치하지 않습니다');
+            setError(t('auth.password.mismatch'));
 
             return;
         }
@@ -44,32 +46,46 @@ export default function PasswordChangePage() {
                 <Stack gap="md">
                     <div>
                         <Text fw={600} size="lg">
-                            비밀번호 변경
+                            {t('auth.changeTitle')}
                         </Text>
                         <Text c="dimmed" mt={4} size="sm">
-                            계정 보안을 위해 주기적으로 변경하세요.
+                            {t('auth.changeSubtitle')}
                         </Text>
                     </div>
                     {!user && (
-                        <Alert color="red" title="로그인 필요">
-                            로그인 상태가 아닙니다. 먼저 로그인해주세요.
+                        <Alert color="red" title={t('auth.loginRequired.title')}>
+                            {t('auth.loginRequired.message.generic')}
                         </Alert>
                     )}
                     {done && (
-                        <Alert color="teal" title="완료">
-                            비밀번호가 변경되었습니다 (mock).
+                        <Alert color="teal" title={t('common.ok')}>
+                            {t('auth.password.changed')}
                         </Alert>
                     )}
-                    <PasswordInput disabled={!user} label="현재 비밀번호" placeholder="현재 비밀번호" size="sm" value={currentPw} onChange={(e) => setCurrentPw(e.currentTarget.value)} />
-                    <PasswordInput disabled={!user} label="새 비밀번호" placeholder="새 비밀번호 (8자 이상)" size="sm" value={newPw} onChange={(e) => setNewPw(e.currentTarget.value)} />
-                    <PasswordInput disabled={!user} label="비밀번호 확인" placeholder="새 비밀번호 확인" size="sm" value={confirmPw} onChange={(e) => setConfirmPw(e.currentTarget.value)} />
+                    <PasswordInput
+                        disabled={!user}
+                        label={t('auth.currentPassword')}
+                        placeholder={t('auth.currentPassword')}
+                        size="sm"
+                        value={currentPw}
+                        onChange={(e) => setCurrentPw(e.currentTarget.value)}
+                    />
+                    <PasswordInput disabled={!user} label={t('auth.newPassword')} placeholder={t('auth.newPassword')} size="sm" value={newPw} onChange={(e) => setNewPw(e.currentTarget.value)} />
+                    <PasswordInput
+                        disabled={!user}
+                        label={t('auth.confirmPassword')}
+                        placeholder={t('auth.confirmPassword')}
+                        size="sm"
+                        value={confirmPw}
+                        onChange={(e) => setConfirmPw(e.currentTarget.value)}
+                    />
                     {error && (
                         <Text c="red" size="sm">
                             {error}
                         </Text>
                     )}
                     <Button disabled={!user} size="sm" onClick={submit}>
-                        변경
+                        {t('auth.password.change')}
                     </Button>
                 </Stack>
             </Card>

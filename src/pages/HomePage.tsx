@@ -77,7 +77,7 @@ const HomePage = () => {
                 )}
 
                 {isLoading ? (
-                    <PageSection aria-busy="true" title="주요 강사진">
+                    <PageSection aria-busy="true" title="강사 소개">
                         <Group gap={24}>
                             {Array.from({ length: 2 }).map((_, i) => (
                                 <InstructorCardSkeleton key={i} />
@@ -85,7 +85,7 @@ const HomePage = () => {
                         </Group>
                     </PageSection>
                 ) : (
-                    <InstructorsSection instructors={instructors} />
+                    <InstructorsSection instructors={instructors} title="강사 소개" />
                 )}
 
                 {isLoading ? (

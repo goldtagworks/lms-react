@@ -15,7 +15,7 @@ export interface CourseCardVM
     student_count?: number;
     lesson_count?: number;
     total_duration_seconds?: number;
-    // 위시리스트 여부
+    // 찜 여부 (이전: 위시리스트)
     is_wishlisted?: boolean;
     // 서버 계산 표시 가격 (sale/쿠폰/세금 반영 최종값)
     effectivePriceCents: number; // 서버 계산 값

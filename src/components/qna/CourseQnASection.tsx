@@ -3,6 +3,7 @@ import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Paginat
 import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
 import { useAnswerQuestion, useAskQuestion, useCourseQuestions, useQuestionAnswers, useResolveQuestion, useUpdateQuestion, useQuestionPrivacy } from '@main/hooks/useCourseQnA';
 import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { useI18n } from '@main/lib/i18n';
 
 interface Props {
     courseId: string;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function CourseQnASection({ courseId, userId, userRole, enrolled, isInstructor }: Props) {
+    const { t } = useI18n();
     const [page, setPage] = useState(1);
     const pageSize = 5;
     const { questions, pageCount, total } = useCourseQuestions(courseId, { page, pageSize, viewerId: userId });
@@ -43,21 +45,21 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
         <Stack gap="lg">
             <Group justify="space-between">
                 <TextTitle fw={600} sizeOverride="md">
-                    전체 질문 {total}개
+                    {t('qna.total', { count: total }, `전체 질문 ${total}개`)}
                 </TextTitle>
                 {pageCount > 1 && <Pagination size="sm" total={pageCount} value={page} onChange={setPage} />}
             </Group>
             <Box>
                 <TextTitle fw={600} mb={6}>
-                    질문 작성
+                    {t('qna.ask', undefined, '질문 작성')}
                 </TextTitle>
-                {!canAsk && <TextBody c="dimmed">수강 중인 사용자만 질문을 작성할 수 있습니다.</TextBody>}
+                {!canAsk && <TextBody c="dimmed">{t('qna.onlyEnrolled', undefined, '수강 중인 사용자만 질문을 작성할 수 있습니다')}</TextBody>}
                 {canAsk && (
                     <Card withBorder p="md" radius="md">
-                        <TextInput mb="xs" placeholder="제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
-                        <Textarea autosize minRows={3} placeholder="본문을 입력하세요" value={body} onChange={(e) => setBody(e.currentTarget.value)} />
+                        <TextInput mb="xs" placeholder={t('qna.titlePlaceholder', undefined, '제목')} size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+                        <Textarea autosize minRows={3} placeholder={t('qna.bodyPlaceholder', undefined, '본문을 입력하세요')} value={body} onChange={(e) => setBody(e.currentTarget.value)} />
                         <Group justify="space-between" mt="xs">
-                            <Switch checked={isPrivate} label="비공개 (나만 보기)" size="sm" onChange={(e) => setIsPrivate(e.currentTarget.checked)} />
+                            <Switch checked={isPrivate} label={t('qna.privateOnlyMe', undefined, '비공개 (나만 보기)')} size="sm" onChange={(e) => setIsPrivate(e.currentTarget.checked)} />
                             <Group gap="xs">
                                 {askError && (
                                     <Badge color="red" size="xs" variant="light">
@@ -65,7 +67,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
                                     </Badge>
                                 )}
                                 <Button disabled={!title.trim() || !body.trim()} size="sm" onClick={handleAsk}>
-                                    등록
+                                    {t('qna.register', undefined, '등록')}
                                 </Button>
                             </Group>
                         </Group>
@@ -74,7 +76,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
             </Box>
             <Divider />
             <Stack gap="sm">
-                {questions.length === 0 && <TextBody c="dimmed">아직 질문이 없습니다.</TextBody>}
+                {questions.length === 0 && <TextBody c="dimmed">{t('qna.noQuestions', undefined, '아직 질문이 없습니다')}</TextBody>}
                 {questions.map((q) => {
                     return (
                         <QuestionItem
@@ -115,6 +117,7 @@ interface QuestionItemProps {
 }
 
 function QuestionItem({ questionId, title, body, createdAt, isResolved, canResolve, onResolve, userId, isInstructor, expanded, onToggle, isPrivate }: QuestionItemProps) {
+    const { t } = useI18n();
     const { answers } = useQuestionAnswers(expanded ? questionId : undefined);
     const { mutate: answer, error } = useAnswerQuestion(questionId, userId, isInstructor);
     const { mutate: updateQ, error: updateError } = useUpdateQuestion(userId);
@@ -170,15 +173,15 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                         {editMode && <TextInput size="sm" value={editTitle} onChange={(e) => setEditTitle(e.currentTarget.value)} />}
                         {isResolved && (
                             <Badge color="green" leftSection={<CheckCircle2 size={12} />} size="xs" variant="light">
-                                해결됨
+                                {t('qna.resolved', undefined, '해결됨')}
                             </Badge>
                         )}
                         {isPrivate && !editMode && (
                             <Badge color="gray" size="xs" variant="light">
-                                비공개
+                                {t('qna.private', undefined, '비공개')}
                             </Badge>
                         )}
-                        {editMode && <Switch checked={localPrivate} label="비공개" size="xs" onChange={(e) => setLocalPrivate(e.currentTarget.checked)} />}
+                        {editMode && <Switch checked={localPrivate} label={t('qna.private', undefined, '비공개')} size="xs" onChange={(e) => setLocalPrivate(e.currentTarget.checked)} />}
                     </Group>
                     <TextMeta mb={6}>{new Date(createdAt).toLocaleDateString()}</TextMeta>
                     {!editMode && (
@@ -196,25 +199,25 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                 <Group gap={4} wrap="nowrap">
                     {canResolve && !isResolved && (
                         <Button size="sm" variant="light" onClick={onResolve}>
-                            해결
+                            {t('qna.solve', undefined, '해결')}
                         </Button>
                     )}
                     {!isResolved && !editMode && isPrivate !== undefined && (
                         <Button size="sm" variant="subtle" onClick={startEdit}>
-                            수정
+                            {t('qna.edit', undefined, '수정')}
                         </Button>
                     )}
                     {editMode && (
                         <Group gap={4} wrap="nowrap">
                             <Button color="gray" size="sm" variant="subtle" onClick={cancelEdit}>
-                                취소
+                                {t('qna.cancel', undefined, '취소')}
                             </Button>
                             <Button size="sm" variant="light" onClick={saveEdit}>
-                                저장
+                                {t('qna.save', undefined, '저장')}
                             </Button>
                         </Group>
                     )}
-                    <ActionIcon aria-label={expanded ? '접기' : '펼치기'} variant="subtle" onClick={onToggle}>
+                    <ActionIcon aria-label={expanded ? t('common.collapse', undefined, '접기') : t('common.expand', undefined, '펼치기')} variant="subtle" onClick={onToggle}>
                         {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </ActionIcon>
                 </Group>
@@ -227,7 +230,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                             <Group align="center" gap={6} mb={4} wrap="nowrap">
                                 {a.is_instructor_answer && (
                                     <Badge color="blue" size="xs" variant="light">
-                                        강사
+                                        {t('qna.instructor', undefined, '강사')}
                                     </Badge>
                                 )}
                                 <TextMeta>{new Date(a.created_at).toLocaleDateString()}</TextMeta>
@@ -237,7 +240,13 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                     ))}
                     {canAnswer && (
                         <Card withBorder p="xs" radius="sm">
-                            <Textarea autosize minRows={2} placeholder="답변을 입력하세요" value={answerBody} onChange={(e) => setAnswerBody(e.currentTarget.value)} />
+                            <Textarea
+                                autosize
+                                minRows={2}
+                                placeholder={t('qna.answerPlaceholder', undefined, '답변을 입력하세요')}
+                                value={answerBody}
+                                onChange={(e) => setAnswerBody(e.currentTarget.value)}
+                            />
                             <Group gap="xs" justify="flex-end" mt={6}>
                                 {error && (
                                     <Badge color="red" size="xs" variant="light">
@@ -245,7 +254,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                                     </Badge>
                                 )}
                                 <Button disabled={!answerBody.trim()} size="sm" onClick={submitAnswer}>
-                                    등록
+                                    {t('qna.register', undefined, '등록')}
                                 </Button>
                             </Group>
                         </Card>

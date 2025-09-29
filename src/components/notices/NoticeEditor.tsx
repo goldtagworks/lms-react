@@ -3,6 +3,7 @@ import { TextInput, Textarea, Switch, Group, Button, Stack } from '@mantine/core
 import { notifications } from '@mantine/notifications';
 import { addNotice, updateNotice } from '@main/lib/noticeRepo';
 import { Save, X } from 'lucide-react';
+import { useI18n } from '@main/lib/i18n';
 
 export interface NoticeEditorProps {
     noticeId?: string;
@@ -22,6 +23,7 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
     const [title, setTitle] = useState(initialTitle);
     const [body, setBody] = useState(initialBody);
     const [pinned, setPinned] = useState(initialPinned);
+    const { t } = useI18n();
 
     useEffect(() => {
         setTitle(initialTitle);
@@ -31,48 +33,47 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
 
     function handleSubmit() {
         if (!title.trim()) {
-            notifications.show({ color: 'red', title: '검증 오류', message: '제목은 필수입니다' });
+            notifications.show({ color: 'red', title: t('notify.error.validation'), message: t('errors.noticeTitleRequired') });
 
             return;
         }
-
         try {
             if (isEdit && noticeId) {
                 updateNotice(noticeId, { title: title.trim(), body: body.trim(), pinned });
-                notifications.show({ color: 'teal', title: '성공', message: '공지 수정 완료' });
+                notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeUpdate') });
                 onSaved?.(noticeId);
             } else {
                 const n = addNotice({ title: title.trim(), body: body.trim(), pinned });
 
-                notifications.show({ color: 'teal', title: '성공', message: '공지 생성 완료' });
+                notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeCreate') });
                 onSaved?.(n.id);
             }
         } catch {
-            notifications.show({ color: 'red', title: '오류', message: '저장 실패' });
+            notifications.show({ color: 'red', title: t('notify.error.generic'), message: t('notify.error.saveFailed') });
         }
     }
 
     return (
         <Stack gap="md" mt="sm">
-            <TextInput data-autofocus label="제목" placeholder="공지 제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
+            <TextInput data-autofocus label={t('notice.titleLabel')} placeholder={t('notice.titlePlaceholder')} size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
             <Textarea
                 autosize
-                label="본문"
+                label={t('notice.bodyLabel')}
                 maxRows={30}
                 minRows={10}
-                placeholder="공지 본문"
+                placeholder={t('notice.bodyPlaceholder')}
                 size="sm"
                 styles={{ input: { fontFamily: 'inherit' } }}
                 value={body}
                 onChange={(e) => setBody(e.currentTarget.value)}
             />
-            <Switch checked={pinned} label="상단 고정(PIN)" onChange={(e) => setPinned(e.currentTarget.checked)} />
+            <Switch checked={pinned} label={t('notice.pin')} onChange={(e) => setPinned(e.currentTarget.checked)} />
             <Group justify="flex-end" mt="sm">
                 <Button leftSection={<Save size={16} />} size="sm" onClick={handleSubmit}>
-                    {isEdit ? '수정' : '생성'}
+                    {isEdit ? t('common.edit') : t('common.register')}
                 </Button>
                 <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onCancel}>
-                    취소
+                    {t('common.cancel')}
                 </Button>
             </Group>
         </Stack>

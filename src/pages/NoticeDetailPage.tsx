@@ -12,19 +12,21 @@ import useCopyLink from '@main/hooks/useCopyLink';
 import { useAuth } from '@main/lib/auth';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { useI18n } from '@main/lib/i18n';
 
 export default function NoticeDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const notice = useNotice(id);
     const { copied, copy } = useCopyLink();
+    const { t } = useI18n();
     const { user } = useAuth();
     const isAdmin = user?.role === 'admin';
 
     if (!notice) {
         return (
             <PageContainer roleMain>
-                <EmptyState message="해당 공지사항을 찾을 수 없습니다." />
+                <EmptyState message={t('empty.noticeMissing')} />
             </PageContainer>
         );
     }
@@ -36,14 +38,14 @@ export default function NoticeDetailPage() {
     function handleTogglePin() {
         if (!isAdmin || !notice) return;
         togglePin(notice.id);
-        notifications.show({ message: notice.pinned ? '공지 상단 고정 해제됨' : '공지 상단에 고정됨', color: 'teal' });
+        notifications.show({ message: notice.pinned ? t('notice.unpinned') : t('notice.pinned'), color: 'teal' });
     }
 
     function handleEdit() {
         if (!isAdmin || !notice) return;
         modals.open({
             modalId: 'notice-editor-modal',
-            title: '공지 수정',
+            title: t('notice.edit'),
             centered: true,
             size: '800px',
             children: (
@@ -65,19 +67,19 @@ export default function NoticeDetailPage() {
         if (!isAdmin || !notice) return;
         modals.openConfirmModal({
             radius: 'md',
-            title: '공지 삭제',
+            title: t('notice.deleteTitle'),
             centered: true,
-            children: <TextBody>정말로 이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</TextBody>,
-            labels: { confirm: '삭제', cancel: '취소' },
+            children: <TextBody>{t('notice.deleteConfirm')}</TextBody>,
+            labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
             confirmProps: { color: 'red' },
             onConfirm: () => {
                 const ok = deleteNotice(notice.id);
 
                 if (ok) {
-                    notifications.show({ message: '공지 삭제 완료', color: 'teal' });
+                    notifications.show({ message: t('notice.deleteDone'), color: 'teal' });
                     navigate('/notices');
                 } else {
-                    notifications.show({ message: '삭제 실패: 이미 삭제되었거나 찾을 수 없습니다.', color: 'red' });
+                    notifications.show({ message: t('notice.deleteFail'), color: 'red' });
                 }
             }
         });
@@ -89,7 +91,7 @@ export default function NoticeDetailPage() {
                 {/* 상단 내비게이션 및 액션 */}
                 <Group justify="space-between" wrap="nowrap">
                     <Anchor
-                        aria-label="공지사항 목록으로"
+                        aria-label={t('notice.backToList')}
                         component={Link}
                         style={{ alignItems: 'center', color: 'var(--mantine-color-dimmed)', display: 'inline-flex', gap: 6 }}
                         to="/notices"
@@ -98,13 +100,13 @@ export default function NoticeDetailPage() {
                         <ActionIcon aria-hidden="true" size="sm" variant="subtle">
                             <ChevronLeft size={16} />
                         </ActionIcon>
-                        <TextMeta sizeOverride="sm">공지사항</TextMeta>
+                        <TextMeta sizeOverride="sm">{t('notice.list')}</TextMeta>
                     </Anchor>
                     <Group gap={4} wrap="nowrap">
                         {isAdmin && (
-                            <Tooltip withArrow label={notice.pinned ? '상단 고정 해제' : '상단 고정'}>
+                            <Tooltip withArrow label={notice.pinned ? t('notice.unpin') : t('notice.pin')}>
                                 <ActionIcon
-                                    aria-label={notice.pinned ? '고정 해제' : '상단 고정'}
+                                    aria-label={notice.pinned ? t('notice.unpin') : t('notice.pin')}
                                     color={notice.pinned ? 'red' : 'dimmed'}
                                     variant={notice.pinned ? 'light' : 'subtle'}
                                     onClick={handleTogglePin}
@@ -114,21 +116,21 @@ export default function NoticeDetailPage() {
                             </Tooltip>
                         )}
                         {isAdmin && (
-                            <Tooltip withArrow label="공지 수정">
-                                <ActionIcon aria-label="공지 수정" variant="subtle" onClick={handleEdit}>
+                            <Tooltip withArrow label={t('notice.edit')}>
+                                <ActionIcon aria-label={t('notice.edit')} variant="subtle" onClick={handleEdit}>
                                     <Pencil size={16} />
                                 </ActionIcon>
                             </Tooltip>
                         )}
                         {isAdmin && (
-                            <Tooltip withArrow label="공지 삭제">
-                                <ActionIcon aria-label="공지 삭제" color="red" variant="subtle" onClick={handleDelete}>
+                            <Tooltip withArrow label={t('notice.delete')}>
+                                <ActionIcon aria-label={t('notice.delete')} color="red" variant="subtle" onClick={handleDelete}>
                                     <Trash2 size={16} />
                                 </ActionIcon>
                             </Tooltip>
                         )}
-                        <Tooltip withArrow label="링크 복사">
-                            <ActionIcon aria-label="링크 복사" color={copied ? 'teal' : 'yellow'} variant="subtle" onClick={handleCopyLink}>
+                        <Tooltip withArrow label={copied ? t('common.copied') : t('common.copyLink')}>
+                            <ActionIcon aria-label={t('common.copyLink')} color={copied ? 'teal' : 'yellow'} variant="subtle" onClick={handleCopyLink}>
                                 {copied ? <Copy size={16} /> : <Share2 size={16} />}
                             </ActionIcon>
                         </Tooltip>
@@ -143,10 +145,10 @@ export default function NoticeDetailPage() {
                         <Group gap="xs" wrap="wrap">
                             {notice.pinned && (
                                 <Badge color="red" size="sm" variant="light">
-                                    PIN
+                                    {t('notice.badgePinned')}
                                 </Badge>
                             )}
-                            <TextMeta>게시일 {formatDate(notice.created_at)}</TextMeta>
+                            <TextMeta>{t('notice.postedAt', { date: formatDate(notice.created_at) })}</TextMeta>
                         </Group>
                         <Divider my="xs" />
                         <MarkdownView source={notice.body} />
@@ -156,7 +158,7 @@ export default function NoticeDetailPage() {
                 {/* 하단 재동작 링크 */}
                 <Group justify="flex-end">
                     <Anchor component={Link} size="sm" to="/notices" underline="always">
-                        목록으로 돌아가기
+                        {t('notice.backLink')}
                     </Anchor>
                 </Group>
             </Stack>

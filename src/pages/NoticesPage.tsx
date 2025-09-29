@@ -5,6 +5,7 @@ import { useNotices, togglePin, deleteNotice } from '@main/lib/noticeRepo';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
+import { useI18n } from '@main/lib/i18n';
 import { formatDate } from '@main/utils/format';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -15,6 +16,7 @@ import NoticeEditor from '@main/components/notices/NoticeEditor';
 import { Pin, Pencil, Trash2 } from 'lucide-react';
 
 export default function NoticesPage() {
+    const { t } = useI18n();
     // reactive notices (pin 토글/수정 즉시 반영)
     const notices = useNotices();
     const PAGE_SIZE = 15;
@@ -49,9 +51,9 @@ export default function NoticesPage() {
         if (!isAdmin) return;
         try {
             togglePin(id);
-            notifications.show({ color: 'blue', title: '업데이트', message: '핀 상태 변경' });
+            notifications.show({ color: 'blue', title: t('notify.success.generic', {}, '업데이트'), message: t('notice.pinToggled', {}, '핀 상태 변경') });
         } catch {
-            notifications.show({ color: 'red', title: '오류', message: '핀 상태 변경 실패' });
+            notifications.show({ color: 'red', title: t('notify.error.generic', {}, '오류'), message: t('notice.pinToggleFail', {}, '핀 상태 변경 실패') });
         }
     }
 
@@ -61,17 +63,17 @@ export default function NoticesPage() {
 
         modals.openConfirmModal({
             radius: 'md',
-            title: '공지 삭제',
+            title: t('notice.deleteTitle', {}, '공지 삭제'),
             centered: true,
-            children: <TextBody>정말로 삭제하시겠습니까? ({n?.title})</TextBody>,
-            labels: { cancel: '취소', confirm: '삭제' },
+            children: <TextBody>{t('notice.deleteConfirm', { title: n?.title || '' }, '정말로 삭제하시겠습니까?')}</TextBody>,
+            labels: { cancel: t('common.cancel', {}, '취소'), confirm: t('common.delete', {}, '삭제') },
             confirmProps: { color: 'red' },
             onConfirm: () => {
                 try {
                     deleteNotice(id);
-                    notifications.show({ color: 'teal', title: '완료', message: '삭제되었습니다' });
+                    notifications.show({ color: 'teal', title: t('notify.success.generic', {}, '완료'), message: t('notice.deleteDone', {}, '삭제되었습니다') });
                 } catch {
-                    notifications.show({ color: 'red', title: '오류', message: '삭제 실패' });
+                    notifications.show({ color: 'red', title: t('notify.error.generic', {}, '오류'), message: t('notice.deleteFail', {}, '삭제 실패') });
                 }
             }
         });
@@ -81,14 +83,14 @@ export default function NoticesPage() {
     return (
         <PageContainer roleMain>
             <Group justify="space-between" mb="md">
-                <PageHeader description="서비스 업데이트 및 점검 안내" title="공지사항" />
+                <PageHeader description={t('empty.noticesIntro')} title={t('notice.list')} />
                 {isAdmin && (
                     <Button size="sm" variant="light" onClick={openCreate}>
-                        새 공지 작성
+                        {t('empty.noticeCreate')}
                     </Button>
                 )}
             </Group>
-            {notices.length === 0 && <EmptyState message="등록된 공지사항이 없습니다." />}
+            {notices.length === 0 && <EmptyState message={t('empty.notices')} />}
             <Stack gap="md">
                 {paged.map((n) => (
                     <Card key={n.id} withBorder aria-label={n.title} component="article" radius="md" shadow="sm" style={{ cursor: 'pointer' }}>
@@ -96,8 +98,8 @@ export default function NoticesPage() {
                             <Stack gap={4} style={{ flex: 1 }} onClick={() => navigate(`/notices/${n.id}`)}>
                                 <Group gap="xs">
                                     {n.pinned && (
-                                        <Badge color="red" title="상단 고정" variant="light">
-                                            PIN
+                                        <Badge color="red" title={t('notice.pinned')} variant="light">
+                                            {t('notice.badgePinned')}
                                         </Badge>
                                     )}
                                     <TextBody fw={600} sizeOverride="sm">
@@ -106,16 +108,16 @@ export default function NoticesPage() {
                                 </Group>
                                 <TextMeta>{formatDate(n.created_at)}</TextMeta>
                                 {n.body && (
-                                    <TextMeta aria-label="본문 요약" lineClamp={3}>
+                                    <TextMeta aria-label={t('notice.bodyLabel')} lineClamp={3}>
                                         {n.body}
                                     </TextMeta>
                                 )}
                             </Stack>
                             {isAdmin && (
                                 <Group gap={6} wrap="nowrap">
-                                    <Tooltip withArrow label={n.pinned ? '상단 고정 해제' : '상단 고정'}>
+                                    <Tooltip withArrow label={n.pinned ? t('notice.unpin') : t('notice.pin')}>
                                         <ActionIcon
-                                            aria-label={n.pinned ? '고정 해제' : '상단 고정'}
+                                            aria-label={n.pinned ? t('notice.unpin') : t('notice.pin')}
                                             color={n.pinned ? 'red' : 'dimmed'}
                                             variant={n.pinned ? 'light' : 'subtle'}
                                             onClick={() => handleTogglePin(n.id)}
@@ -124,14 +126,14 @@ export default function NoticesPage() {
                                         </ActionIcon>
                                     </Tooltip>
 
-                                    <Tooltip withArrow label="공지 수정">
-                                        <ActionIcon aria-label="공지 수정" variant="subtle" onClick={() => openEdit(n.id)}>
+                                    <Tooltip withArrow label={t('notice.edit')}>
+                                        <ActionIcon aria-label={t('notice.edit')} variant="subtle" onClick={() => openEdit(n.id)}>
                                             <Pencil size={16} />
                                         </ActionIcon>
                                     </Tooltip>
 
-                                    <Tooltip withArrow label="공지 삭제">
-                                        <ActionIcon aria-label="공지 삭제" color="red" variant="subtle" onClick={() => handleDelete(n.id)}>
+                                    <Tooltip withArrow label={t('notice.delete')}>
+                                        <ActionIcon aria-label={t('notice.delete')} color="red" variant="subtle" onClick={() => handleDelete(n.id)}>
                                             <Trash2 size={16} />
                                         </ActionIcon>
                                     </Tooltip>
@@ -142,7 +144,7 @@ export default function NoticesPage() {
                 ))}
             </Stack>
             <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
-            <Modal centered withinPortal opened={!!editorState} radius="md" size="800px" title={editingNotice ? '공지 수정' : '새 공지 작성'} onClose={closeEditor}>
+            <Modal centered withinPortal opened={!!editorState} radius="md" size="800px" title={editingNotice ? t('notice.update') : t('empty.noticeCreate')} onClose={closeEditor}>
                 {editorState && (
                     <NoticeEditor
                         initialBody={editingNotice?.body}

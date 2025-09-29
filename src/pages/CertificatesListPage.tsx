@@ -2,6 +2,7 @@ import { Button, Group, Text, Card, Stack, Badge } from '@mantine/core';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import EmptyState from '@main/components/EmptyState';
+import { useI18n } from '@main/lib/i18n';
 import { useAuth } from '@main/lib/auth';
 import { useState, useEffect } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
@@ -14,6 +15,7 @@ import { notifications } from '@mantine/notifications';
 // 이전 파생 로직 제거: 실제 issueCertificate + useCertificates 사용
 
 const CertificatesListPage = () => {
+    const { t } = useI18n();
     const { user } = useAuth();
     const userId = user?.id;
     const enrollments = useEnrollmentsState(userId);
@@ -27,7 +29,7 @@ const CertificatesListPage = () => {
     const rawCerts = useCertificates(userId);
     const certs = rawCerts.map((c) => ({
         ...c,
-        courseTitle: courseMap[c.enrollment_id.split('-').slice(-1)[0]] || '수료 강의'
+        courseTitle: courseMap[c.enrollment_id.split('-').slice(-1)[0]] || t('certificate.title')
     }));
     const PAGE_SIZE = 12;
     const [page, setPage] = useState(1);
@@ -43,7 +45,7 @@ const CertificatesListPage = () => {
         const enrollment = enrollments[0];
 
         if (!enrollment) {
-            notifications.show({ color: 'yellow', message: '수강 중인 강의가 없어 수료증을 발급할 수 없습니다.', title: '발급 불가' });
+            notifications.show({ color: 'yellow', message: t('empty.certificateIssueBlocked'), title: t('errors.blocked') });
 
             return;
         }
@@ -51,7 +53,7 @@ const CertificatesListPage = () => {
         const attemptId = 'attempt-' + Date.now().toString(36); // 임시 시험 시도 ID
         const cert = issueCertificate({ enrollment_id: enrollment.id, exam_attempt_id: attemptId, user_id: userId, course_id: courseId });
 
-        notifications.show({ color: 'teal', message: '수료증이 발급되었습니다: ' + cert.serial_no, title: '발급 완료' });
+        notifications.show({ color: 'teal', message: t('certificate.issued') + ': ' + cert.serial_no, title: t('certificate.issued') });
     };
 
     return (
@@ -61,19 +63,19 @@ const CertificatesListPage = () => {
                     userId && (
                         <Group gap="xs">
                             <Button size="sm" variant="light" onClick={handleIssueOne}>
-                                수료증 발급
+                                {t('empty.issueCertificate')}
                             </Button>
                         </Group>
                     )
                 }
-                description="발급된 수료증을 모아보고 PDF로 저장하거나 검증 코드를 활용할 수 있습니다. 시험 합격 시 실제 발급 로직으로 대체됩니다."
-                title="내 수료증"
+                description={t('empty.certificatesIntro')}
+                title={t('nav.myCertificates')}
             />
             <Card withBorder p="lg" radius="md" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
-                            발급된 수료증
+                            {t('empty.certificatesHeader')}
                         </Text>
                         {userId && certs.length > 0 && (
                             <Badge color="indigo" variant="light">
@@ -81,8 +83,8 @@ const CertificatesListPage = () => {
                             </Badge>
                         )}
                     </Group>
-                    {!userId && <EmptyState actionLabel="로그인" message="로그인 후 수료증을 확인할 수 있습니다." title="로그인 필요" to="/signin" />}
-                    {userId && certs.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="합격한 시험이 아직 없어 수료증이 없습니다." title="수료증 없음" to="/courses" />}
+                    {!userId && <EmptyState actionLabel={t('common.login')} message={t('empty.certificatesLoginNeeded')} title={t('empty.loginRequired')} to="/signin" />}
+                    {userId && certs.length === 0 && <EmptyState actionLabel={t('empty.exploreCourses')} message={t('empty.certificatesNone')} title={t('empty.certificatesEmpty')} to="/courses" />}
                     {userId && certs.length > 0 && (
                         <CourseGrid mt="md">
                             {paged.map((c) => (
@@ -92,7 +94,7 @@ const CertificatesListPage = () => {
                     )}
                     {userId && (
                         <Text c="dimmed" mt="sm" size="sm">
-                            발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.
+                            {t('empty.certificateIssueNote')}
                         </Text>
                     )}
                     <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />

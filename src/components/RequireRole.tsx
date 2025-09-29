@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useI18n } from '@main/lib/i18n';
 import { useAuth } from '@main/lib/auth';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { Alert, Button, Group, Stack, Text } from '@mantine/core';
@@ -18,6 +19,7 @@ interface RequireRoleProps {
 export function RequireRole({ requiredRole, children }: RequireRoleProps) {
     const { user, loading } = useAuth();
     const location = useLocation();
+    const { t } = useI18n();
 
     if (loading) return null; // 또는 스켈레톤
 
@@ -31,21 +33,21 @@ export function RequireRole({ requiredRole, children }: RequireRoleProps) {
 
         return (
             <Stack mt="xl" px="md">
-                <Alert color="red" title="접근 불가" variant="light">
-                    {isInstructorGuard ? '강사 전용 페이지입니다. 강사 신청 후 승인되면 접근할 수 있습니다.' : '관리자 전용 페이지입니다.'}
+                <Alert color="red" title={t('access.forbidden')} variant="light">
+                    {isInstructorGuard ? t('access.instructorOnly') : t('access.adminOnly')}
                 </Alert>
                 <Group>
                     {isInstructorGuard && user.role === 'student' && (
                         <Button component={Link} size="sm" to="/instructor/apply" variant="filled">
-                            강사 신청하기
+                            {t('access.applyInstructorCta')}
                         </Button>
                     )}
                     <Button component={Link} size="sm" to="/" variant="subtle">
-                        홈으로
+                        {t('access.goHome')}
                     </Button>
                 </Group>
                 <Text c="dimmed" fz="sm">
-                    필요 권한: {requiredRole} / 현재 역할: {user.role}
+                    {t('access.requiredRole', { required: requiredRole, current: user.role })}
                 </Text>
             </Stack>
         );

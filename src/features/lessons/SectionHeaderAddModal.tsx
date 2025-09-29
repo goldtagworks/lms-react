@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button, Group, Modal, Stack, TextInput } from '@mantine/core';
 import { Plus, X } from 'lucide-react';
+import { useI18n } from '@main/lib/i18n';
 
 interface SectionHeaderAddModalProps {
     opened: boolean;
@@ -10,6 +11,7 @@ interface SectionHeaderAddModalProps {
 
 // Controlled 섹션 헤더 추가 모달 (내부 입력 상태만 관리)
 export default function SectionHeaderAddModal({ opened, onClose, onAdd }: SectionHeaderAddModalProps) {
+    const { t } = useI18n();
     const [title, setTitle] = useState('');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -29,12 +31,12 @@ export default function SectionHeaderAddModal({ opened, onClose, onAdd }: Sectio
     }
 
     return (
-        <Modal centered withinPortal opened={opened} radius="md" title="섹션 구분 추가" onClose={onClose}>
+        <Modal centered withinPortal opened={opened} radius="md" title={t('lesson.sectionAdd.title')} onClose={onClose}>
             <Stack gap="sm" mt="xs">
                 <TextInput
                     ref={inputRef}
-                    label="섹션 제목"
-                    placeholder="예: 섹션 1. 소개"
+                    label={t('lesson.sectionAdd.field.title')}
+                    placeholder={t('lesson.sectionAdd.placeholder.title')}
                     value={title}
                     onChange={(e) => setTitle(e.currentTarget.value)}
                     onKeyDown={(e) => {
@@ -45,11 +47,11 @@ export default function SectionHeaderAddModal({ opened, onClose, onAdd }: Sectio
                     }}
                 />
                 <Group gap="xs" justify="flex-end">
-                    <Button disabled={!trimmed} leftSection={<Plus size={14} />} size="sm" onClick={handleSubmit}>
-                        추가
+                    <Button aria-label={t('lesson.sectionAdd.actions.add')} disabled={!trimmed} leftSection={<Plus size={14} />} size="sm" onClick={handleSubmit}>
+                        {t('lesson.sectionAdd.actions.add')}
                     </Button>
-                    <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
-                        취소
+                    <Button aria-label={t('lesson.sectionAdd.actions.cancel')} leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
+                        {t('lesson.sectionAdd.actions.cancel')}
                     </Button>
                 </Group>
             </Stack>

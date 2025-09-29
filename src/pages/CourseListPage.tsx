@@ -12,9 +12,11 @@ import PriceText from '@main/components/price/PriceText';
 import { useCourses, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import EmptyState from '@main/components/EmptyState';
+import { useI18n } from '@main/lib/i18n';
 import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
 import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
+// Removed react-i18next usage in favor of internal i18n hook
 
 const categories = [
     { value: 'all', label: '전체' },
@@ -94,15 +96,17 @@ const CourseListPage = () => {
         setQuery('');
     };
 
+    const { t } = useI18n();
+
     return (
         <PageContainer roleMain>
-            <PageHeader description="카테고리/정렬/검색을 활용해 원하는 강의를 찾아보세요." title="전체 강의" />
+            <PageHeader isMainTitle description="카테고리/정렬/검색을 활용해 원하는 강의를 찾아보세요." title="전체 강의" />
             <PageSection withGapTop={false}>
                 {/* 필터/정렬/검색 UI */}
                 <Group gap="md" mb="xl" wrap="wrap">
-                    <Select aria-label="카테고리" data={categories} defaultValue="all" size="sm" value={category} onChange={(v) => setCategory(v || 'all')} />
+                    <Select aria-label={t('a11y.categorySelect', {}, '카테고리')} data={categories} defaultValue="all" size="sm" value={category} onChange={(v) => setCategory(v || 'all')} />
                     <Select
-                        aria-label="정렬"
+                        aria-label={t('a11y.sortSelect', {}, '정렬')}
                         data={[
                             { value: 'latest', label: '최신순' },
                             { value: 'popular', label: '인기순' },
@@ -111,12 +115,19 @@ const CourseListPage = () => {
                         defaultValue="latest"
                         size="sm"
                     />
-                    <TextInput aria-label="검색" miw={220} placeholder="강의명/키워드 검색" size="sm" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
+                    <TextInput
+                        aria-label={t('a11y.search', {}, '검색')}
+                        miw={220}
+                        placeholder={t('a11y.searchPlaceholder', {}, '강의명/키워드 검색')}
+                        size="sm"
+                        value={query}
+                        onChange={(e) => setQuery(e.currentTarget.value)}
+                    />
                     <Button disabled size="sm" variant="outline">
-                        정렬(스텁)
+                        {t('empty.sortStub', {}, '정렬(스텁)')}
                     </Button>
                 </Group>
-                <CourseGrid>
+                <CourseGrid listMode>
                     {paged.map((course) => {
                         const enrolled = userId ? isEnrolled(userId, course.id) : false;
                         const wish = userId ? isWishlisted(userId, course.id) : false;
@@ -134,7 +145,7 @@ const CourseListPage = () => {
                                         )}
                                         {wish && (
                                             <Badge color="pink" size="xs">
-                                                위시
+                                                {t('terms.favoriteAdd')}
                                             </Badge>
                                         )}
                                     </Group>
@@ -168,13 +179,18 @@ const CourseListPage = () => {
                                     onToggleWish={() => handleWishlist(course.id)}
                                 />
                                 <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt="sm" radius="md" size="sm" to={`/course/${course.id}`} variant="light">
-                                    자세히 보기
+                                    {t('terms.viewDetails')}
                                 </Button>
                             </Card>
                         );
                     })}
                     {filtered.length === 0 && (
-                        <EmptyState actionLabel="필터 초기화" message="검색어나 필터를 조정해 다시 시도해 주세요." title="코스를 찾을 수 없어요" onActionClick={handleResetFilters} />
+                        <EmptyState
+                            actionLabel={t('common.resetFilters', {}, '필터 초기화')}
+                            message={t('empty.coursesFiltered', {}, '검색어나 필터를 조정해 다시 시도해 주세요.')}
+                            title={t('empty.coursesNotFound', {}, '코스를 찾을 수 없어요')}
+                            onActionClick={handleResetFilters}
+                        />
                     )}
                 </CourseGrid>
                 <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />

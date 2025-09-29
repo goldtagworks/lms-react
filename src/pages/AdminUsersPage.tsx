@@ -1,4 +1,5 @@
 import { ActionIcon, Badge, Button, Group, Modal, Select, Stack, Table, TextInput, Tooltip, Notification } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import { TextBody, TextMeta } from '@main/components/typography';
 import { useEffect, useMemo, useState } from 'react';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -15,9 +16,9 @@ interface RoleOption {
 }
 
 const ROLE_OPTIONS: RoleOption[] = [
-    { value: 'student', label: '학생' },
-    { value: 'instructor', label: '강사' },
-    { value: 'admin', label: '관리자' }
+    { value: 'student', label: 'student' },
+    { value: 'instructor', label: 'instructor' },
+    { value: 'admin', label: 'admin' }
 ];
 
 // 간단 seed: Auth Provider 에 저장된 사용자 외 추가 목록 비어 있을 수 있음
@@ -93,14 +94,16 @@ const AdminUsersPage = () => {
         setPage(1);
     }
 
+    const { t } = useI18n();
+
     return (
         <PageContainer roleMain py={48} size="lg">
             <PageHeader
                 actions={
                     <Group gap="xs">
                         <TextInput
-                            aria-label="검색"
-                            placeholder="이름/이메일/ID"
+                            aria-label={t('a11y.admin.usersSearch')}
+                            placeholder={t('admin.users.searchPlaceholder')}
                             radius="md"
                             size="sm"
                             value={query}
@@ -112,9 +115,9 @@ const AdminUsersPage = () => {
                         <Select
                             allowDeselect
                             clearable
-                            aria-label="역할 필터"
+                            aria-label={t('a11y.roleFilter')}
                             data={ROLE_OPTIONS}
-                            placeholder="역할 전체"
+                            placeholder={t('admin.users.filter.roleAll')}
                             radius="md"
                             size="sm"
                             value={roleFilter}
@@ -123,15 +126,15 @@ const AdminUsersPage = () => {
                                 setPage(1);
                             }}
                         />
-                        <Tooltip label="필터 초기화">
-                            <ActionIcon aria-label="필터 초기화" variant="light" onClick={resetFilters}>
+                        <Tooltip label={t('common.resetFilters')}>
+                            <ActionIcon aria-label={t('common.resetFilters')} variant="light" onClick={resetFilters}>
                                 <RefreshCw size={16} />
                             </ActionIcon>
                         </Tooltip>
                     </Group>
                 }
-                description="플랫폼 사용자 목록을 조회하고 역할을 변경하거나 비활성화합니다. (mock 페이징)"
-                title="사용자 관리"
+                description={t('admin.users.description')}
+                title={t('admin.users.title')}
             />
 
             <Stack gap="lg">
@@ -139,19 +142,19 @@ const AdminUsersPage = () => {
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th style={{ width: 140 }} ta="center">
-                                ID
+                                {t('admin.users.table.id')}
                             </Table.Th>
                             <Table.Th style={{ width: 160 }} ta="center">
-                                이름
+                                {t('admin.users.table.name')}
                             </Table.Th>
                             <Table.Th style={{ width: 220 }} ta="center">
-                                이메일
+                                {t('admin.users.table.email')}
                             </Table.Th>
                             <Table.Th style={{ width: 100 }} ta="center">
-                                역할
+                                {t('admin.users.table.role')}
                             </Table.Th>
                             <Table.Th style={{ width: 80 }} ta="center">
-                                액션
+                                {t('admin.users.table.actions')}
                             </Table.Th>
                         </Table.Tr>
                     </Table.Thead>
@@ -160,7 +163,7 @@ const AdminUsersPage = () => {
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
                                     <TextMeta py={20} ta="center">
-                                        사용자가 없습니다.
+                                        {t('admin.users.empty')}
                                     </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
@@ -185,14 +188,14 @@ const AdminUsersPage = () => {
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Group align="center" gap={4} justify="center">
-                                        <Tooltip label="역할 변경">
-                                            <ActionIcon aria-label="역할 변경" size="sm" variant="subtle" onClick={() => openEdit(u.id, u.role)}>
+                                        <Tooltip label={t('admin.users.action.changeRole')}>
+                                            <ActionIcon aria-label={t('admin.users.action.changeRole')} size="sm" variant="subtle" onClick={() => openEdit(u.id, u.role)}>
                                                 <Shield size={14} />
                                             </ActionIcon>
                                         </Tooltip>
-                                        <Tooltip label={u.id === current?.id ? '자기 자신은 비활성화 불가' : '비활성화'}>
+                                        <Tooltip label={u.id === current?.id ? t('admin.users.action.selfDeactivateBlock') : t('admin.users.action.deactivate')}>
                                             <ActionIcon
-                                                aria-label="비활성화"
+                                                aria-label={t('admin.users.action.deactivate')}
                                                 color="red"
                                                 disabled={u.id === current?.id}
                                                 size="sm"
@@ -202,9 +205,9 @@ const AdminUsersPage = () => {
                                                 <Trash2 size={14} />
                                             </ActionIcon>
                                         </Tooltip>
-                                        <Tooltip label="비밀번호 초기화">
+                                        <Tooltip label={t('admin.users.action.passwordReset')}>
                                             <ActionIcon
-                                                aria-label="비밀번호 초기화"
+                                                aria-label={t('admin.users.action.passwordReset')}
                                                 color="grape"
                                                 size="sm"
                                                 variant="subtle"
@@ -223,35 +226,35 @@ const AdminUsersPage = () => {
                 </Table>
                 <PaginationBar align="right" page={page} size="sm" totalPages={totalPages} onChange={(p) => setPage(p)} />
             </Stack>
-            <Modal centered opened={!!editUserId} radius="md" title="역할 변경" onClose={() => setEditUserId(null)}>
+            <Modal centered opened={!!editUserId} radius="md" title={t('admin.users.modal.changeRoleTitle')} onClose={() => setEditUserId(null)}>
                 <Stack gap="sm" mt="xs">
                     <Select
                         data={ROLE_OPTIONS}
                         disabled={current?.id === editUserId && editRole === 'student'}
-                        label="역할"
+                        label={t('admin.users.modal.roleLabel')}
                         size="sm"
                         value={editRole}
-                        // 자기 자신을 learner(학생)으로 강등 방지 (spec AC: self downgrade 금지)
+                        // Prevent self downgrade to learner (spec AC: self downgrade forbidden)
                         onChange={(v) => v && setEditRole(v as UserRole)}
                     />
                     <Group justify="flex-end" mt="sm">
                         <Button leftSection={<Save size={14} />} size="sm" onClick={saveRole}>
-                            저장
+                            {t('common.save')}
                         </Button>
                         <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditUserId(null)}>
-                            취소
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
-            <Modal centered opened={!!confirmRemove} radius="md" title="사용자 비활성화" onClose={() => setConfirmRemove(null)}>
-                <TextBody>이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)</TextBody>
+            <Modal centered opened={!!confirmRemove} radius="md" title={t('admin.users.modal.deactivateTitle')} onClose={() => setConfirmRemove(null)}>
+                <TextBody>{t('admin.users.modal.deactivateConfirm')}</TextBody>
                 <Group justify="flex-end" mt="md">
                     <Button color="red" leftSection={<Trash2 size={14} />} size="sm" onClick={handleRemove}>
-                        비활성화
+                        {t('admin.users.action.deactivate')}
                     </Button>
                     <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setConfirmRemove(null)}>
-                        취소
+                        {t('common.cancel')}
                     </Button>
                 </Group>
             </Modal>
@@ -259,7 +262,7 @@ const AdminUsersPage = () => {
                 centered
                 opened={!!resetTarget}
                 radius="md"
-                title={resetDone ? '초기화 완료' : '비밀번호 초기화'}
+                title={resetDone ? t('admin.users.modal.passwordResetDone') : t('admin.users.modal.passwordResetTitle')}
                 onClose={() => {
                     setResetTarget(null);
                     setResetDone(false);
@@ -268,7 +271,7 @@ const AdminUsersPage = () => {
                 <Stack gap="sm">
                     {!resetDone && (
                         <>
-                            <TextBody>해당 사용자의 비밀번호를 초기화하고 재설정 안내 메일을 발송합니다. 진행하시겠습니까?</TextBody>
+                            <TextBody>{t('admin.users.modal.passwordResetConfirm')}</TextBody>
                             <Group justify="flex-end" mt="sm">
                                 <Button
                                     color="grape"
@@ -281,17 +284,17 @@ const AdminUsersPage = () => {
                                         }
                                     }}
                                 >
-                                    초기화 및 발송
+                                    {t('admin.users.modal.passwordResetAndSend')}
                                 </Button>
                                 <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setResetTarget(null)}>
-                                    취소
+                                    {t('common.cancel')}
                                 </Button>
                             </Group>
                         </>
                     )}
                     {resetDone && (
-                        <Notification color="grape" title="메일 발송 완료" withCloseButton={false}>
-                            재설정 메일(모킹 로그)이 발송되었습니다. 사용자가 링크를 통해 새 비밀번호를 설정할 수 있습니다.
+                        <Notification color="grape" title={t('admin.users.modal.passwordResetMailSentTitle')} withCloseButton={false}>
+                            {t('admin.users.modal.passwordResetMailSentBody')}
                         </Notification>
                     )}
                 </Stack>

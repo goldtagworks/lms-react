@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Container, Card, Group, Title, Text } from '@mantine/core';
 import { LinkButton } from '@main/components/LinkButton';
+import { useI18n } from '@main/lib/i18n';
 
 interface SupportSectionProps {
     title?: string;
@@ -12,29 +13,22 @@ interface SupportSectionProps {
     bare?: boolean;
 }
 
-function SupportSectionBase({
-    title = '도움이 필요하신가요?',
-    email = 'help@example.com',
-    phone = '02-0000-0000',
-    hours = '평일 09:00–18:00',
-    faqHref = '#faq',
-    contactHref = '#contact',
-    bare
-}: SupportSectionProps) {
+function SupportSectionBase({ title, email = 'help@example.com', phone = '02-0000-0000', hours, faqHref = '#faq', contactHref = '#contact', bare }: SupportSectionProps) {
+    const { t } = useI18n();
+    const finalTitle = title || t('home.support.title');
+    const finalHours = hours || t('home.support.hours');
     const content = (
         <Card withBorder radius="md">
             <Group align="center" justify="space-between">
                 <div>
                     <Title mb="sm" order={3}>
-                        {title}
+                        {finalTitle}
                     </Title>
-                    <Text c="dimmed">
-                        운영시간 {hours} · {email} · {phone}
-                    </Text>
+                    <Text c="dimmed">{t('home.support.meta', { hours: finalHours, email, phone })}</Text>
                 </div>
                 <Group gap="sm">
-                    <LinkButton color="accent" href={faqHref} label="FAQ" size="md" variant="light" />
-                    <LinkButton color="primary" href={contactHref} label="1:1 문의" size="md" />
+                    <LinkButton color="accent" href={faqHref} label={t('home.support.faq')} size="md" variant="light" />
+                    <LinkButton color="primary" href={contactHref} label={t('home.support.contact')} size="md" />
                 </Group>
             </Group>
         </Card>

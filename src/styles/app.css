@@ -8,6 +8,25 @@
     user-select: none;
 }
 
+/* Viewport height safety variable (set via JS) */
+html {
+    --app-vh: 1vh;
+}
+
+/* Utility classes for min-height using safe units */
+.min-h-app-vh {
+    min-height: calc(var(--app-vh) * 100);
+}
+.min-h-100dvh {
+    min-height: 100dvh;
+}
+.min-h-100svh {
+    min-height: 100svh;
+}
+.min-h-100lvh {
+    min-height: 100lvh;
+}
+
 /* Light mode styles */
 :root[data-mantine-color-scheme='light'] {
     --main-background: #ffffff;

@@ -1,4 +1,5 @@
 import { Box, Divider, Stack, Text } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import { LinkButton } from '@main/components/LinkButton';
 import { filterNav, navGroups } from '@main/lib/nav';
 import { useAuth } from '@main/lib/auth';
@@ -11,6 +12,7 @@ interface NavbarProps {
 
 const Navbar = ({ closeNav, firstFocusableRef }: NavbarProps) => {
     const { user } = useAuth();
+    const { t } = useI18n();
     const role = user?.role ?? null;
     const filtered = filterNav(
         navGroups.map((g) => ({
@@ -25,12 +27,12 @@ const Navbar = ({ closeNav, firstFocusableRef }: NavbarProps) => {
     const { pathname } = useLocation();
 
     return (
-        <Box aria-label="모바일 메뉴" component="nav">
+        <Box aria-label={t('nav.menuMobile')} component="nav">
             <Stack gap="sm">
                 {filtered.map((g, gi) => (
                     <Box key={g.id}>
                         <Text c="dimmed" fw={600} mb={4} size="sm" style={{ letterSpacing: 0.5 }} tt="uppercase">
-                            {g.label}
+                            {g.labelKey ? t(g.labelKey) : g.label || ''}
                         </Text>
                         <Stack gap={4} mb="xs">
                             {(() => {
@@ -55,7 +57,7 @@ const Navbar = ({ closeNav, firstFocusableRef }: NavbarProps) => {
                                             color={active ? 'primary' : 'gray'}
                                             href={it.href}
                                             justify="flex-start"
-                                            label={it.label}
+                                            label={it.labelKey ? t(it.labelKey) : it.label || ''}
                                             style={active ? { fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
                                             variant={active ? 'light' : 'subtle'}
                                             onClick={() => {
@@ -72,8 +74,8 @@ const Navbar = ({ closeNav, firstFocusableRef }: NavbarProps) => {
                 ))}
                 {!user && (
                     <Stack gap={6} pt="sm">
-                        <LinkButton color="primary" href="/signin" justify="flex-start" label="로그인" variant="light" onClick={() => closeNav?.()} />
-                        <LinkButton color="primary" href="/signup" justify="flex-start" label="회원가입" variant="filled" onClick={() => closeNav?.()} />
+                        <LinkButton color="primary" href="/signin" justify="flex-start" label={t('nav.login', {}, t('auth.signIn'))} variant="light" onClick={() => closeNav?.()} />
+                        <LinkButton color="primary" href="/signup" justify="flex-start" label={t('nav.signup', {}, t('auth.signUp'))} variant="filled" onClick={() => closeNav?.()} />
                     </Stack>
                 )}
             </Stack>

@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Container, Title, Card, Text, Stack, SimpleGrid, Tooltip } from '@mantine/core';
 import { AppImage } from '@main/components/AppImage';
+import { useI18n } from '@main/lib/i18n';
 
 import { InstructorVM } from '../../../viewmodels/home';
 
@@ -10,13 +11,15 @@ interface InstructorsSectionProps {
     limit?: number;
 }
 
-function InstructorsSectionBase({ instructors, title = '주요 강사진', limit }: InstructorsSectionProps) {
+function InstructorsSectionBase({ instructors, title, limit }: InstructorsSectionProps) {
+    const { t } = useI18n();
     const list = limit ? instructors.slice(0, limit) : instructors;
+    const finalTitle = title || t('home.instructors.title');
 
     return (
         <Container py="xl" size="lg">
             <Title mb="md" order={2} size="xl">
-                {title}
+                {finalTitle}
             </Title>
             <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing={24} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {list.map((i) => {
@@ -32,7 +35,7 @@ function InstructorsSectionBase({ instructors, title = '주요 강사진', limit
                         <Card
                             key={i.user_id}
                             withBorder
-                            aria-label={`강사 ${i.name}${i.headline ? ' - ' + i.headline : ''}`}
+                            aria-label={t('a11y.instructorCard', { name: i.name }, `${i.name} 강사`)}
                             p="lg"
                             radius="md"
                             shadow="sm"

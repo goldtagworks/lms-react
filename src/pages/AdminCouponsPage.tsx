@@ -5,12 +5,14 @@ import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
 import { Plus, Pencil, Ban, RotateCcw, RefreshCw, Save, X } from 'lucide-react';
 import useAdminCoupons from '@main/hooks/admin/useAdminCoupons';
+import { useI18n } from '@main/lib/i18n';
 
 type ActiveFilter = 'all' | 'active' | 'inactive';
 
 // (PagedCouponsResult) 이전 로컬 구현 잔여 타입 제거 (훅에서 반환)
 
 const AdminCouponsPage = () => {
+    const { t } = useI18n();
     const {
         paged,
         q,
@@ -60,8 +62,8 @@ const AdminCouponsPage = () => {
                 actions={
                     <Group gap="xs">
                         <TextInput
-                            aria-label="코드 검색"
-                            placeholder="코드 검색"
+                            aria-label={t('a11y.admin.codeSearch')}
+                            placeholder={t('admin.coupons.search')}
                             radius="md"
                             size="sm"
                             value={q}
@@ -71,11 +73,11 @@ const AdminCouponsPage = () => {
                             }}
                         />
                         <Select
-                            aria-label="활성 필터"
+                            aria-label={t('a11y.admin.filterActive')}
                             data={[
-                                { value: 'all', label: '전체' },
-                                { value: 'active', label: '활성' },
-                                { value: 'inactive', label: '비활성' }
+                                { value: 'all', label: t('admin.coupons.filter.all') },
+                                { value: 'active', label: t('admin.coupons.filter.active') },
+                                { value: 'inactive', label: t('admin.coupons.filter.inactive') }
                             ]}
                             radius="md"
                             size="sm"
@@ -85,32 +87,32 @@ const AdminCouponsPage = () => {
                                 setPage(1);
                             }}
                         />
-                        <Tooltip label="필터 초기화">
-                            <ActionIcon aria-label="필터 초기화" variant="light" onClick={resetFilters}>
+                        <Tooltip label={t('common.resetFilters')}>
+                            <ActionIcon aria-label={t('common.resetFilters')} variant="light" onClick={resetFilters}>
                                 <RefreshCw size={16} />
                             </ActionIcon>
                         </Tooltip>
                         <Button leftSection={<Plus size={16} />} size="sm" onClick={() => setCreateOpen(true)}>
-                            새 쿠폰
+                            {t('admin.coupons.modal.newTitle')}
                         </Button>
                     </Group>
                 }
-                description="플랫폼 내 발행된 쿠폰을 생성/수정/비활성화합니다. (mock)"
-                title="쿠폰 관리"
+                description={t('admin.coupons.description')}
+                title={t('admin.coupons.title')}
             />
 
             <Stack gap="lg" mt="md">
                 <Table highlightOnHover striped withColumnBorders withTableBorder>
                     <Table.Thead>
                         <Table.Tr>
-                            <Table.Th style={{ width: 140 }}>코드</Table.Th>
-                            <Table.Th style={{ width: 110 }}>종류</Table.Th>
-                            <Table.Th style={{ width: 120 }}>값</Table.Th>
-                            <Table.Th style={{ width: 160 }}>기간</Table.Th>
-                            <Table.Th style={{ width: 120 }}>사용/한도</Table.Th>
-                            <Table.Th style={{ width: 90 }}>상태</Table.Th>
+                            <Table.Th style={{ width: 140 }}>{t('admin.coupons.table.code')}</Table.Th>
+                            <Table.Th style={{ width: 110 }}>{t('admin.coupons.table.type')}</Table.Th>
+                            <Table.Th style={{ width: 120 }}>{t('admin.coupons.table.value')}</Table.Th>
+                            <Table.Th style={{ width: 160 }}>{t('admin.coupons.table.period')}</Table.Th>
+                            <Table.Th style={{ width: 120 }}>{t('admin.coupons.table.usage')}</Table.Th>
+                            <Table.Th style={{ width: 90 }}>{t('admin.coupons.table.status')}</Table.Th>
                             <Table.Th style={{ width: 120 }} ta="center">
-                                액션
+                                {t('admin.coupons.table.actions')}
                             </Table.Th>
                         </Table.Tr>
                     </Table.Thead>
@@ -119,7 +121,7 @@ const AdminCouponsPage = () => {
                             <Table.Tr>
                                 <Table.Td colSpan={7}>
                                     <TextMeta py={20} ta="center">
-                                        쿠폰이 없습니다.
+                                        {t('admin.coupons.table.empty')}
                                     </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
@@ -152,24 +154,24 @@ const AdminCouponsPage = () => {
                                     </Table.Td>
                                     <Table.Td>
                                         <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
-                                            {c.active ? '활성' : '비활성'}
+                                            {t(c.active ? 'status.active' : 'status.inactive')}
                                         </Badge>
                                     </Table.Td>
                                     <Table.Td ta="center">
                                         <Group gap={4} justify="center">
-                                            <Tooltip label="수정">
-                                                <ActionIcon aria-label="수정" size="sm" variant="subtle" onClick={() => openEdit(c)}>
+                                            <Tooltip label={t('common.edit')}>
+                                                <ActionIcon aria-label={t('common.edit')} size="sm" variant="subtle" onClick={() => openEdit(c)}>
                                                     <Pencil size={14} />
                                                 </ActionIcon>
                                             </Tooltip>
-                                            <Tooltip label={c.active ? '비활성화' : '활성화'}>
-                                                <ActionIcon aria-label="활성 토글" color={c.active ? 'red' : 'green'} size="sm" variant="subtle" onClick={() => toggleActive(c)}>
+                                            <Tooltip label={t(c.active ? 'admin.categories.tooltip.deactivate' : 'admin.categories.tooltip.activate')}>
+                                                <ActionIcon aria-label={t('a11y.admin.activateToggle')} color={c.active ? 'red' : 'green'} size="sm" variant="subtle" onClick={() => toggleActive(c)}>
                                                     {c.active ? <Ban size={14} /> : <RotateCcw size={14} />}
                                                 </ActionIcon>
                                             </Tooltip>
                                             {c.active && (
-                                                <Tooltip label="즉시 비활성(soft)">
-                                                    <ActionIcon aria-label="즉시 비활성" color="orange" size="sm" variant="subtle" onClick={() => softDeactivate(c)}>
+                                                <Tooltip label={t('admin.categories.tooltip.instantDeactivate')}>
+                                                    <ActionIcon aria-label={t('a11y.admin.instantDeactivate')} color="orange" size="sm" variant="subtle" onClick={() => softDeactivate(c)}>
                                                         <Ban size={14} />
                                                     </ActionIcon>
                                                 </Tooltip>
@@ -185,70 +187,84 @@ const AdminCouponsPage = () => {
             </Stack>
 
             {/* 생성 모달 */}
-            <Modal centered opened={createOpen} radius="md" size="lg" title="새 쿠폰 생성" onClose={() => setCreateOpen(false)}>
+            <Modal centered opened={createOpen} radius="md" size="lg" title={t('admin.coupons.modal.newTitle')} onClose={() => setCreateOpen(false)}>
                 <Stack gap="sm">
                     {createErr && (
-                        <Notification color="red" title="오류" onClose={() => setCreateErr(null)}>
+                        <Notification color="red" title={t('errors.error')} onClose={() => setCreateErr(null)}>
                             {createErr}
                         </Notification>
                     )}
                     <Group grow>
-                        <TextInput label="코드" placeholder="WELCOME10" value={cCode} onChange={(e) => setCCode(e.currentTarget.value)} />
+                        <TextInput label={t('admin.coupons.form.code')} placeholder="WELCOME10" value={cCode} onChange={(e) => setCCode(e.currentTarget.value)} />
                         <Select
                             data={[
                                 { value: 'percent', label: 'percent' },
                                 { value: 'fixed', label: 'fixed' }
                             ]}
-                            label="종류"
+                            label={t('admin.coupons.form.type')}
                             value={cType}
                             onChange={(v) => v && setCType(v as 'percent' | 'fixed')}
                         />
-                        <NumberInput label="값" min={1} value={cValue} onChange={(val) => setCValue(typeof val === 'number' ? val : '')} />
+                        <NumberInput label={t('admin.coupons.form.value')} min={1} value={cValue} onChange={(val) => setCValue(typeof val === 'number' ? val : '')} />
                     </Group>
-                    {cType === 'fixed' && <TextInput label="통화" placeholder="KRW" value={cCurrency} onChange={(e) => setCCurrency(e.currentTarget.value.toUpperCase())} />}
+                    {cType === 'fixed' && (
+                        <TextInput label={t('admin.coupons.form.currency')} placeholder="KRW" value={cCurrency} onChange={(e) => setCCurrency(e.currentTarget.value.toUpperCase())} />
+                    )}
                     <Group grow>
-                        <NumberInput label="총 사용 한도" min={1} placeholder="무제한" value={cMaxUses} onChange={(v) => setCMaxUses(typeof v === 'number' ? v : '')} />
-                        <NumberInput label="사용자당 한도" min={1} placeholder="무제한" value={cPerUser} onChange={(v) => setCPerUser(typeof v === 'number' ? v : '')} />
+                        <NumberInput
+                            label={t('admin.coupons.form.maxUses')}
+                            min={1}
+                            placeholder={t('admin.coupons.form.unlimited')}
+                            value={cMaxUses}
+                            onChange={(v) => setCMaxUses(typeof v === 'number' ? v : '')}
+                        />
+                        <NumberInput
+                            label={t('admin.coupons.form.perUser')}
+                            min={1}
+                            placeholder={t('admin.coupons.form.unlimited')}
+                            value={cPerUser}
+                            onChange={(v) => setCPerUser(typeof v === 'number' ? v : '')}
+                        />
                     </Group>
                     <Group grow>
-                        <TextInput label="시작 (ISO)" placeholder="2025-09-01" value={cStart} onChange={(e) => setCStart(e.currentTarget.value)} />
-                        <TextInput label="종료 (ISO)" placeholder="2025-09-30" value={cEnd} onChange={(e) => setCEnd(e.currentTarget.value)} />
+                        <TextInput label={t('admin.coupons.form.start')} placeholder="2025-09-01" value={cStart} onChange={(e) => setCStart(e.currentTarget.value)} />
+                        <TextInput label={t('admin.coupons.form.end')} placeholder="2025-09-30" value={cEnd} onChange={(e) => setCEnd(e.currentTarget.value)} />
                     </Group>
                     <Divider my="xs" />
                     <Group justify="flex-end" mt="sm">
                         <Button leftSection={<Save size={14} />} size="sm" onClick={createNew}>
-                            생성
+                            {t('common.create')}
                         </Button>
                         <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setCreateOpen(false)}>
-                            취소
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>
             </Modal>
 
             {/* 수정 모달 */}
-            <Modal centered opened={!!editId} radius="md" size="lg" title="쿠폰 수정" onClose={() => setEditId(null)}>
+            <Modal centered opened={!!editId} radius="md" size="lg" title={t('admin.coupons.modal.editTitle')} onClose={() => setEditId(null)}>
                 {editId && (
                     <Stack gap="sm">
                         {editErr && (
-                            <Notification color="red" title="오류" onClose={() => setEditErr(null)}>
+                            <Notification color="red" title={t('errors.error')} onClose={() => setEditErr(null)}>
                                 {editErr}
                             </Notification>
                         )}
                         <Group grow>
-                            <TextInput label="코드" radius="md" value={editDraft.code} onChange={(e) => setEditDraft((d) => ({ ...d, code: e.currentTarget.value }))} />
+                            <TextInput label={t('admin.coupons.form.code')} radius="md" value={editDraft.code} onChange={(e) => setEditDraft((d) => ({ ...d, code: e.currentTarget.value }))} />
                             <Select
                                 data={[
                                     { value: 'percent', label: 'percent' },
                                     { value: 'fixed', label: 'fixed' }
                                 ]}
-                                label="종류"
+                                label={t('admin.coupons.form.type')}
                                 radius="md"
                                 value={editDraft.type}
                                 onChange={(v) => v && setEditDraft((d) => ({ ...d, type: v as 'percent' | 'fixed' }))}
                             />
                             <NumberInput
-                                label="값"
+                                label={t('admin.coupons.form.value')}
                                 min={1}
                                 radius="md"
                                 value={editDraft.value as number | undefined}
@@ -257,7 +273,7 @@ const AdminCouponsPage = () => {
                         </Group>
                         {editDraft.type === 'fixed' && (
                             <TextInput
-                                label="통화"
+                                label={t('admin.coupons.form.currency')}
                                 radius="md"
                                 value={editDraft.currency_code || ''}
                                 onChange={(e) => setEditDraft((d) => ({ ...d, currency_code: e.currentTarget.value.toUpperCase() }))}
@@ -265,17 +281,17 @@ const AdminCouponsPage = () => {
                         )}
                         <Group grow>
                             <NumberInput
-                                label="총 사용 한도"
+                                label={t('admin.coupons.form.maxUses')}
                                 min={1}
-                                placeholder="무제한"
+                                placeholder={t('admin.coupons.form.unlimited')}
                                 radius="md"
                                 value={editDraft.max_uses as number | undefined}
                                 onChange={(val) => setEditDraft((d) => ({ ...d, max_uses: typeof val === 'number' ? val : undefined }))}
                             />
                             <NumberInput
-                                label="사용자당 한도"
+                                label={t('admin.coupons.form.perUser')}
                                 min={1}
-                                placeholder="무제한"
+                                placeholder={t('admin.coupons.form.unlimited')}
                                 radius="md"
                                 value={editDraft.per_user_limit as number | undefined}
                                 onChange={(val) => setEditDraft((d) => ({ ...d, per_user_limit: typeof val === 'number' ? val : undefined }))}
@@ -283,20 +299,25 @@ const AdminCouponsPage = () => {
                         </Group>
                         <Group grow>
                             <TextInput
-                                label="시작 (ISO)"
+                                label={t('admin.coupons.form.start')}
                                 radius="md"
                                 value={editDraft.starts_at || ''}
                                 onChange={(e) => setEditDraft((d) => ({ ...d, starts_at: e.currentTarget.value || undefined }))}
                             />
-                            <TextInput label="종료 (ISO)" radius="md" value={editDraft.ends_at || ''} onChange={(e) => setEditDraft((d) => ({ ...d, ends_at: e.currentTarget.value || undefined }))} />
+                            <TextInput
+                                label={t('admin.coupons.form.end')}
+                                radius="md"
+                                value={editDraft.ends_at || ''}
+                                onChange={(e) => setEditDraft((d) => ({ ...d, ends_at: e.currentTarget.value || undefined }))}
+                            />
                         </Group>
-                        <Switch checked={!!editDraft.active} label="활성 상태" onChange={(e) => setEditDraft((d) => ({ ...d, active: e.currentTarget.checked }))} />
+                        <Switch checked={!!editDraft.active} label={t('admin.coupons.form.activeState')} onChange={(e) => setEditDraft((d) => ({ ...d, active: e.currentTarget.checked }))} />
                         <Group justify="flex-end" mt="sm">
                             <Button leftSection={<Save size={14} />} size="sm" onClick={commitEdit}>
-                                저장
+                                {t('common.save')}
                             </Button>
                             <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditId(null)}>
-                                취소
+                                {t('common.cancel')}
                             </Button>
                         </Group>
                     </Stack>

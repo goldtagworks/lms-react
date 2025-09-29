@@ -4,6 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { approveInstructorApplication, rejectInstructorApplication, revokeInstructorApplication, useInstructorApplication } from '@main/lib/repository';
 import { CheckCircle2, XCircle, Link as LinkIcon, User, CalendarClock, FileText, X, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
+import { useI18n } from '@main/lib/i18n';
 
 interface InstructorAppDetailProps {
     appId: string | null;
@@ -21,13 +22,14 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
     const app = useInstructorApplication(appId);
     const [rejectMode, setRejectMode] = useState(false);
     const [reason, setReason] = useState(''); // 공유 textarea 값 (반려/회수 모두 사용)
+    const { t } = useI18n();
 
     if (!app) {
         return (
             <Stack p="md">
-                <TextMeta>데이터를 불러올 수 없습니다.</TextMeta>
+                <TextMeta>{t('errors.dataUnavailable', undefined, '데이터를 불러올 수 없습니다.')}</TextMeta>
                 <Button mt="sm" size="sm" variant="default" onClick={onClose}>
-                    닫기
+                    {t('common.close')}
                 </Button>
             </Stack>
         );
@@ -36,7 +38,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
     function approve() {
         if (!app) return;
         approveInstructorApplication(app.id);
-        notifications.show({ color: 'teal', title: '승인 완료', message: `${app.display_name} 신청이 승인되었습니다.` });
+        notifications.show({ color: 'teal', title: t('notify.success.approve'), message: t('instructor.appApproved', { name: app.display_name }, '{{name}} 신청이 승인되었습니다.') });
         onClose();
     }
 
@@ -44,14 +46,14 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
         if (!app) return;
         // 반려 사유는 선택적: 빈 문자열이면 undefined 저장
         rejectInstructorApplication(app.id, reason.trim() || undefined);
-        notifications.show({ color: 'red', title: '반려 처리', message: `${app.display_name} 신청이 반려되었습니다.` });
+        notifications.show({ color: 'red', title: t('notify.success.reject'), message: t('instructor.appRejected', { name: app.display_name }, '{{name}} 신청이 반려되었습니다.') });
         onClose();
     }
 
     function revoke() {
         if (!app) return;
         revokeInstructorApplication(app.id, reason.trim() || undefined);
-        notifications.show({ color: 'gray', title: '권한 회수', message: `${app.display_name} 강사 권한이 회수되었습니다.` });
+        notifications.show({ color: 'gray', title: t('notify.success.revoke'), message: t('instructor.appRevoked', { name: app.display_name }, '{{name}} 강사 권한이 회수되었습니다.') });
         onClose();
     }
 
@@ -87,11 +89,11 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                             </ThemeIcon>
 
                             <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
-                                소개
+                                {t('instructor.bio', undefined, '소개')}
                             </TextMeta>
                         </Group>
                         <Card withBorder w="100%">
-                            <TextBody style={{ whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{app.bio_md || '소개가 없습니다.'}</TextBody>
+                            <TextBody style={{ whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{app.bio_md || t('instructor.noBio', undefined, '소개가 없습니다.')}</TextBody>
                         </Card>
                     </Box>
                     <Box>
@@ -100,7 +102,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 <LinkIcon size={14} />
                             </ThemeIcon>
                             <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
-                                링크
+                                {t('instructor.links', undefined, '링크')}
                             </TextMeta>
                         </Group>
                         {app.links && app.links.length > 0 ? (
@@ -112,7 +114,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 ))}
                             </Stack>
                         ) : (
-                            <TextMeta>등록된 링크 없음</TextMeta>
+                            <TextMeta>{t('instructor.noLinks', undefined, '등록된 링크 없음')}</TextMeta>
                         )}
                     </Box>
                     <Group gap="xl" wrap="nowrap">
@@ -120,7 +122,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                             <Group gap={4}>
                                 <CalendarClock size={14} />
                                 <TextMeta fw={600} sizeOverride="sm">
-                                    신청일
+                                    {t('instructor.appliedAt', undefined, '신청일')}
                                 </TextMeta>
                             </Group>
                             <TextMeta>{dt(app.created_at)}</TextMeta>
@@ -129,7 +131,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                             <Group gap={4}>
                                 <CalendarClock size={14} />
                                 <TextMeta fw={600} sizeOverride="sm">
-                                    결정일
+                                    {t('instructor.decidedAt', undefined, '결정일')}
                                 </TextMeta>
                             </Group>
                             <TextMeta>{dt(app.decided_at)}</TextMeta>
@@ -142,7 +144,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                     <XCircle size={14} />
                                 </ThemeIcon>
                                 <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
-                                    반려 사유
+                                    {t('instructor.rejectReason', undefined, '반려 사유')}
                                 </TextMeta>
                             </Group>
                             <TextBody style={{ whiteSpace: 'pre-wrap' }}>{app.rejection_reason}</TextBody>
@@ -155,11 +157,17 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                     <ShieldAlert size={14} />
                                 </ThemeIcon>
                                 <TextMeta fw={600} sizeOverride="sm" tt="uppercase">
-                                    회수 정보
+                                    {t('instructor.revokeInfo', undefined, '회수 정보')}
                                 </TextMeta>
                             </Group>
-                            <TextMeta>회수일: {dt(app.revoked_at)}</TextMeta>
-                            {app.revoke_reason && <TextBody style={{ whiteSpace: 'pre-wrap' }}>사유: {app.revoke_reason}</TextBody>}
+                            <TextMeta>
+                                {t('instructor.revokedAt', undefined, '회수일')}: {dt(app.revoked_at)}
+                            </TextMeta>
+                            {app.revoke_reason && (
+                                <TextBody style={{ whiteSpace: 'pre-wrap' }}>
+                                    {t('instructor.reason', undefined, '사유')}: {app.revoke_reason}
+                                </TextBody>
+                            )}
                         </Box>
                     )}
                 </Stack>
@@ -170,10 +178,10 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                 {app.status === 'PENDING' && rejectMode && (
                     <Textarea
                         autosize
-                        label="반려 사유 (선택)"
+                        label={t('instructor.rejectReasonOptional', undefined, '반려 사유 (선택)')}
                         maxRows={5}
                         minRows={2}
-                        placeholder="사유를 입력하거나 비워둘 수 있습니다"
+                        placeholder={t('instructor.reasonPlaceholder', undefined, '사유를 입력하거나 비워둘 수 있습니다')}
                         size="sm"
                         value={reason}
                         onChange={(e) => setReason(e.currentTarget.value)}
@@ -182,10 +190,10 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                 {app.status === 'APPROVED' && (
                     <Textarea
                         autosize
-                        label="권한 회수 사유 (선택)"
+                        label={t('instructor.revokeReasonOptional', undefined, '권한 회수 사유 (선택)')}
                         maxRows={4}
                         minRows={2}
-                        placeholder="정책 위반/법적 문제 등 (비워두면 사유 미표시)"
+                        placeholder={t('instructor.revokeReasonPlaceholder', undefined, '정책 위반/법적 문제 등 (비워두면 사유 미표시)')}
                         size="sm"
                         value={reason}
                         onChange={(e) => setReason(e.currentTarget.value)}
@@ -194,14 +202,14 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                 <Group gap={6} justify="flex-end">
                     {app.status === 'PENDING' && !rejectMode && (
                         <>
-                            <Tooltip withArrow label="신청 승인">
+                            <Tooltip withArrow label={t('instructor.approveTooltip', undefined, '신청 승인')}>
                                 <Button color="teal" leftSection={<CheckCircle2 size={14} />} size="sm" onClick={approve}>
-                                    승인
+                                    {t('common.approve')}
                                 </Button>
                             </Tooltip>
-                            <Tooltip withArrow label="신청 반려">
+                            <Tooltip withArrow label={t('instructor.rejectTooltip', undefined, '신청 반려')}>
                                 <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={() => setRejectMode(true)}>
-                                    반려
+                                    {t('common.reject')}
                                 </Button>
                             </Tooltip>
                         </>
@@ -209,20 +217,20 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                     {app.status === 'PENDING' && rejectMode && (
                         <>
                             <Button color="red" leftSection={<XCircle size={14} />} size="sm" onClick={reject}>
-                                반려 확정
+                                {t('instructor.rejectConfirm', undefined, '반려 확정')}
                             </Button>
                             <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setRejectMode(false)}>
-                                취소
+                                {t('common.cancel')}
                             </Button>
                         </>
                     )}
                     {app.status === 'APPROVED' && (
                         <Button color="gray" leftSection={<ShieldAlert size={14} />} size="sm" onClick={revoke}>
-                            권한 회수
+                            {t('common.revoke')}
                         </Button>
                     )}
                     <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
-                        닫기
+                        {t('common.close')}
                     </Button>
                 </Group>
             </Stack>

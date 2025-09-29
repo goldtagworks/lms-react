@@ -1,5 +1,7 @@
 import React from 'react';
 import { Burger, Container, Group, Title, Button, Menu, rem } from '@mantine/core';
+import LanguageSwitch from '@main/components/LanguageSwitch';
+import { useI18n } from '@main/lib/i18n';
 import { LinkButton } from '@main/components/LinkButton';
 import { useAuth } from '@main/lib/auth';
 import { filterNav, navGroups } from '@main/lib/nav';
@@ -16,6 +18,7 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
     const navigate = useNavigate();
 
     const role = user?.role ?? null;
+    const { t } = useI18n();
     const location = useLocation();
     const pathname = location.pathname;
     const filtered = filterNav(
@@ -34,7 +37,7 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
             <Group align="center" gap="lg" h="100%" justify="space-between" wrap="nowrap">
                 <Group gap="sm">
                     <Burger ref={burgerRef} aria-controls="global-nav-panel" aria-expanded={navOpened} opened={navOpened} size="sm" onClick={toggleNav} />
-                    <Link aria-label="홈으로 이동" style={{ color: 'inherit', textDecoration: 'none' }} to="/">
+                    <Link aria-label={t('nav.home', undefined, 'Home')} style={{ color: 'inherit', textDecoration: 'none' }} to="/">
                         <Title className="ls-tight" fw={800} m={0} order={3}>
                             KSI Style LMS
                         </Title>
@@ -63,16 +66,16 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                                         style={groupActive ? { fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 4 } : undefined}
                                         variant={groupActive ? 'light' : 'subtle'}
                                     >
-                                        {g.label}
+                                        {g.labelKey ? t(g.labelKey) : g.label || ''}
                                     </Button>
                                 </Menu.Target>
-                                <Menu.Dropdown aria-label={`${g.label} 메뉴`}>
+                                <Menu.Dropdown aria-label={g.labelKey ? t(g.labelKey) : g.label || ''}>
                                     {g.items.map((it) => {
                                         const itemActive = it.href === activeItemHref; // 최장 매칭만 active
 
                                         return (
                                             <Menu.Item key={it.id} component={Link} style={itemActive ? { background: 'var(--mantine-color-blue-light)', fontWeight: 600 } : undefined} to={it.href}>
-                                                {it.label}
+                                                {it.labelKey ? t(it.labelKey) : it.label || ''}
                                             </Menu.Item>
                                         );
                                     })}
@@ -80,20 +83,21 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                             </Menu>
                         );
                     })}
-                    {!user && <LinkButton href="/signin" label="로그인" variant="outline" />}
-                    {!user && <LinkButton href="/signup" label="회원가입" variant="filled" />}
+                    {!user && <LinkButton href="/signin" label={t('auth.header.login')} variant="outline" />}
+                    {!user && <LinkButton href="/signup" label={t('auth.header.signup')} variant="filled" />}
+                    <LanguageSwitch />
                     {user && (
                         <Menu withinPortal position="bottom-end" shadow="md" width={180}>
                             <Menu.Target>
                                 <Button variant="default">{user.name}</Button>
                             </Menu.Target>
-                            <Menu.Dropdown aria-label="계정 메뉴">
-                                <Menu.Label>계정</Menu.Label>
+                            <Menu.Dropdown aria-label={t('auth.header.account')}>
+                                <Menu.Label>{t('auth.header.account')}</Menu.Label>
                                 <Menu.Item component={Link} to="/my">
-                                    마이페이지
+                                    {t('auth.header.myPage')}
                                 </Menu.Item>
                                 <Menu.Item component={Link} to="/password/change">
-                                    비밀번호 변경
+                                    {t('auth.header.changePassword')}
                                 </Menu.Item>
                                 <Menu.Item
                                     onClick={() => {
@@ -101,7 +105,7 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                                         navigate('/');
                                     }}
                                 >
-                                    로그아웃
+                                    {t('auth.header.logout')}
                                 </Menu.Item>
                             </Menu.Dropdown>
                         </Menu>

@@ -1,19 +1,21 @@
 import type { Lesson } from '@main/types/lesson';
 
+import { t } from '@main/lib/i18n';
+
 import { YOUTUBE_REGEX } from './constants';
 
 export function validateLessonTitle(title: string): string | null {
-    const t = title.trim();
+    const trimmed = title.trim();
 
-    if (t.length < 2) return '제목은 2글자 이상이어야 합니다.';
-    if (t.length > 150) return '제목은 150자를 넘을 수 없습니다.';
+    if (trimmed.length < 2) return t('validation.lesson.title.min');
+    if (trimmed.length > 150) return t('validation.lesson.title.max');
 
     return null;
 }
 
 export function validateDuration(seconds: number): string | null {
-    if (seconds < 0) return '길이는 0 이상이어야 합니다.';
-    if (seconds > 60 * 60 * 5) return '5시간을 초과할 수 없습니다.';
+    if (seconds < 0) return t('validation.lesson.duration.min');
+    if (seconds > 60 * 60 * 5) return t('validation.lesson.duration.max');
 
     return null;
 }

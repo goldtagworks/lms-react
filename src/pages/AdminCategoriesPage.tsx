@@ -5,8 +5,10 @@ import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
 import useAdminCategories from '@main/hooks/admin/useAdminCategories';
+import { useI18n } from '@main/lib/i18n';
 
 export default function AdminCategoriesPage() {
+    const { t } = useI18n();
     const {
         items,
         page,
@@ -43,29 +45,31 @@ export default function AdminCategoriesPage() {
             <PageHeader
                 actions={
                     <Group gap="xs">
-                        <TextInput aria-label="검색" placeholder="이름/슬러그" radius="md" size="sm" value={q} onChange={(e) => setQ(e.currentTarget.value)} />
+                        <TextInput aria-label={t('a11y.search')} placeholder={t('admin.categories.search')} radius="md" size="sm" value={q} onChange={(e) => setQ(e.currentTarget.value)} />
                         <TextInput
                             readOnly
-                            aria-label="활성 필터"
-                            placeholder={filterActive === 'all' ? '전체' : filterActive === 'active' ? '활성' : '비활성'}
+                            aria-label={t('a11y.admin.filterActive')}
+                            placeholder={
+                                filterActive === 'all' ? t('admin.categories.filter.all') : filterActive === 'active' ? t('admin.categories.filter.active') : t('admin.categories.filter.inactive')
+                            }
                             radius="md"
                             size="sm"
                             style={{ cursor: 'pointer', width: 110 }}
-                            value={filterActive === 'all' ? '' : filterActive === 'active' ? '활성 필터 중' : '비활성 필터 중'}
+                            value={filterActive === 'all' ? '' : filterActive === 'active' ? t('admin.categories.filter.current.active') : t('admin.categories.filter.current.inactive')}
                             onClick={() => setFilterActive((prev) => (prev === 'all' ? 'active' : prev === 'active' ? 'inactive' : 'all'))}
                         />
-                        <Tooltip label="필터 초기화">
-                            <ActionIcon aria-label="필터 초기화" variant="light" onClick={resetFilters}>
+                        <Tooltip label={t('common.resetFilters')}>
+                            <ActionIcon aria-label={t('common.resetFilters')} variant="light" onClick={resetFilters}>
                                 <RefreshCw size={16} />
                             </ActionIcon>
                         </Tooltip>
                         <Button leftSection={<Plus size={16} />} size="sm" onClick={() => setCreateOpen(true)}>
-                            새 카테고리
+                            {t('admin.categories.modal.newTitle')}
                         </Button>
                     </Group>
                 }
-                description="코스 분류용 카테고리를 생성/재정렬/비활성화합니다. (mock)"
-                title="카테고리 관리"
+                description={t('admin.categories.description')}
+                title={t('admin.categories.title')}
             />
 
             <Stack gap="lg" mt="md">
@@ -73,19 +77,19 @@ export default function AdminCategoriesPage() {
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th style={{ width: 60 }} ta="center">
-                                순서
+                                {t('admin.categories.table.order')}
                             </Table.Th>
                             <Table.Th style={{ width: 260 }} ta="center">
-                                이름
+                                {t('admin.categories.table.name')}
                             </Table.Th>
                             <Table.Th style={{ width: 220 }} ta="center">
-                                슬러그
+                                {t('admin.categories.table.slug')}
                             </Table.Th>
                             <Table.Th style={{ width: 100 }} ta="center">
-                                상태
+                                {t('admin.categories.table.status')}
                             </Table.Th>
                             <Table.Th style={{ width: 140 }} ta="center">
-                                액션
+                                {t('admin.categories.table.actions')}
                             </Table.Th>
                         </Table.Tr>
                     </Table.Thead>
@@ -94,7 +98,7 @@ export default function AdminCategoriesPage() {
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
                                     <TextMeta py={20} ta="center">
-                                        카테고리가 없습니다.
+                                        {t('admin.categories.table.empty')}
                                     </TextMeta>
                                 </Table.Td>
                             </Table.Tr>
@@ -103,10 +107,16 @@ export default function AdminCategoriesPage() {
                             <Table.Tr key={c.id} style={{ opacity: c.active ? 1 : 0.55 }}>
                                 <Table.Td ta="center">
                                     <Group align="center" gap={4} justify="center" wrap="nowrap">
-                                        <ActionIcon aria-label="위로" disabled={idx === 0 && pageSafe === 1} size="sm" variant="subtle" onClick={() => move(c, 'up')}>
+                                        <ActionIcon aria-label={t('a11y.admin.moveUp')} disabled={idx === 0 && pageSafe === 1} size="sm" variant="subtle" onClick={() => move(c, 'up')}>
                                             <ArrowUp size={14} />
                                         </ActionIcon>
-                                        <ActionIcon aria-label="아래로" disabled={idx === paged.length - 1 && pageSafe === totalPages} size="sm" variant="subtle" onClick={() => move(c, 'down')}>
+                                        <ActionIcon
+                                            aria-label={t('a11y.admin.moveDown')}
+                                            disabled={idx === paged.length - 1 && pageSafe === totalPages}
+                                            size="sm"
+                                            variant="subtle"
+                                            onClick={() => move(c, 'down')}
+                                        >
                                             <ArrowDown size={14} />
                                         </ActionIcon>
                                     </Group>
@@ -114,11 +124,17 @@ export default function AdminCategoriesPage() {
                                 <Table.Td>
                                     {renameId === c.id ? (
                                         <Group gap={4} wrap="nowrap">
-                                            <TextInput aria-label="카테고리 이름" size="sm" style={{ flexGrow: 1 }} value={renameValue} onChange={(e) => setRenameValue(e.currentTarget.value)} />
-                                            <ActionIcon aria-label="저장" color="green" size="sm" variant="light" onClick={commitRename}>
+                                            <TextInput
+                                                aria-label={t('a11y.admin.categoryNameInput')}
+                                                size="sm"
+                                                style={{ flexGrow: 1 }}
+                                                value={renameValue}
+                                                onChange={(e) => setRenameValue(e.currentTarget.value)}
+                                            />
+                                            <ActionIcon aria-label={t('common.save')} color="green" size="sm" variant="light" onClick={commitRename}>
                                                 <Save size={14} />
                                             </ActionIcon>
-                                            <ActionIcon aria-label="취소" color="red" size="sm" variant="light" onClick={() => setRenameId(null)}>
+                                            <ActionIcon aria-label={t('common.cancel')} color="red" size="sm" variant="light" onClick={() => setRenameId(null)}>
                                                 <X size={14} />
                                             </ActionIcon>
                                         </Group>
@@ -127,7 +143,7 @@ export default function AdminCategoriesPage() {
                                             <TextBody c={c.active ? undefined : 'dimmed'} fw={500} sizeOverride="sm">
                                                 {c.name}
                                             </TextBody>
-                                            <ActionIcon aria-label="이름 변경" size="sm" variant="subtle" onClick={() => startRename(c)}>
+                                            <ActionIcon aria-label={t('admin.categories.tooltip.rename')} size="sm" variant="subtle" onClick={() => startRename(c)}>
                                                 <Edit3 size={14} />
                                             </ActionIcon>
                                         </Group>
@@ -138,17 +154,17 @@ export default function AdminCategoriesPage() {
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
-                                        {c.active ? '활성' : '비활성'}
+                                        {t(c.active ? 'status.active' : 'status.inactive')}
                                     </Badge>
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Group gap={4} justify="center">
-                                        <Tooltip label={c.active ? '비활성화' : '활성화'}>
-                                            <Switch aria-label="활성 토글" checked={c.active} size="sm" onChange={() => toggleActive(c)} />
+                                        <Tooltip label={t(c.active ? 'admin.categories.tooltip.deactivate' : 'admin.categories.tooltip.activate')}>
+                                            <Switch aria-label={t('a11y.admin.activateToggle')} checked={c.active} size="sm" onChange={() => toggleActive(c)} />
                                         </Tooltip>
                                         {c.active && (
-                                            <Tooltip label="즉시 비활성 (soft)">
-                                                <ActionIcon aria-label="즉시 비활성" color="orange" size="sm" variant="subtle" onClick={() => deactivate(c)}>
+                                            <Tooltip label={t('admin.categories.tooltip.instantDeactivate')}>
+                                                <ActionIcon aria-label={t('a11y.admin.instantDeactivate')} color="orange" size="sm" variant="subtle" onClick={() => deactivate(c)}>
                                                     <X size={14} />
                                                 </ActionIcon>
                                             </Tooltip>
@@ -163,20 +179,27 @@ export default function AdminCategoriesPage() {
 
             <PaginationBar align="right" page={pageSafe} totalPages={totalPages} onChange={(p) => setPage(p)} />
 
-            <Modal centered opened={createOpen} radius="md" size="sm" title="새 카테고리" onClose={() => setCreateOpen(false)}>
+            <Modal centered opened={createOpen} radius="md" size="sm" title={t('admin.categories.modal.newTitle')} onClose={() => setCreateOpen(false)}>
                 <Stack gap="sm">
                     {creatingErr && (
-                        <Notification color="red" title="오류" onClose={() => setCreatingErr(null)}>
+                        <Notification color="red" title={t('errors.error')} onClose={() => setCreatingErr(null)}>
                             {creatingErr}
                         </Notification>
                     )}
-                    <TextInput aria-label="카테고리 이름" label="이름" placeholder="예: 개발" radius="md" value={newName} onChange={(e) => setNewName(e.currentTarget.value)} />
+                    <TextInput
+                        aria-label={t('a11y.admin.categoryNameInput')}
+                        label={t('admin.categories.form.nameLabel')}
+                        placeholder={t('admin.categories.form.namePlaceholder')}
+                        radius="md"
+                        value={newName}
+                        onChange={(e) => setNewName(e.currentTarget.value)}
+                    />
                     <Group justify="flex-end" mt="sm">
                         <Button leftSection={<Save size={14} />} size="sm" onClick={handleCreate}>
-                            생성
+                            {t('common.create')}
                         </Button>
                         <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setCreateOpen(false)}>
-                            취소
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>

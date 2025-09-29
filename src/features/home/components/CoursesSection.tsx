@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Container, Group, Title, SimpleGrid, Button } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import { Link } from 'react-router-dom';
 
 import { CourseCardVM } from '../../../viewmodels/home';
@@ -16,6 +17,7 @@ interface CoursesSectionProps {
 
 function CoursesSectionBase({ title, courses, viewAllTo = '/courses', limit, gridCols }: CoursesSectionProps) {
     const list = limit ? courses.slice(0, limit) : courses;
+    const { t } = useI18n();
 
     return (
         <Container py="xl" size="lg">
@@ -24,7 +26,7 @@ function CoursesSectionBase({ title, courses, viewAllTo = '/courses', limit, gri
                     {title}
                 </Title>
                 <Button component={Link} size="sm" to={viewAllTo} variant="subtle">
-                    전체 보기
+                    {t('home.courses.viewAll', undefined, '전체 보기')}
                 </Button>
             </Group>
             <SimpleGrid cols={gridCols || { base: 1, sm: 2, md: 3 }} spacing="xl">

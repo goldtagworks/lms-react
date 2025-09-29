@@ -1,6 +1,7 @@
 import type { Lesson } from '@main/types/lesson';
 
 import { notifications } from '@mantine/notifications';
+import { useI18n } from '@main/lib/i18n';
 import { listLessonsByCourse, createLesson, deleteLesson, moveLesson, updateLesson } from '@main/lib/repository';
 import { useCallback, useRef, useState } from 'react';
 
@@ -18,6 +19,7 @@ export interface LessonsStateApi {
 // repository 기반으로 전환되어 개별 STORAGE_KEY 불필요
 
 export function useLessonsState(courseId?: string): LessonsStateApi {
+    const { t } = useI18n();
     const [lessons, setLessons] = useState<Lesson[]>(() => (courseId ? listLessonsByCourse(courseId) : []));
 
     // repository 기반 persistence (별도 persist noop 제거)
@@ -27,7 +29,12 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
     const addLesson = useCallback(
         (title: string, opts?: { silent?: boolean }) => {
             if (!courseId) {
-                if (!opts?.silent) notifications.show({ color: 'red', title: '코스 필요', message: '먼저 코스를 저장하세요.' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'red',
+                        title: t('notify.error.generic'),
+                        message: t('lesson.edit.needCourse')
+                    });
 
                 return false;
             }
@@ -35,11 +42,21 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
                 const created = createLesson({ course_id: courseId, title });
 
                 setLessons((prev) => [...prev, created]);
-                if (!opts?.silent) notifications.show({ color: 'teal', title: '레슨 추가', message: '레슨이 추가되었습니다.' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'teal',
+                        title: t('notify.success.lessonAdd'),
+                        message: t('lesson.edit.added')
+                    });
 
                 return true;
             } catch {
-                if (!opts?.silent) notifications.show({ color: 'red', title: '오류', message: '레슨 추가 실패' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'red',
+                        title: t('notify.error.generic'),
+                        message: t('notify.error.lessonAdd')
+                    });
 
                 return false;
             }
@@ -50,7 +67,12 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
     const addSection = useCallback(
         (title: string, opts?: { silent?: boolean }) => {
             if (!courseId) {
-                if (!opts?.silent) notifications.show({ color: 'red', title: '코스 필요', message: '먼저 코스를 저장하세요.' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'red',
+                        title: t('notify.error.generic'),
+                        message: t('lesson.edit.needCourse')
+                    });
 
                 return false;
             }
@@ -58,11 +80,21 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
                 const created = createLesson({ course_id: courseId, title, is_section: true });
 
                 setLessons((prev) => [...prev, created]);
-                if (!opts?.silent) notifications.show({ color: 'teal', title: '섹션 추가', message: '섹션 헤더가 추가되었습니다.' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'teal',
+                        title: t('notify.success.sectionAdd'),
+                        message: t('lesson.edit.sectionAdded')
+                    });
 
                 return true;
             } catch {
-                if (!opts?.silent) notifications.show({ color: 'red', title: '오류', message: '섹션 추가 실패' });
+                if (!opts?.silent)
+                    notifications.show({
+                        color: 'red',
+                        title: t('notify.error.generic'),
+                        message: t('notify.error.sectionAdd')
+                    });
 
                 return false;
             }
@@ -73,7 +105,12 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
     const removeLesson = useCallback((id: string, opts?: { silent?: boolean }) => {
         deleteLesson(id);
         setLessons((prev) => prev.filter((l) => l.id !== id));
-        if (!opts?.silent) notifications.show({ color: 'teal', title: '삭제 완료', message: '레슨이 삭제되었습니다.' });
+        if (!opts?.silent)
+            notifications.show({
+                color: 'teal',
+                title: t('notify.success.delete'),
+                message: t('lesson.edit.deleted')
+            });
     }, []);
 
     const move = useCallback(
@@ -105,8 +142,8 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
                 if (!last || last.type !== type || now - last.at > 300) {
                     notifications.show({
                         color: type === 'set' ? 'teal' : 'gray',
-                        title: type === 'set' ? '미리보기 지정' : '미리보기 해제',
-                        message: type === 'set' ? '레슨이 미리보기로 지정됨' : '미리보기 해제됨'
+                        title: type === 'set' ? t('notify.success.previewSet') : t('notify.success.previewUnset'),
+                        message: type === 'set' ? t('lesson.edit.previewSet') : t('lesson.edit.previewUnset')
                     });
                     lastPreviewNotifRef.current = { type, at: now };
                 }
@@ -127,8 +164,8 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
 
                 notifications.show({
                     color: 'teal',
-                    title: isSection ? '섹션 수정' : '레슨 수정',
-                    message: isSection ? '섹션이 업데이트되었습니다.' : '레슨이 업데이트되었습니다.'
+                    title: isSection ? t('notify.success.sectionUpdate') : t('notify.success.lessonUpdate'),
+                    message: isSection ? t('lesson.edit.sectionUpdated') : t('lesson.edit.updated')
                 });
             }
         },

@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import ConsentCheckboxes, { ConsentState } from '@main/components/auth/ConsentCheckboxes';
+import { useI18n } from '@main/lib/i18n';
 
 export default function SignUpPage() {
     const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export default function SignUpPage() {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const { register, loading } = useAuth();
     const navigate = useNavigate();
+    const { t } = useI18n();
 
     const passwordMismatch = passwordConfirm.length > 0 && passwordConfirm !== password;
     const canSubmit = name && email && password && !passwordMismatch && consent?.terms && consent?.privacy && (consent?.age ?? true);
@@ -33,20 +35,28 @@ export default function SignUpPage() {
                     <Stack gap="lg">
                         <div>
                             <Title fw={700} order={3} size={26}>
-                                회원가입
+                                {t('auth.signUp')}
                             </Title>
                             <Text c="dimmed" mt={4} size="sm">
-                                지금 계정을 만들고 학습을 시작하세요.
+                                {t('auth.subtitleSignUp')}
                             </Text>
                         </div>
                         <Stack gap="sm">
-                            <TextInput autoComplete="name" label="이름" placeholder="홍길동" size="sm" value={name} onChange={(e) => setName(e.target.value)} />
-                            <TextInput autoComplete="email" label="이메일" placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
-                            <TextInput autoComplete="new-password" label="비밀번호" placeholder="••••••" size="sm" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <TextInput autoComplete="name" label={t('auth.name')} placeholder="홍길동" size="sm" value={name} onChange={(e) => setName(e.target.value)} />
+                            <TextInput autoComplete="email" label={t('auth.email')} placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <TextInput
                                 autoComplete="new-password"
-                                error={passwordMismatch ? '비밀번호가 일치하지 않습니다.' : undefined}
-                                label="비밀번호 확인"
+                                label={t('auth.password')}
+                                placeholder="••••••"
+                                size="sm"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <TextInput
+                                autoComplete="new-password"
+                                error={passwordMismatch ? t('auth.password.mismatch') : undefined}
+                                label={t('auth.confirmPassword')}
                                 placeholder="••••••"
                                 size="sm"
                                 type="password"
@@ -56,19 +66,19 @@ export default function SignUpPage() {
                         </Stack>
                         {passwordMismatch && (
                             <Text c="red" fz={12} mt={-4} pb={0}>
-                                비밀번호가 서로 다릅니다. 다시 입력해주세요.
+                                {t('auth.password.mismatch')}
                             </Text>
                         )}
                         <ConsentCheckboxes requireAge onChange={setConsent} />
                         <Button disabled={!canSubmit} leftSection={<UserPlus size={14} />} loading={loading} size="sm" type="submit">
-                            회원가입
+                            {t('auth.signUp')}
                         </Button>
-                        <Divider label="이미 계정이 있나요?" labelPosition="center" my="xs" />
+                        <Divider label={t('auth.haveAccount')} labelPosition="center" my="xs" />
                         <Group justify="space-between">
                             <Text c="dimmed" size="sm">
-                                이미 계정이 있나요?{' '}
+                                {t('auth.haveAccount')}{' '}
                                 <Text component={Link} fw={600} size="sm" to="/signin">
-                                    로그인
+                                    {t('auth.signIn')}
                                 </Text>
                             </Text>
                         </Group>

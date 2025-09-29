@@ -1,6 +1,7 @@
 import { Text, Card, Group, Button, Badge, Stack } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import EmptyState from '@main/components/EmptyState';
+import { useI18n } from '@main/lib/i18n';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import { useAuth } from '@main/lib/auth';
@@ -15,6 +16,7 @@ import { TagChip } from '@main/components/TagChip';
 import CourseGrid from '@main/components/layout/CourseGrid';
 
 export default function WishlistPage() {
+    const { t } = useI18n();
     const { user } = useAuth();
     const userId = user?.id;
     const allCourses = useCourses();
@@ -42,12 +44,12 @@ export default function WishlistPage() {
 
     return (
         <PageContainer roleMain>
-            <PageHeader description="나중에 수강하고 싶은 강의를 한 곳에서 관리하세요." title="위시리스트" />
+            <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('terms.favoriteAdd', {}, '찜')} />
             <Card withBorder p="lg" radius="md" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
-                            위시한 강의
+                            {t('terms.favoriteAdd')} 강의
                         </Text>
                         {userId && wishlist.length > 0 && (
                             <Badge color="pink" variant="light">
@@ -55,8 +57,22 @@ export default function WishlistPage() {
                             </Badge>
                         )}
                     </Group>
-                    {!userId && <EmptyState actionLabel="로그인" message="로그인 후 위시리스트를 사용할 수 있습니다." title="위시리스트 이용 안내" to="/signin" />}
-                    {userId && wishlist.length === 0 && <EmptyState actionLabel="강의 둘러보기" message="아직 찜한 강의가 없습니다." title="위시한 강의 없음" to="/courses" />}
+                    {!userId && (
+                        <EmptyState
+                            actionLabel={t('common.login', {}, '로그인')}
+                            message={t('empty.wishlistLoginNeeded', {}, '로그인 후 찜 기능을 사용할 수 있습니다.')}
+                            title={t('empty.wishlistInfo', {}, '찜 기능 안내')}
+                            to="/signin"
+                        />
+                    )}
+                    {userId && wishlist.length === 0 && (
+                        <EmptyState
+                            actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}
+                            message={t('empty.wishlistNone', {}, '아직 찜한 강의가 없습니다.')}
+                            title={t('empty.wishlistEmpty', {}, '찜한 강의 없음')}
+                            to="/courses"
+                        />
+                    )}
                     {userId && wishlist.length > 0 && (
                         <CourseGrid mt="md">
                             {paged.map((course) => {
@@ -78,7 +94,7 @@ export default function WishlistPage() {
                                                 )}
                                                 {wish && (
                                                     <Badge color="pink" size="sm">
-                                                        위시
+                                                        {t('terms.favoriteAdd')}
                                                     </Badge>
                                                 )}
                                             </Group>
@@ -103,7 +119,7 @@ export default function WishlistPage() {
                                             onToggleWish={() => handleToggle(course.id)}
                                         />
                                         <Button fullWidth component={Link} leftSection={<Eye size={14} />} mt={8} radius="md" size="md" to={`/course/${course.id}`} variant="default">
-                                            자세히 보기
+                                            {t('terms.viewDetails')}
                                         </Button>
                                     </Card>
                                 );

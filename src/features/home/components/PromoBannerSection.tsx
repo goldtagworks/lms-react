@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Container, Card, Group, Title, Text } from '@mantine/core';
 import { AppImage } from '@main/components/AppImage';
+import { useI18n } from '@main/lib/i18n';
 
 import { PromoBannerVM } from '../../../viewmodels/home';
 
@@ -9,6 +10,7 @@ interface PromoBannerSectionProps {
 }
 
 function PromoBannerSectionBase({ banner }: PromoBannerSectionProps) {
+    const { t } = useI18n();
     // CSS 변수 기반 배경 (다크/라이트 자동 전환)
     const promoBg = 'var(--gradient-promo, linear-gradient(90deg, #e0e7ff 60%, #f5f7fa 100%))';
 
@@ -27,11 +29,11 @@ function PromoBannerSectionBase({ banner }: PromoBannerSectionProps) {
                         )}
                         {banner.coupon_code && (
                             <Text c="blue.6" fw={600} size="sm">
-                                쿠폰코드: {banner.coupon_code}
+                                {t('home.promo.couponLabel', { code: banner.coupon_code })}
                             </Text>
                         )}
                     </div>
-                    {banner.image_url && <AppImage loadingSkeleton alt={banner.title} height={180} radius={12} shadow="md" src={banner.image_url} width={320} />}
+                    {banner.image_url && <AppImage loadingSkeleton alt={banner.title || t('a11y.image.mainBanner')} height={180} radius={12} shadow="md" src={banner.image_url} width={320} />}
                 </Group>
             </Card>
         </Container>

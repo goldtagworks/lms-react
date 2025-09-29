@@ -12,6 +12,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { getCourse, saveCourseDraft } from '@main/lib/repository';
 import PageContainer from '@main/components/layout/PageContainer';
+import { useI18n } from '@main/lib/i18n';
 
 // NOTE: 섹션 전용 구조 제거 → is_section=true 인 Lesson Row 가 섹션 헤더 역할.
 // 이전 lms_sections_v1 마이그레이션 로직 제거 (사용 안함)
@@ -77,38 +78,40 @@ const CourseEditPage = () => {
 
     navigateRef.current = navigate; // 최신 참조
 
+    const { t } = useI18n();
+
     function guardedNavigate(to: any) {
-        if (dirty && !window.confirm('변경사항이 저장되지 않았습니다. 이동하시겠습니까?')) return;
+        if (dirty && !window.confirm(t('course.editPage.save.navigateAwayConfirm'))) return;
         navigateRef.current(to);
     }
 
     // ----- Course Save -----
     function handleSave() {
-        const t = title.trim();
+        const trimmedTitle = title.trim();
 
-        if (t.length < 2) {
-            notifications.show({ color: 'red', title: '제목 필요', message: '제목 2글자 이상 입력' });
+        if (trimmedTitle.length < 2) {
+            notifications.show({ color: 'red', title: t('course.editPage.notify.titleNeeded'), message: t('course.editPage.notify.titleNeededMessage') });
 
             return;
         }
-        const { created, course: saved, error } = saveCourseDraft({ id: course?.id, title: t, summary: summary.trim(), description: desc.trim() });
+        const { created, course: saved, error } = saveCourseDraft({ id: course?.id, title: trimmedTitle, summary: summary.trim(), description: desc.trim() });
 
         if (error) {
-            notifications.show({ color: 'red', title: '저장 실패', message: error });
+            notifications.show({ color: 'red', title: t('course.editPage.notify.saveErrorTitle'), message: t('course.editPage.notify.saveErrorMessage') });
 
             return;
         }
         if (created && saved) {
             notifications.show({
                 color: 'teal',
-                title: '코스 생성',
-                message: '새 코스가 생성되었습니다. 첫 레슨을 바로 추가해보세요.'
+                title: t('course.editPage.notify.createdTitle'),
+                message: t('course.editPage.notify.createdMessage')
             });
             // 강사용 편집 경로로 이동 후 레슨 입력창 포커스 유도 쿼리 파라미터 추가
             navigate(`/instructor/courses/${saved.id}/edit?focus=new-lesson`);
             // 새 코스로 이동하면 초기 스냅샷 재설정 (다음 렌더에서 course 갱신 후 useEffect 처리)
         } else {
-            notifications.show({ color: 'teal', title: '저장 완료', message: '코스가 저장되었습니다.' });
+            notifications.show({ color: 'teal', title: t('course.editPage.notify.savedTitle'), message: t('course.editPage.notify.savedMessage') });
             // 스냅샷 갱신
             initialSnapshotRef.current = computeSnapshot();
             setDirty(false);
@@ -140,7 +143,7 @@ const CourseEditPage = () => {
     // ----- CRUD: Add / Remove / Move (공통) -----
     function openSectionModal() {
         if (!course) {
-            notifications.show({ color: 'red', title: '코스 필요', message: '먼저 코스를 저장하세요.' });
+            notifications.show({ color: 'red', title: t('course.editPage.notify.courseNeededTitle'), message: t('course.editPage.notify.courseNeededMessage') });
 
             return;
         }
@@ -178,51 +181,70 @@ const CourseEditPage = () => {
 
     function commitRename() {
         if (!renamingId) return;
-        const v = renameDraft.trim();
+        const trimmedRenameDraft = renameDraft.trim();
 
-        if (v.length < 2) {
-            notifications.show({ color: 'red', title: '이름 오류', message: '제목 2글자 이상 입력' });
-        }
+        if (trimmedRenameDraft.length < 2) {
+            notifications.show({ color: 'red', title: t('course.editPage.notify.renameErrorTitle'), message: t('course.editPage.notify.renameErrorMessage') });
 
-        if (v.length < 2) {
             return;
         }
-        patch({ id: renamingId, title: v });
+        patch({ id: renamingId, title: trimmedRenameDraft });
         setRenamingId(null);
         setRenameDraft('');
     }
 
     const [lessonModalOpen, setLessonModalOpen] = useState(false);
 
+    // useI18n t 사용 (keys already prepared)
+
     return (
         <PageContainer roleMain py={48} size="lg">
             <Group justify="space-between" mb="lg">
-                <Title order={2}>{id ? '코스 수정' : '새 코스 작성'}</Title>
+                <Title order={2}>{id ? t('course.editPage.titleEdit') : t('course.editPage.titleCreate')}</Title>
                 {id && (
                     <Button component={Link} size="sm" to={`/course/${id}`} variant="light">
-                        상세 보기
+                        {t('terms.viewDetails')}
                     </Button>
                 )}
             </Group>
             <Stack gap="md">
-                <TextInput label="제목" placeholder="코스 제목" size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
-                <TextInput label="요약" placeholder="간단 요약" size="sm" value={summary} onChange={(e) => setSummary(e.currentTarget.value)} />
-                <Textarea label="상세 설명" minRows={6} placeholder="코스 상세" size="sm" value={desc} onChange={(e) => setDesc(e.currentTarget.value)} />
+                <TextInput
+                    label={t('course.editPage.field.title')}
+                    placeholder={t('course.editPage.field.titlePlaceholder')}
+                    size="sm"
+                    value={title}
+                    onChange={(e) => setTitle(e.currentTarget.value)}
+                />
+                <TextInput
+                    label={t('course.editPage.field.summary')}
+                    placeholder={t('course.editPage.field.summaryPlaceholder')}
+                    size="sm"
+                    value={summary}
+                    onChange={(e) => setSummary(e.currentTarget.value)}
+                />
+                <Textarea
+                    label={t('course.editPage.field.desc')}
+                    minRows={6}
+                    placeholder={t('course.editPage.field.descPlaceholder')}
+                    size="sm"
+                    value={desc}
+                    onChange={(e) => setDesc(e.currentTarget.value)}
+                />
                 <Card withBorder p="md" radius="md" shadow="sm">
                     <Stack gap="sm">
                         <Group justify="space-between">
                             <Text fw={600} size="sm">
-                                섹션 & 레슨
+                                {t('course.editPage.lessons.header')}
                             </Text>
                             {course && (
                                 <Badge color="pink" variant="light">
-                                    {lessons.length}개 레슨
+                                    {t('course.editPage.lessons.count', { count: lessons.length })}
                                 </Badge>
                             )}
                         </Group>
                         {!course && (
                             <Text c="dimmed" size="sm">
-                                코스를 먼저 저장하면 레슨/섹션을 추가할 수 있습니다.
+                                {t('course.editPage.lessons.saveFirstHint')}
                             </Text>
                         )}
                         {course && (
@@ -231,17 +253,17 @@ const CourseEditPage = () => {
                                     <TextInput
                                         flex={1}
                                         id="new-lesson-input"
-                                        label="새 레슨 제목"
-                                        placeholder="예: 1. 소개"
+                                        label={t('course.editPage.lessons.newLessonLabel')}
+                                        placeholder={t('course.editPage.lessons.newLessonPlaceholder')}
                                         size="sm"
                                         value={newLessonTitle}
                                         onChange={(e) => setNewLessonTitle(e.currentTarget.value)}
                                     />
                                     <Button leftSection={<Plus size={14} />} size="sm" variant="light" onClick={handleAddLesson}>
-                                        레슨 추가
+                                        {t('course.editPage.lessons.addLesson')}
                                     </Button>
                                     <Button leftSection={<Split size={14} />} size="sm" variant="default" onClick={openSectionModal}>
-                                        섹션 구분 추가
+                                        {t('course.editPage.lessons.addSection')}
                                     </Button>
                                 </Group>
                                 <Divider my={6} />
@@ -300,12 +322,12 @@ const CourseEditPage = () => {
                                     })()}
                                     {lessons.some((l) => l.is_preview) === false && lessons.length > 0 && (
                                         <Text c="dimmed" size="xs">
-                                            현재 미리보기 레슨이 없습니다. (선택은 옵션)
+                                            {t('course.editPage.lessons.noPreview')}
                                         </Text>
                                     )}
                                     {lessons.length === 0 && course && (
                                         <Text c="dimmed" size="xs">
-                                            아직 레슨이 없습니다. 첫 레슨을 추가하세요.
+                                            {t('course.editPage.lessons.noLessons')}
                                         </Text>
                                     )}
                                 </Stack>
@@ -315,14 +337,15 @@ const CourseEditPage = () => {
                 </Card>
                 <Group justify="flex-end" mt="md">
                     <Button disabled={!title.trim()} leftSection={<Save size={14} />} size="xs" onClick={handleSave}>
-                        {dirty ? '변경 저장' : '저장'}
+                        {dirty ? t('course.editPage.save.saveChanges') : t('course.editPage.save.save')}
                     </Button>
                     <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => guardedNavigate(-1)}>
-                        {dirty ? '변경 취소' : '취소'}
+                        {dirty ? t('course.editPage.save.cancelChanges') : t('course.editPage.save.cancel')}
                     </Button>
                 </Group>
                 <Text c="dimmed" size="xs">
-                    단순화된 안내: 섹션은 is_section 플래그를 가진 헤더 행입니다. (드래그 정렬 / 고급 필드 추후) {dirty && ' · 미저장 변경 있음'}
+                    {t('course.editPage.save.inlineHelp')}
+                    {dirty && t('course.editPage.save.unsavedIndicator')}
                 </Text>
                 <LessonEditModal
                     lesson={editingLesson}

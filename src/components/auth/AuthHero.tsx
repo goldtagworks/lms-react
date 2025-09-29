@@ -1,5 +1,6 @@
 import { Card, List, rem, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { CheckCircle2 } from 'lucide-react';
+import { useI18n } from '@main/lib/i18n';
 
 interface AuthHeroProps {
     variant?: 'signin' | 'signup' | 'reset' | 'change';
@@ -9,6 +10,7 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
     const isSignUp = variant === 'signup';
     const isReset = variant === 'reset';
     const isChange = variant === 'change';
+    const { t } = useI18n();
 
     return (
         <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
@@ -18,10 +20,10 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
                         KSI LMS
                     </Title>
                     <Text c="dimmed" size="sm">
-                        {isSignUp && '지금 계정을 만들고 성장 여정을 시작하세요.'}
-                        {!isSignUp && !isReset && !isChange && '돌아오신 것을 환영합니다. 배움은 계속됩니다.'}
-                        {isReset && '비밀번호를 잊으셨나요? 몇 단계만 거치면 다시 로그인할 수 있습니다.'}
-                        {isChange && '보안을 강화하세요. 새 비밀번호는 이전 것과 충분히 달라야 합니다.'}
+                        {isSignUp && t('auth.hero.signUp')}
+                        {!isSignUp && !isReset && !isChange && t('auth.hero.signIn')}
+                        {isReset && t('auth.hero.reset')}
+                        {isChange && t('auth.hero.change')}
                     </Text>
                 </div>
                 {!isReset && !isChange && (
@@ -35,9 +37,9 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
                         size="sm"
                         spacing={6}
                     >
-                        <List.Item>언제든 빠르게 재개</List.Item>
-                        <List.Item>진도 자동 저장·연동</List.Item>
-                        <List.Item>수료증 발급 지원</List.Item>
+                        <List.Item>{t('auth.list.signin.1')}</List.Item>
+                        <List.Item>{t('auth.list.signin.2')}</List.Item>
+                        <List.Item>{t('auth.list.signin.3')}</List.Item>
                     </List>
                 )}
                 {isReset && (
@@ -51,9 +53,9 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
                         size="sm"
                         spacing={6}
                     >
-                        <List.Item>이메일 주소 확인</List.Item>
-                        <List.Item>재설정 링크 전송</List.Item>
-                        <List.Item>새 비밀번호 설정</List.Item>
+                        <List.Item>{t('auth.list.reset.1')}</List.Item>
+                        <List.Item>{t('auth.list.reset.2')}</List.Item>
+                        <List.Item>{t('auth.list.reset.3')}</List.Item>
                     </List>
                 )}
                 {isChange && (
@@ -67,9 +69,9 @@ export function AuthHero({ variant = 'signin' }: AuthHeroProps) {
                         size="sm"
                         spacing={6}
                     >
-                        <List.Item>강력한 조합 (문자+숫자)</List.Item>
-                        <List.Item>다른 서비스와 다른 비밀번호</List.Item>
-                        <List.Item>주기적 변경 권장</List.Item>
+                        <List.Item>{t('auth.list.change.1')}</List.Item>
+                        <List.Item>{t('auth.list.change.2')}</List.Item>
+                        <List.Item>{t('auth.list.change.3')}</List.Item>
                     </List>
                 )}
             </Stack>

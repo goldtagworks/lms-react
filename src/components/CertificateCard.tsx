@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Download, ArrowRight } from 'lucide-react';
 import { findCertificateById } from '@main/lib/repository';
 import { openCertificatePrintView } from '@main/lib/certificatePrint';
+import { useI18n } from '@main/lib/i18n';
 
 export interface CertificateCardProps {
     id: string;
@@ -16,6 +17,7 @@ export interface CertificateCardProps {
 // 간단한 표시 컴포넌트: 추후 성적/점수/강사명 추가 가능
 export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }: CertificateCardProps) {
     const date = new Date(issuedAt).toLocaleDateString();
+    const { t } = useI18n();
 
     return (
         <Card withBorder p="lg" radius="md" shadow="sm">
@@ -25,12 +27,12 @@ export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }
                         {courseTitle}
                     </Text>
                     <Badge color="teal" size="sm" variant="light">
-                        수료
+                        {t('certificate.issued')}
                     </Badge>
                 </Group>
                 <Group gap={12} justify="space-between" wrap="nowrap">
                     <Text c="dimmed" size="sm">
-                        발급일 {date}
+                        {t('certificate.issuedAt', { date })}
                     </Text>
                     <Text c="dimmed" size="sm">
                         #{serialNo}
@@ -38,14 +40,15 @@ export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }
                 </Group>
                 {!compact && (
                     <Text c="dimmed" lineClamp={2} size="sm">
-                        해당 강의 수료를 완료하여 발급된 인증서입니다. PDF 다운로드 또는 상세 페이지에서 검증 정보를 확인할 수 있습니다.
+                        {t('certificate.cardDescription')}
                     </Text>
                 )}
                 <Group gap={8} mt={4} wrap="nowrap">
                     <Button component={Link} leftSection={<ArrowRight size={14} />} size="sm" to={`/certificate/${id}`} variant="light">
-                        상세 보기
+                        {t('certificate.viewDetails')}
                     </Button>
                     <Button
+                        aria-label={t('certificate.pdfDownload')}
                         leftSection={<Download size={14} />}
                         size="sm"
                         variant="outline"
@@ -55,7 +58,7 @@ export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }
                             if (cert) openCertificatePrintView({ certificate: cert, courseTitle });
                         }}
                     >
-                        PDF
+                        {t('certificate.pdfDownload')}
                     </Button>
                 </Group>
             </Stack>

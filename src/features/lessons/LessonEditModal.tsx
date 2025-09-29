@@ -2,6 +2,7 @@ import type { Lesson } from '@main/types/lesson';
 
 import { Save, X } from 'lucide-react';
 import { Modal, Stack, TextInput, SegmentedControl, NumberInput, Textarea, Group, Button } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import { useEffect, useState, useCallback } from 'react';
 
 import { YOUTUBE_REGEX } from './constants';
@@ -30,6 +31,7 @@ export interface LessonEditModalProps {
 }
 
 export default function LessonEditModal({ lesson, opened, onClose, onSave }: LessonEditModalProps) {
+    const { t } = useI18n();
     const [draft, setDraft] = useState<LessonEditDraft | null>(null);
 
     // Initialize draft when lesson changes or opened
@@ -76,7 +78,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
         return (
             <Stack gap="sm" mt="xs">
                 <TextInput
-                    label="제목"
+                    label={t('lesson.edit.field.title')}
                     size="sm"
                     value={draft.title}
                     onChange={(e) => {
@@ -90,17 +92,17 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                         <SegmentedControl
                             fullWidth
                             data={[
-                                { label: '영상 없음', value: 'none' },
-                                { label: 'YouTube', value: 'youtube' },
-                                { label: 'CDN/기타', value: 'cdn' }
+                                { label: t('lesson.edit.videoType.none'), value: 'none' },
+                                { label: t('lesson.edit.videoType.youtube'), value: 'youtube' },
+                                { label: t('lesson.edit.videoType.cdn'), value: 'cdn' }
                             ]}
                             value={draft.videoType}
                             onChange={(v: any) => setDraft((d) => (d ? { ...d, videoType: v } : d))}
                         />
                         {draft.videoType !== 'none' && (
                             <TextInput
-                                label={draft.videoType === 'youtube' ? 'YouTube URL' : '영상 URL'}
-                                placeholder={draft.videoType === 'youtube' ? 'https://youtu.be/...' : 'https://cdn.example.com/video.mp4'}
+                                label={draft.videoType === 'youtube' ? t('lesson.edit.field.youtubeUrl') : t('lesson.edit.field.url')}
+                                placeholder={draft.videoType === 'youtube' ? t('lesson.edit.placeholder.youtube') : t('lesson.edit.placeholder.url')}
                                 size="sm"
                                 value={draft.url}
                                 onChange={(e) => {
@@ -110,11 +112,11 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                                 }}
                             />
                         )}
-                        <NumberInput label="길이(초)" min={0} value={draft.duration} onChange={(v) => setDraft((d) => (d ? { ...d, duration: Number(v) || 0 } : d))} />
+                        <NumberInput label={t('lesson.edit.field.durationSeconds')} min={0} value={draft.duration} onChange={(v) => setDraft((d) => (d ? { ...d, duration: Number(v) || 0 } : d))} />
                         <Textarea
-                            label="본문(Markdown)"
+                            label={t('lesson.edit.field.content')}
                             minRows={4}
-                            placeholder="# 제목\n내용 ..."
+                            placeholder={t('lesson.edit.placeholder.content')}
                             size="sm"
                             value={draft.content}
                             onChange={(e) => {
@@ -124,8 +126,8 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                             }}
                         />
                         <TextInput
-                            label="첨부 (쉼표 구분)"
-                            placeholder="file1.pdf, link2"
+                            label={t('lesson.edit.field.attachments')}
+                            placeholder={t('lesson.edit.placeholder.attachments')}
                             size="sm"
                             value={draft.attachments}
                             onChange={(e) => {
@@ -137,11 +139,11 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
                     </>
                 )}
                 <Group justify="flex-end" mt="sm">
-                    <Button leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
-                        저장
+                    <Button aria-label={t('common.save')} leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
+                        {t('common.save')}
                     </Button>
-                    <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
-                        닫기
+                    <Button aria-label={t('common.close')} leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
+                        {t('common.close')}
                     </Button>
                 </Group>
             </Stack>
@@ -149,7 +151,7 @@ export default function LessonEditModal({ lesson, opened, onClose, onSave }: Les
     }
 
     return (
-        <Modal centered withinPortal opened={opened && !!lesson} radius="md" size="lg" title="레슨 편집" onClose={onClose}>
+        <Modal centered withinPortal opened={opened && !!lesson} radius="md" size="lg" title={t(lesson?.is_section ? 'lesson.edit.sectionTitle' : 'lesson.edit.title')} onClose={onClose}>
             {body()}
         </Modal>
     );

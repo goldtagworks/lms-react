@@ -1,3 +1,4 @@
+/* i18n-ignore-start (dev-only quick navigation panel literals intentionally excluded) */
 import React, { useState } from 'react';
 import { Paper, Stack, Anchor, Text, Box, Badge, ActionIcon, Tooltip, Divider } from '@mantine/core';
 import { Link } from 'react-router-dom';
@@ -13,13 +14,16 @@ function CollapseIcon({ open }: { open: boolean }) {
  * 개발/데모 환경에서만 노출되는 빠른 이동 패널.
  * - production 번들에서는 import.meta.env.DEV 조건으로 자동 비표시
  * - 접근성: toggle 버튼에 aria-expanded / aria-controls 제공
- * - 추후 i18n 필요 시 051_copy_catalog.json 등록 (현재는 내부 개발 전용 라벨 유지)
+ * - i18n 전환 후: dev 전용라벨이므로 namespace JSON에 미등재 (프로덕션 노출 제거 전제)
  */
 export function DevQuickNav() {
     const { user } = useAuth();
     const [open, setOpen] = useState(true);
 
-    if (!import.meta.env.DEV) return null; // dev 전용
+    // Jest 환경 등 import.meta가 없을 수 있으므로 안전 가드
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    if (!isDev) return null; // dev 전용
 
     return (
         <Paper
@@ -88,7 +92,7 @@ export function DevQuickNav() {
                         <Divider my={4} />
                         <SectionLabel label="마이" />
                         <QuickLink label="마이페이지" to="/my" />
-                        <QuickLink label="위시리스트" to="/my/wishlist" />
+                        <QuickLink label="찜한 강의" to="/my/wishlist" />
                         <Divider my={4} />
                         <SectionLabel label="관리자" />
                         <QuickLink label="강사 신청 관리" to="/admin/instructors/apps" />
@@ -121,3 +125,4 @@ function QuickLink({ label, to }: { label: string; to: string }) {
 }
 
 export default DevQuickNav;
+/* i18n-ignore-end */

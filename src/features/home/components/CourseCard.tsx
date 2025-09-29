@@ -4,6 +4,7 @@ import { Eye } from 'lucide-react';
 import { TagChip } from '@main/components/TagChip';
 import { Link } from 'react-router-dom';
 import { AppImage } from '@main/components/AppImage';
+import { useI18n } from '@main/lib/i18n';
 
 import { CourseCardVM } from '../../../viewmodels/home';
 
@@ -14,6 +15,7 @@ interface CourseCardProps {
 
 function CourseCardBase({ course, to }: CourseCardProps) {
     const finalLink = to || `/course/${course.id}`;
+    const { t } = useI18n();
     const hasDiscount = !!course.sale_price_cents && course.sale_price_cents < course.list_price_cents;
 
     return (
@@ -46,17 +48,17 @@ function CourseCardBase({ course, to }: CourseCardProps) {
             <Group align="center" gap={8} mb={8}>
                 {course.avg_rating && (
                     <Text c="yellow.7" size="sm">
-                        ★ {course.avg_rating.toFixed(1)}
+                        ★ {t('home.card.rating', { rating: course.avg_rating.toFixed(1) }, `평점 ${course.avg_rating.toFixed(1)}`)}
                     </Text>
                 )}
                 {course.student_count && (
                     <Text c="dimmed" size="sm">
-                        수강생 {course.student_count.toLocaleString()}명
+                        {t('home.card.students', { count: course.student_count.toLocaleString() }, `수강생 ${course.student_count.toLocaleString()}명`)}
                     </Text>
                 )}
             </Group>
             <Button fullWidth component={Link} leftSection={<Eye size={16} />} mt="sm" radius="md" size="sm" to={finalLink} variant="light">
-                자세히 보기
+                {t('terms.viewDetails')}
             </Button>
         </Card>
     );

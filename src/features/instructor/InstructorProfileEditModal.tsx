@@ -2,6 +2,7 @@ import type { InstructorProfile } from '@main/lib/repository';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Modal, Stack, TextInput, Textarea, Group, Button, ActionIcon } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import { Plus, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { Save, X } from 'lucide-react';
 
@@ -13,6 +14,7 @@ export interface InstructorProfileEditModalProps {
 }
 
 export default function InstructorProfileEditModal({ opened, profile, onClose, onSave }: InstructorProfileEditModalProps) {
+    const { t } = useI18n();
     const [displayName, setDisplayName] = useState('');
     const [bio, setBio] = useState('');
     const [links, setLinks] = useState<{ label: string; url: string }[]>([]);
@@ -50,41 +52,67 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
     }
 
     return (
-        <Modal centered withinPortal opened={opened} radius="md" size="lg" title="프로필 수정" onClose={onClose}>
+        <Modal centered withinPortal opened={opened} radius="md" size="lg" title={t('instructor.edit.title')} onClose={onClose}>
             <Stack gap="sm" mt="xs">
-                <TextInput label="표시 이름" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
-                <Textarea label="소개 (Markdown)" minRows={6} placeholder="## 소개\n경력 요약 ..." value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
-                <TextInput label="표시 이름" size="sm" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
-                <Textarea label="소개 (Markdown)" minRows={6} placeholder="## 소개\n경력 요약 ..." size="sm" value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
+                <TextInput label={t('instructor.edit.displayName')} value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
+                <Textarea label={t('instructor.edit.bio')} minRows={6} placeholder={t('instructor.edit.bioPlaceholder')} value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
+                <TextInput label={t('instructor.edit.displayName')} size="sm" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
+                <Textarea label={t('instructor.edit.bio')} minRows={6} placeholder={t('instructor.edit.bioPlaceholder')} size="sm" value={bio} onChange={(e) => setBio(e.currentTarget.value)} />
                 <Group justify="space-between" mt="xs">
                     <Group gap={6}>
                         <LinkIcon size={16} />
-                        <TextInput disabled value="외부 링크" w={100} />
-                        <TextInput disabled size="sm" value="외부 링크" w={100} />
+                        <TextInput disabled value={t('instructor.edit.linkLabel')} w={100} />
+                        <TextInput disabled size="sm" value={t('instructor.edit.linkLabel')} w={100} />
                     </Group>
-                    <ActionIcon aria-label="링크 추가" variant="light" onClick={addLink}>
+                    <ActionIcon aria-label={t('instructor.edit.linkAdd')} variant="light" onClick={addLink}>
                         <Plus size={16} />
                     </ActionIcon>
                 </Group>
                 <Stack gap={6}>
                     {links.map((l, i) => (
                         <Group key={i} align="flex-end" gap={8} wrap="nowrap">
-                            <TextInput flex={1} label={`Label ${i + 1}`} placeholder="GitHub" value={l.label} onChange={(e) => updateLink(i, { label: e.currentTarget.value })} />
-                            <TextInput flex={2} label="URL" placeholder="https://" value={l.url} onChange={(e) => updateLink(i, { url: e.currentTarget.value })} />
-                            <TextInput flex={1} label={`Label ${i + 1}`} placeholder="GitHub" size="sm" value={l.label} onChange={(e) => updateLink(i, { label: e.currentTarget.value })} />
-                            <TextInput flex={2} label="URL" placeholder="https://" size="sm" value={l.url} onChange={(e) => updateLink(i, { url: e.currentTarget.value })} />
-                            <ActionIcon aria-label="삭제" color="red" mb={4} variant="subtle" onClick={() => removeLink(i)}>
+                            <TextInput
+                                flex={1}
+                                label={t('instructor.edit.linkLabelIndexed', { index: i + 1 })}
+                                placeholder={t('instructor.edit.linkPlaceholder')}
+                                value={l.label}
+                                onChange={(e) => updateLink(i, { label: e.currentTarget.value })}
+                            />
+                            <TextInput
+                                flex={2}
+                                label={t('instructor.edit.url')}
+                                placeholder={t('instructor.edit.urlPlaceholder')}
+                                value={l.url}
+                                onChange={(e) => updateLink(i, { url: e.currentTarget.value })}
+                            />
+                            <TextInput
+                                flex={1}
+                                label={t('instructor.edit.linkLabelIndexed', { index: i + 1 })}
+                                placeholder={t('instructor.edit.linkPlaceholder')}
+                                size="sm"
+                                value={l.label}
+                                onChange={(e) => updateLink(i, { label: e.currentTarget.value })}
+                            />
+                            <TextInput
+                                flex={2}
+                                label={t('instructor.edit.url')}
+                                placeholder={t('instructor.edit.urlPlaceholder')}
+                                size="sm"
+                                value={l.url}
+                                onChange={(e) => updateLink(i, { url: e.currentTarget.value })}
+                            />
+                            <ActionIcon aria-label={t('instructor.edit.linkRemove')} color="red" mb={4} variant="subtle" onClick={() => removeLink(i)}>
                                 <Trash2 size={16} />
                             </ActionIcon>
                         </Group>
                     ))}
                 </Stack>
                 <Group justify="flex-end" mt="sm">
-                    <Button disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
-                        저장
+                    <Button aria-label={t('common.save')} disabled={displayName.trim().length < 2} leftSection={<Save size={16} />} size="sm" onClick={handleSave}>
+                        {t('common.save')}
                     </Button>
-                    <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
-                        취소
+                    <Button aria-label={t('common.cancel')} leftSection={<X size={16} />} size="sm" variant="default" onClick={onClose}>
+                        {t('common.cancel')}
                     </Button>
                 </Group>
             </Stack>

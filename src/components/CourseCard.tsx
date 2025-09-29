@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Card, Title, Badge, Group, Button, CardProps } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { TextBody, TextMeta } from './typography';
 
@@ -13,6 +14,8 @@ interface CourseCardProps extends CardProps {
 }
 
 const CourseCardComponent = ({ title, level, percent, price, weeks, lessons, ...cardProps }: CourseCardProps) => {
+    const { t } = useTranslation();
+
     return (
         <Card withBorder radius="md" shadow="md" {...cardProps}>
             <Title mb="sm" order={4} size="lg">
@@ -29,7 +32,7 @@ const CourseCardComponent = ({ title, level, percent, price, weeks, lessons, ...
                     {weeks}주 · {lessons}차시
                 </TextMeta>
                 <Button color="primary" component="a" href="#detail" size="sm">
-                    자세히
+                    {t('terms.viewDetails')}
                 </Button>
             </Group>
         </Card>

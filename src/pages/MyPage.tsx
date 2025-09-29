@@ -9,12 +9,14 @@ import { useState, useEffect } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
 import { useEnrollmentsState, useCourses, isEnrolled, isWishlisted } from '@main/lib/repository';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
+import { useI18n } from '@main/lib/i18n';
 import AppImage from '@main/components/AppImage';
 import { TagChip } from '@main/components/TagChip';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import PriceText from '@main/components/price/PriceText';
 
 export default function MyPage() {
+    const { t } = useI18n();
     const { user } = useAuth();
     const userId = user?.id;
     const enrollments = useEnrollmentsState(userId);
@@ -36,27 +38,27 @@ export default function MyPage() {
                 actions={
                     <Group gap="xs">
                         <Button color="orange" component={Link} leftSection={<List size={16} />} size="sm" to="/courses" variant="light">
-                            코스 목록
+                            {t('nav.courses', {}, '코스 목록')}
                         </Button>
                         <Button color="green" component={Link} leftSection={<Heart size={16} />} size="sm" to="/my/wishlist" variant="light">
-                            위시리스트
+                            {t('terms.favoriteAdd')}
                         </Button>
                         <Button color="violet" component={Link} leftSection={<Award size={16} />} size="sm" to="/my/certificates" variant="light">
-                            수료증
+                            {t('nav.certificates', {}, '수료증')}
                         </Button>
                         <Button component={Link} leftSection={<Home size={16} />} size="sm" to="/" variant="outline">
-                            홈으로
+                            {t('nav.home', {}, '홈으로')}
                         </Button>
                     </Group>
                 }
-                description="내 정보, 수강 내역, 수료증, 위시리스트 등을 관리할 수 있습니다."
-                title="마이페이지"
+                description={t('empty.myPageIntro', { favorite: t('terms.favoriteAdd', {}, '찜') }, `내 정보, 수강 내역, 수료증, ${t('terms.favoriteAdd', {}, '찜')} 목록 등을 관리할 수 있습니다.`)}
+                title={t('nav.myPage', {}, '마이페이지')}
             />
             <Card withBorder p="lg" radius="md" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
-                            수강중 강의
+                            {t('empty.enrolledCoursesHeader', {}, '수강중 강의')}
                         </Text>
                         {userId && enrolledCourses.length > 0 && (
                             <Badge color="teal" variant="light">
@@ -64,8 +66,22 @@ export default function MyPage() {
                             </Badge>
                         )}
                     </Group>
-                    {!userId && <EmptyState actionLabel="로그인" message="로그인 후 수강 내역을 확인할 수 있습니다." title="로그인 필요" to="/signin" />}
-                    {userId && enrolledCourses.length === 0 && <EmptyState actionLabel="강의 탐색" message="아직 수강중인 강의가 없습니다." title="수강중 강의 없음" to="/courses" />}
+                    {!userId && (
+                        <EmptyState
+                            actionLabel={t('common.login', {}, '로그인')}
+                            message={t('empty.enrollmentsLoginNeeded', {}, '로그인 후 수강 내역을 확인할 수 있습니다.')}
+                            title={t('empty.loginRequired', {}, '로그인 필요')}
+                            to="/signin"
+                        />
+                    )}
+                    {userId && enrolledCourses.length === 0 && (
+                        <EmptyState
+                            actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}
+                            message={t('empty.enrollmentsNone', {}, '아직 수강중인 강의가 없습니다.')}
+                            title={t('empty.enrollmentsEmpty', {}, '수강중 강의 없음')}
+                            to="/courses"
+                        />
+                    )}
                     {userId && enrolledCourses.length > 0 && (
                         <CourseGrid mt="md">
                             {paged.map((course) => {
@@ -87,7 +103,7 @@ export default function MyPage() {
                                                 )}
                                                 {wish && (
                                                     <Badge color="pink" size="xs">
-                                                        위시
+                                                        {t('terms.favoriteAdd')}
                                                     </Badge>
                                                 )}
                                             </Group>
@@ -126,7 +142,7 @@ export default function MyPage() {
                                             to={`/course/${course.id}`}
                                             variant="light"
                                         >
-                                            이어서 학습
+                                            {t('empty.continueLearning', {}, '이어서 학습')}
                                         </Button>
                                     </Card>
                                 );

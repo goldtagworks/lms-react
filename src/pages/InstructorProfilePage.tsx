@@ -5,6 +5,7 @@ import { useAuth } from '@main/lib/auth';
 import { ensureInstructorProfile, useInstructorProfile, upsertInstructorProfile, curateInstructorCourses } from '@main/lib/repository';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import AppImage from '@main/components/AppImage';
+import { useTranslation } from 'react-i18next';
 import PriceText from '@main/components/price/PriceText';
 import { TagChip } from '@main/components/TagChip';
 import MarkdownViewer from '@main/components/MarkdownViewer';
@@ -90,6 +91,8 @@ const InstructorProfilePage = () => {
         );
     }
 
+    const { t } = useTranslation();
+
     return (
         <PageContainer roleMain py={48} size="lg">
             <Stack gap="xl">
@@ -132,7 +135,7 @@ const InstructorProfilePage = () => {
                                 )}
                                 <PriceText discount={curation.featured.sale_price_cents ?? undefined} price={curation.featured.list_price_cents} />
                                 <Button fullWidth component="a" href={`/course/${curation.featured.id}`} mt="sm" radius="md" size="sm" target="_blank" variant="light">
-                                    상세 보기
+                                    {t('terms.viewDetails')}
                                 </Button>
                             </Card>
                         )}
@@ -163,7 +166,7 @@ const InstructorProfilePage = () => {
                                 )}
                                 <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} />
                                 <Button fullWidth component="a" href={`/course/${c.id}`} mt="sm" radius="md" size="sm" target="_blank" variant="light">
-                                    상세 보기
+                                    {t('terms.viewDetails')}
                                 </Button>
                             </Card>
                         ))}

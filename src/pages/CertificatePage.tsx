@@ -5,6 +5,8 @@ import PageHeader from '@main/components/layout/PageHeader';
 import { findCertificateById, getAttemptMeta, upsertAttemptMeta, useCertificate, useCourses } from '@main/lib/repository';
 import { openCertificatePrintView } from '@main/lib/certificatePrint';
 import { useEffect, useMemo } from 'react';
+import { formatDateTime, formatScore } from '@main/lib/format';
+import { useI18n } from '@main/lib/i18n';
 
 // (임시) 방문 시 샘플 attempt 메타 자동 주입: 실제 구현에서는 채점 완료 시 저장
 function ensureSampleAttemptMeta(certId: string | undefined) {
@@ -35,14 +37,17 @@ const CertificatePage = () => {
         // enrollment_id 패턴: enr-... -> course id 추출 불가(현재 스키마로 직접 매핑 없음). 데모: 전체 중 첫 번째 코스명 or placeholder.
         // 실제 구현 시 certificate -> enrollment -> course join 필요.
 
-        return courses[0]?.title || '수료 강의';
+        // course title placeholder (i18n demo) - using certificate.title if missing
+        return courses[0]?.title || t('certificate.title');
     }, [cert, courses]);
+
+    const { t } = useI18n();
 
     if (!id) {
         return (
             <PageContainer roleMain>
-                <Alert color="red" title="잘못된 경로">
-                    수료증 ID가 제공되지 않았습니다.
+                <Alert color="red" title={t('certificate.invalidPathTitle')}>
+                    {t('certificate.invalidPathMessage')}
                 </Alert>
             </PageContainer>
         );
@@ -51,20 +56,21 @@ const CertificatePage = () => {
     if (!cert) {
         return (
             <PageContainer roleMain>
-                <Alert color="yellow" title="수료증 없음">
-                    해당 ID의 수료증을 찾을 수 없습니다. 목록에서 다시 시도해주세요.
+                <Alert color="yellow" title={t('certificate.notFoundTitle')}>
+                    {t('certificate.notFoundMessage')}
                 </Alert>
             </PageContainer>
         );
     }
 
     const passed = attemptMeta?.passed;
-    const scoreText = attemptMeta?.score != null ? `${attemptMeta.score}점` : '—';
-    const passScoreText = attemptMeta?.pass_score != null ? `${attemptMeta.pass_score}점` : '—';
+    const unit = t('certificate.scoreUnit');
+    const scoreText = formatScore(attemptMeta?.score) + (attemptMeta?.score != null ? unit : '');
+    const passScoreText = formatScore(attemptMeta?.pass_score) + (attemptMeta?.pass_score != null ? unit : '');
 
     return (
         <PageContainer roleMain>
-            <PageHeader description="데모 환경 수료증 상세입니다. 실제 서비스에서는 검증 코드 및 시험 세부 이력이 표시됩니다." title="수료증" />
+            <PageHeader description={t('certificate.pageDescDemo')} title={t('certificate.pageTitle')} />
             <Card withBorder padding="xl" radius="md" shadow="sm">
                 <Stack gap="lg">
                     <Group align="flex-start" justify="space-between">
@@ -73,18 +79,18 @@ const CertificatePage = () => {
                             <Group gap="xs" mt={8}>
                                 {passed != null && (
                                     <Badge color={passed ? 'teal' : 'red'} variant="light">
-                                        {passed ? '합격' : '불합격'}
+                                        {passed ? t('certificate.passed') : t('certificate.failed')}
                                     </Badge>
                                 )}
-                                <Badge variant="outline">데모</Badge>
+                                <Badge variant="outline">{t('certificate.demoBadge')}</Badge>
                             </Group>
                         </div>
                         <Group gap="xs">
                             <Button component={Link} size="sm" to="/my/certificates" variant="light">
-                                목록으로
+                                {t('certificate.backList')}
                             </Button>
                             <Button component={Link} size="sm" to="/my" variant="outline">
-                                마이페이지
+                                {t('certificate.backMyPage')}
                             </Button>
                         </Group>
                     </Group>
@@ -93,15 +99,15 @@ const CertificatePage = () => {
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
                                 <Text c="dimmed" size="sm">
-                                    일련번호
+                                    {t('certificate.serial')}
                                 </Text>
                                 <Group gap="xs" wrap="nowrap">
                                     <Text fw={500}>{cert.serial_no}</Text>
                                     <CopyButton timeout={1500} value={cert.serial_no}>
                                         {({ copied, copy }) => (
-                                            <Tooltip withArrow label={copied ? '복사됨' : '복사'}>
+                                            <Tooltip withArrow label={copied ? t('certificate.copied') : t('certificate.copy')}>
                                                 <Button color={copied ? 'teal' : 'gray'} size="sm" variant={copied ? 'filled' : 'light'} onClick={copy}>
-                                                    {copied ? '복사됨' : '복사'}
+                                                    {copied ? t('certificate.copied') : t('certificate.copy')}
                                                 </Button>
                                             </Tooltip>
                                         )}
@@ -112,15 +118,15 @@ const CertificatePage = () => {
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
                                 <Text c="dimmed" size="sm">
-                                    발급일
+                                    {t('certificate.issuedDateLabel')}
                                 </Text>
-                                <Text fw={500}>{new Date(cert.issued_at).toLocaleString()}</Text>
+                                <Text fw={500}>{formatDateTime(cert.issued_at)}</Text>
                             </Stack>
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
                                 <Text c="dimmed" size="smsm">
-                                    점수 / 합격기준
+                                    {t('certificate.scoreAndPass')}
                                 </Text>
                                 <Text fw={500}>
                                     {scoreText} / {passScoreText}
@@ -130,7 +136,7 @@ const CertificatePage = () => {
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Stack gap={4}>
                                 <Text c="dimmed" size="sm">
-                                    시험명
+                                    {t('certificate.examTitle')}
                                 </Text>
                                 <Text fw={500}>{attemptMeta?.exam_title || '—'}</Text>
                             </Stack>
@@ -138,13 +144,13 @@ const CertificatePage = () => {
                         <Grid.Col span={12}>
                             <Box mt="sm">
                                 <Button size="sm" variant="filled" onClick={() => openCertificatePrintView({ certificate: cert, courseTitle })}>
-                                    PDF 다운로드
+                                    {t('certificate.pdfDownload')}
                                 </Button>
                             </Box>
                         </Grid.Col>
                     </Grid>
-                    <Alert color="gray" title="데모 안내" variant="light">
-                        이 수료증 데이터는 로컬 세션 스토리지에만 저장되며 실제 검증 기능/예비 위변조 방지 요소는 포함되어 있지 않습니다.
+                    <Alert color="gray" title={t('certificate.demoNoticeTitle')} variant="light">
+                        {t('certificate.demoNoticeBody')}
                     </Alert>
                 </Stack>
             </Card>

@@ -1,6 +1,7 @@
 import { AppShell } from '@mantine/core';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
 
 import Header from './Header';
 import Navbar from './Navbar';
@@ -12,6 +13,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
     const [navOpened, { toggle: toggleNav, close: closeNav }] = useDisclosure(false);
+    const { t } = useTranslation();
     const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine sm breakpoint (≈768px)
     const burgerRef = useRef<HTMLButtonElement>(null!);
     const firstNavFocusRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
@@ -67,11 +69,33 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {...(appShellNavbarProp ? { navbar: appShellNavbarProp } : {})}
             padding={0}
         >
+            <a
+                className="skip-link"
+                href="#app-main"
+                style={{
+                    background: 'var(--mantine-color-blue-6)',
+                    borderRadius: 4,
+                    color: 'white',
+                    left: -9999,
+                    padding: '8px 12px',
+                    position: 'absolute',
+                    top: 0,
+                    zIndex: 10000
+                }}
+                onBlur={(e) => {
+                    e.currentTarget.style.left = '-9999px';
+                }}
+                onFocus={(e) => {
+                    e.currentTarget.style.left = '8px';
+                }}
+            >
+                {t('a11y.skipToContent')}
+            </a>
             <AppShell.Header style={{ backgroundColor: 'color-mix(in srgb, var(--mantine-color-body), transparent 50%)', backdropFilter: 'blur(5px)' }}>
                 <Header burgerRef={burgerRef} navOpened={navOpened} toggleNav={toggleNav} />
             </AppShell.Header>
             {navOpened && (
-                <div aria-label="주 메뉴" id="global-nav-panel" role="navigation" style={panelStyle}>
+                <div aria-label={t('a11y.mainNav')} id="global-nav-panel" role="navigation" style={panelStyle}>
                     <div style={{ padding: 'var(--mantine-spacing-md)' }}>
                         <Navbar closeNav={closeNav} firstFocusableRef={firstNavFocusRef} />
                     </div>
@@ -96,7 +120,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                     }}
                 />
             )}
-            <AppShell.Main bg="light-dark(#f8fafc, #181c1f)" id="main">
+            <AppShell.Main bg="light-dark(#f8fafc, #181c1f)" className="min-h-app-vh" id="app-main">
                 {children}
             </AppShell.Main>
             <AppShell.Footer>
