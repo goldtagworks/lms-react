@@ -1,6 +1,5 @@
 import { Group } from '@mantine/core';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Heart, HeartOff, LogIn, BookOpen } from 'lucide-react';
 
 import { AppButton } from './AppButton';
@@ -43,8 +42,8 @@ export function EnrollWishlistActions({ enrolled, wish, userId, size = 'xs', onE
     if (!userId) {
         return (
             <Group grow gap={8}>
-                <AppButton component={Link} href="/signin" label={t.loginRequired} leftSection={<LogIn size={14} />} roleName="primary" size={size} />
-                <AppButton component={Link} href="/signin" label={t.wishAdd} leftSection={<Heart size={14} />} roleName="add" size={size} />
+                <AppButton href="/signin" label={t.loginRequired} leftSection={<LogIn size={14} />} roleName="primary" size={size} />
+                <AppButton href="/signin" label={t.wishAdd} leftSection={<Heart size={14} />} roleName="add" size={size} />
             </Group>
         );
     }

@@ -89,10 +89,10 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                             </Menu.Target>
                             <Menu.Dropdown aria-label="계정 메뉴">
                                 <Menu.Label>계정</Menu.Label>
-                                <Menu.Item component="a" href="/my">
+                                <Menu.Item component={Link} to="/my">
                                     마이페이지
                                 </Menu.Item>
-                                <Menu.Item component="a" href="/password/change">
+                                <Menu.Item component={Link} to="/password/change">
                                     비밀번호 변경
                                 </Menu.Item>
                                 <Menu.Item

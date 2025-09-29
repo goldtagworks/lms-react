@@ -1,5 +1,6 @@
 import { Button, ButtonProps } from '@mantine/core';
 import { memo } from 'react';
+import { Link } from 'react-router-dom';
 
 import { applyRoleProps, ButtonRole } from '../lib/buttonRoles';
 
@@ -21,8 +22,26 @@ const AppButtonComponent = ({ label, href, roleName, ...props }: AppButtonProps)
         if (!finalProps.variant) finalProps.variant = 'subtle';
     }
 
+    const isInternal = href && href.startsWith('/') && !href.startsWith('//');
+
+    if (href && isInternal) {
+        return (
+            <Button component={Link} radius="md" to={href} {...finalProps}>
+                {label}
+            </Button>
+        );
+    }
+
+    if (href) {
+        return (
+            <Button component="a" href={href} radius="md" {...finalProps}>
+                {label}
+            </Button>
+        );
+    }
+
     return (
-        <Button component={href ? 'a' : 'button'} href={href} radius="md" {...finalProps}>
+        <Button radius="md" {...finalProps}>
             {label}
         </Button>
     );
