@@ -18,16 +18,6 @@ import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
 // Removed react-i18next usage in favor of internal i18n hook
 
-const categories = [
-    { value: 'all', label: '전체' },
-    { value: 'frontend', label: '프론트엔드' },
-    { value: 'backend', label: '백엔드' },
-    { value: 'data', label: '데이터분석' },
-    { value: 'ai', label: 'AI/ML' },
-    { value: 'cert', label: '자격증' },
-    { value: 'biz', label: '비즈니스' }
-];
-
 // 기존 mock 제거 → repository seed 사용
 
 const CourseListPage = () => {
@@ -98,9 +88,19 @@ const CourseListPage = () => {
 
     const { t } = useI18n();
 
+    const categories = [
+        { value: 'all', label: t('category.all', {}, '전체') },
+        { value: 'frontend', label: t('category.frontend', {}, '프론트엔드') },
+        { value: 'backend', label: t('category.backend', {}, '백엔드') },
+        { value: 'data', label: t('category.data', {}, '데이터분석') },
+        { value: 'ai', label: t('category.ai', {}, 'AI/ML') },
+        { value: 'cert', label: t('category.cert', {}, '자격증') },
+        { value: 'biz', label: t('category.biz', {}, '비즈니스') }
+    ];
+
     return (
         <PageContainer roleMain>
-            <PageHeader isMainTitle description="카테고리/정렬/검색을 활용해 원하는 강의를 찾아보세요." title="전체 강의" />
+            <PageHeader isMainTitle description={t('course.list.description')} title={t('course.list.title')} />
             <PageSection withGapTop={false}>
                 {/* 필터/정렬/검색 UI */}
                 <Group gap="md" mb="xl" wrap="wrap">
@@ -108,9 +108,9 @@ const CourseListPage = () => {
                     <Select
                         aria-label={t('a11y.sortSelect', {}, '정렬')}
                         data={[
-                            { value: 'latest', label: '최신순' },
-                            { value: 'popular', label: '인기순' },
-                            { value: 'rating', label: '평점순' }
+                            { value: 'latest', label: t('sort.latest', {}, '최신순') },
+                            { value: 'popular', label: t('sort.popular', {}, '인기순') },
+                            { value: 'rating', label: t('sort.rating', {}, '평점순') }
                         ]}
                         defaultValue="latest"
                         size="sm"
@@ -140,12 +140,12 @@ const CourseListPage = () => {
                                     <Group gap={4}>
                                         {enrolled && (
                                             <Badge color="green" size="xs">
-                                                수강중
+                                                {t('enroll.enrolled', {}, '수강중')}
                                             </Badge>
                                         )}
                                         {wish && (
                                             <Badge color="pink" size="xs">
-                                                {t('terms.favoriteAdd')}
+                                                {t('common.favorite.add')}
                                             </Badge>
                                         )}
                                     </Group>

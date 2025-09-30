@@ -79,7 +79,7 @@ const CertificatePage = () => {
                             <Group gap="xs" mt={8}>
                                 {passed != null && (
                                     <Badge color={passed ? 'teal' : 'red'} variant="light">
-                                        {passed ? t('certificate.passed') : t('certificate.failed')}
+                                        {passed ? t('result.pass') : t('result.fail')}
                                     </Badge>
                                 )}
                                 <Badge variant="outline">{t('certificate.demoBadge')}</Badge>
@@ -105,9 +105,9 @@ const CertificatePage = () => {
                                     <Text fw={500}>{cert.serial_no}</Text>
                                     <CopyButton timeout={1500} value={cert.serial_no}>
                                         {({ copied, copy }) => (
-                                            <Tooltip withArrow label={copied ? t('certificate.copied') : t('certificate.copy')}>
+                                            <Tooltip withArrow label={copied ? t('common.copied') : t('common.copyLink')}>
                                                 <Button color={copied ? 'teal' : 'gray'} size="sm" variant={copied ? 'filled' : 'light'} onClick={copy}>
-                                                    {copied ? t('certificate.copied') : t('certificate.copy')}
+                                                    {copied ? t('common.copied') : t('common.copyLink')}
                                                 </Button>
                                             </Tooltip>
                                         )}

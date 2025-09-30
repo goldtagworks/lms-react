@@ -24,7 +24,7 @@ const InstructorProfilePage = () => {
 
     // 초기 프로필 보장 (승인된 강사 시나리오는 mock, 여기서는 단순 보장)
     useEffect(() => {
-        if (instructorId) ensureInstructorProfile(instructorId, { display_name: '강사' });
+        if (instructorId) ensureInstructorProfile(instructorId, { display_name: t('instructor.edit.displayName') });
     }, [instructorId]);
 
     const curation = useMemo(() => curateInstructorCourses(instructorId, { limit: 4 }), [instructorId]);
@@ -65,7 +65,7 @@ const InstructorProfilePage = () => {
                         </Badge>
                         {canEdit && (
                             <Button leftSection={<Edit size={14} />} size="sm" variant="subtle" onClick={() => setEditOpen(true)}>
-                                프로필 수정
+                                {t('instructor.edit.title')}
                             </Button>
                         )}
                     </Group>
@@ -97,11 +97,11 @@ const InstructorProfilePage = () => {
         <PageContainer roleMain py={48} size="lg">
             <Stack gap="xl">
                 {hero()}
-                <Divider label="강의" labelPosition="center" my="md" />
+                <Divider label={t('instructor.profile.coursesDivider')} labelPosition="center" my="md" />
                 {curation.allCount === 0 && (
                     <Card withBorder padding="lg" radius="md">
                         <Text c="dimmed" size="sm">
-                            아직 공개된 강의가 없습니다.
+                            {t('instructor.profile.emptyCourses')}
                         </Text>
                     </Card>
                 )}
@@ -149,7 +149,7 @@ const InstructorProfilePage = () => {
                                     <Group gap={4}>
                                         {c.is_featured && (
                                             <Badge color="teal" size="xs" variant="light">
-                                                추천
+                                                {t('instructor.profile.featuredBadge')}
                                             </Badge>
                                         )}
                                     </Group>
@@ -175,7 +175,7 @@ const InstructorProfilePage = () => {
                 {curation.allCount > (curation.featured ? 1 : 0) + curation.others.length && (
                     <Group justify="center" mt="md">
                         <Anchor href={`/courses?instructor=${instructorId}`} size="sm">
-                            전체 강의 보기 ({curation.allCount}개)
+                            {t('instructor.profile.allCoursesLink', { count: curation.allCount })}
                         </Anchor>
                     </Group>
                 )}

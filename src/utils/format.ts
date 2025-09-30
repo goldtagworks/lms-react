@@ -1,5 +1,9 @@
+import { t } from '@main/lib/i18n';
+
 export function formatPrice(value: number): string {
-    return `${value.toLocaleString()}원`;
+    const formatted = value.toLocaleString();
+
+    return t('price.currencyWon', { value: formatted }, `${formatted}원`);
 }
 
 export function formatDate(iso: string): string {

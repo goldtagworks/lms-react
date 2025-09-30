@@ -123,8 +123,8 @@ export default function NoticeDetailPage() {
                             </Tooltip>
                         )}
                         {isAdmin && (
-                            <Tooltip withArrow label={t('notice.delete')}>
-                                <ActionIcon aria-label={t('notice.delete')} color="red" variant="subtle" onClick={handleDelete}>
+                            <Tooltip withArrow label={t('common.delete')}>
+                                <ActionIcon aria-label={t('common.delete')} color="red" variant="subtle" onClick={handleDelete}>
                                     <Trash2 size={16} />
                                 </ActionIcon>
                             </Tooltip>

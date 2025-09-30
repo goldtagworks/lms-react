@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useI18n } from '@main/lib/i18n';
 import { Box, BoxProps, Skeleton, useMantineTheme } from '@mantine/core';
 
 export interface AppImageProps extends Omit<BoxProps, 'src'> {
@@ -37,6 +38,8 @@ export function AppImage({
     const resolvedRadius = typeof radius === 'number' ? `${radius}px` : (theme.radius as any)[radius as string] || radius;
     const resolvedShadow = shadow && (theme.shadows as any)[shadow] ? (theme.shadows as any)[shadow] : shadow;
 
+    const { t } = useI18n();
+
     return (
         <Box pos="relative" style={{ width, height, ...style }} {...rest}>
             {loadingSkeleton && !loaded && !error && <Skeleton h={height} radius={resolvedRadius as any} visible={true} w={width} />}
@@ -72,7 +75,7 @@ export function AppImage({
                         color: 'var(--mantine-color-dimmed)'
                     }}
                 >
-                    이미지 오류
+                    {t('image.error')}
                 </Box>
             )}
         </Box>

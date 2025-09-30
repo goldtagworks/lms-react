@@ -193,9 +193,9 @@ const AdminUsersPage = () => {
                                                 <Shield size={14} />
                                             </ActionIcon>
                                         </Tooltip>
-                                        <Tooltip label={u.id === current?.id ? t('admin.users.action.selfDeactivateBlock') : t('admin.users.action.deactivate')}>
+                                        <Tooltip label={u.id === current?.id ? t('admin.users.action.selfDeactivateBlock') : t('common.deactivate')}>
                                             <ActionIcon
-                                                aria-label={t('admin.users.action.deactivate')}
+                                                aria-label={t('common.deactivate')}
                                                 color="red"
                                                 disabled={u.id === current?.id}
                                                 size="sm"
@@ -251,7 +251,7 @@ const AdminUsersPage = () => {
                 <TextBody>{t('admin.users.modal.deactivateConfirm')}</TextBody>
                 <Group justify="flex-end" mt="md">
                     <Button color="red" leftSection={<Trash2 size={14} />} size="sm" onClick={handleRemove}>
-                        {t('admin.users.action.deactivate')}
+                        {t('common.deactivate')}
                     </Button>
                     <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setConfirmRemove(null)}>
                         {t('common.cancel')}

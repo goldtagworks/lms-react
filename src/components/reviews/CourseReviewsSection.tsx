@@ -137,7 +137,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled }: Pro
                         />
                         <Group justify="flex-end" mt="sm">
                             <Button leftSection={<Save size={16} />} size="sm" onClick={handleSubmit}>
-                                {t('review.actions.save', undefined, '저장')}
+                                {t('common.save', undefined, '저장')}
                             </Button>
                         </Group>
                     </Card>

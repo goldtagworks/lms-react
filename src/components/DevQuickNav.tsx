@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Paper, Stack, Anchor, Text, Box, Badge, ActionIcon, Tooltip, Divider } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
+import { t } from '@main/lib/i18n';
 
 // 간단한 텍스트 아이콘 (외부 아이콘 패키지 제거)
 function CollapseIcon({ open }: { open: boolean }) {
@@ -28,7 +29,7 @@ export function DevQuickNav() {
     return (
         <Paper
             withBorder
-            aria-label="개발 빠른 이동 패널"
+            aria-label={t('a11y.devQuickNav')}
             p="xs"
             radius="md"
             shadow="sm"
@@ -46,8 +47,8 @@ export function DevQuickNav() {
                             </Badge>
                         </Box>
                     )}
-                    <Tooltip withArrow label={open ? '접기' : '펼치기'} position="left">
-                        <ActionIcon aria-label={open ? '패널 접기' : '패널 펼치기'} size="sm" variant="subtle" onClick={() => setOpen((o) => !o)}>
+                    <Tooltip withArrow label={open ? t('a11y.collapse') : t('a11y.expand')} position="left">
+                        <ActionIcon aria-label={open ? t('a11y.panelCollapse') : t('a11y.panelExpand')} size="sm" variant="subtle" onClick={() => setOpen((o) => !o)}>
                             <CollapseIcon open={open} />
                         </ActionIcon>
                     </Tooltip>

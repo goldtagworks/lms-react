@@ -67,7 +67,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
                                     </Badge>
                                 )}
                                 <Button disabled={!title.trim() || !body.trim()} size="sm" onClick={handleAsk}>
-                                    {t('qna.register', undefined, '등록')}
+                                    {t('common.submit', undefined, '제출')}
                                 </Button>
                             </Group>
                         </Group>
@@ -204,16 +204,16 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                     )}
                     {!isResolved && !editMode && isPrivate !== undefined && (
                         <Button size="sm" variant="subtle" onClick={startEdit}>
-                            {t('qna.edit', undefined, '수정')}
+                            {t('common.edit', undefined, '수정')}
                         </Button>
                     )}
                     {editMode && (
                         <Group gap={4} wrap="nowrap">
                             <Button color="gray" size="sm" variant="subtle" onClick={cancelEdit}>
-                                {t('qna.cancel', undefined, '취소')}
+                                {t('common.cancel', undefined, '취소')}
                             </Button>
                             <Button size="sm" variant="light" onClick={saveEdit}>
-                                {t('qna.save', undefined, '저장')}
+                                {t('common.save', undefined, '저장')}
                             </Button>
                         </Group>
                     )}
@@ -254,7 +254,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                                     </Badge>
                                 )}
                                 <Button disabled={!answerBody.trim()} size="sm" onClick={submitAnswer}>
-                                    {t('qna.register', undefined, '등록')}
+                                    {t('common.submit', undefined, '제출')}
                                 </Button>
                             </Group>
                         </Card>

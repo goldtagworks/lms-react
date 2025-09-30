@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useI18n } from '@main/lib/i18n';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Box, Text } from '@mantine/core';
@@ -15,6 +16,7 @@ interface MarkdownViewProps {
 const disallowed: string[] = ['script', 'iframe', 'style'];
 
 export default function MarkdownView({ source, className, compact, clampLines }: MarkdownViewProps) {
+    const { t } = useI18n();
     const content = (source || '').trim();
     const isEmpty = content.length === 0;
 
@@ -53,7 +55,7 @@ export default function MarkdownView({ source, className, compact, clampLines }:
             ),
             a: (props: any) => (
                 <a rel="noopener noreferrer" style={{ color: 'var(--mantine-color-blue-6)' }} target="_blank" {...props}>
-                    {props.children ? props.children : <span aria-label="링크">링크</span>}
+                    {props.children ? props.children : <span aria-label={t('link.label')}>{t('link.label')}</span>}
                 </a>
             )
         }),
@@ -63,7 +65,7 @@ export default function MarkdownView({ source, className, compact, clampLines }:
     if (isEmpty) {
         return (
             <Text c="dimmed" fz={compact ? 'xs' : 'sm'}>
-                내용이 없습니다.
+                {t('markdown.empty')}
             </Text>
         );
     }

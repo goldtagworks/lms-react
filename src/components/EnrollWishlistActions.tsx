@@ -1,7 +1,7 @@
 import { Group } from '@mantine/core';
 import React from 'react';
 import { Heart, HeartOff, LogIn, BookOpen } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
 
 import { AppButton } from './AppButton';
 
@@ -27,17 +27,25 @@ interface EnrollWishlistActionsProps {
  * - 접근성/라벨 일관 유지
  */
 export function EnrollWishlistActions({ enrolled, wish, userId, size = 'xs', onEnroll, onToggleWish, labels }: EnrollWishlistActionsProps) {
-    const { t } = useTranslation();
+    const { t } = useI18n();
     // 기존 기본 라벨 → i18n 전환 (labels prop 이 전달되면 override)
-    const enrollLabel = enrolled ? labels?.enrolled || '수강중' : userId ? labels?.enroll || '신청' : labels?.loginRequired || '로그인';
-    const wishLabel = wish ? labels?.wishRemove || t('terms.favoriteRemove') : labels?.wishAdd || t('terms.favoriteAdd');
+    let enrollLabel: string;
+
+    if (enrolled) {
+        enrollLabel = labels?.enrolled || t('enroll.enrolled', undefined, '수강중');
+    } else if (userId) {
+        enrollLabel = labels?.enroll || t('enroll.apply', undefined, '신청');
+    } else {
+        enrollLabel = labels?.loginRequired || t('enroll.login', undefined, '로그인');
+    }
+    const wishLabel = wish ? labels?.wishRemove || t('common.favorite.remove') : labels?.wishAdd || t('common.favorite.add');
 
     // 비로그인 상태: 비활성 버튼 대신 명확한 로그인 유도 클릭 가능한 버튼 렌더
     if (!userId) {
         return (
             <Group grow gap={8}>
-                <AppButton href="/signin" label={labels?.loginRequired || '로그인'} leftSection={<LogIn size={14} />} roleName="primary" size={size} />
-                <AppButton href="/signin" label={labels?.wishAdd || t('terms.favoriteAdd')} leftSection={<Heart size={14} />} roleName="add" size={size} />
+                <AppButton href="/signin" label={labels?.loginRequired || t('enroll.login', undefined, '로그인')} leftSection={<LogIn size={14} />} roleName="primary" size={size} />
+                <AppButton href="/signin" label={labels?.wishAdd || t('common.favorite.add')} leftSection={<Heart size={14} />} roleName="add" size={size} />
             </Group>
         );
     }

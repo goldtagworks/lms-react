@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import MarkdownView from '@main/components/markdown/MarkdownView';
 import { useLessons } from '@main/lib/repository';
+import { t } from '@main/lib/i18n';
 
 export default function LessonPlayerPage() {
     const { enrollmentId } = useParams();
@@ -12,11 +13,11 @@ export default function LessonPlayerPage() {
 
     return (
         <PageContainer roleMain py={48}>
-            <Title order={2}>강의 플레이어</Title>
-            <Text>수강 ID: {enrollmentId}</Text>
-            <Text mb="sm">비디오/콘텐츠 영역 (mock)</Text>
+            <Title order={2}>{t('player.title')}</Title>
+            <Text>{t('player.enrollmentId', { id: enrollmentId || '' })}</Text>
+            <Text mb="sm">{t('player.mockVideo')}</Text>
             <Card withBorder p="lg" radius="md" shadow="sm">
-                <MarkdownView source={first?.content_md || '# 샘플 레슨\n내용이 아직 없습니다.'} />
+                <MarkdownView source={first?.content_md || `# ${t('lesson.sampleTitle')}` + `\n${t('lesson.emptyContent')}`} />
             </Card>
         </PageContainer>
     );

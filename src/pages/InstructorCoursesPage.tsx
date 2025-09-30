@@ -2,6 +2,7 @@ import { Title, Text, Button, Group, Card, Badge } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Eye, Edit } from 'lucide-react';
+import { t } from '@main/lib/i18n';
 import { loadCoursesPaged } from '@main/lib/repository';
 import PaginationBar from '@main/components/PaginationBar';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -23,17 +24,17 @@ const InstructorCoursesPage = () => {
     return (
         <PageContainer roleMain py={48}>
             <Group justify="space-between" mb="lg">
-                <Title order={2}>강의 관리</Title>
+                <Title order={2}>{t('instructor.courses.title')}</Title>
                 <Button component={Link} size="sm" to="/instructor/courses/new" variant="light">
-                    새 강의 만들기
+                    {t('instructor.courses.new')}
                 </Button>
             </Group>
             <Text c="dimmed" mb="md" size="sm">
-                내가 개설한 강의 목록
+                {t('instructor.courses.subtitle')}
             </Text>
             {total === 0 && (
                 <Text c="dimmed" size="sm">
-                    강의가 없습니다.
+                    {t('instructor.courses.empty')}
                 </Text>
             )}
             {total > 0 && (
@@ -47,7 +48,7 @@ const InstructorCoursesPage = () => {
                                 </Text>
                                 {c.is_featured && (
                                     <Badge color="teal" size="xs" variant="light">
-                                        추천
+                                        {t('instructor.courses.featured')}
                                     </Badge>
                                 )}
                             </Group>
@@ -64,10 +65,10 @@ const InstructorCoursesPage = () => {
                             <PriceText discount={c.sale_price_cents ?? undefined} price={c.list_price_cents} size="sm" />
                             <Group grow gap={8} mt="sm">
                                 <Button component={Link} leftSection={<Eye size={14} />} radius="md" size="sm" to={`/course/${c.id}`} variant="filled">
-                                    보기
+                                    {t('common.view')}
                                 </Button>
                                 <Button component={Link} leftSection={<Edit size={14} />} radius="md" size="sm" to={`/instructor/courses/${c.id}/edit`} variant="outline">
-                                    수정
+                                    {t('common.edit')}
                                 </Button>
                             </Group>
                         </Card>

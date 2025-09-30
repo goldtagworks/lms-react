@@ -154,7 +154,7 @@ export default function AdminCategoriesPage() {
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
-                                        {t(c.active ? 'status.active' : 'status.inactive')}
+                                        {t(c.active ? 'common.status.active' : 'common.status.inactive')}
                                     </Badge>
                                 </Table.Td>
                                 <Table.Td ta="center">

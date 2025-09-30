@@ -47,11 +47,11 @@ export default function SectionHeaderAddModal({ opened, onClose, onAdd }: Sectio
                     }}
                 />
                 <Group gap="xs" justify="flex-end">
-                    <Button aria-label={t('lesson.sectionAdd.actions.add')} disabled={!trimmed} leftSection={<Plus size={14} />} size="sm" onClick={handleSubmit}>
-                        {t('lesson.sectionAdd.actions.add')}
+                    <Button aria-label={t('common.add')} disabled={!trimmed} leftSection={<Plus size={14} />} size="sm" onClick={handleSubmit}>
+                        {t('common.add')}
                     </Button>
-                    <Button aria-label={t('lesson.sectionAdd.actions.cancel')} leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
-                        {t('lesson.sectionAdd.actions.cancel')}
+                    <Button aria-label={t('common.cancel')} leftSection={<X size={14} />} size="sm" variant="default" onClick={onClose}>
+                        {t('common.cancel')}
                     </Button>
                 </Group>
             </Stack>

@@ -337,10 +337,10 @@ const CourseEditPage = () => {
                 </Card>
                 <Group justify="flex-end" mt="md">
                     <Button disabled={!title.trim()} leftSection={<Save size={14} />} size="xs" onClick={handleSave}>
-                        {dirty ? t('course.editPage.save.saveChanges') : t('course.editPage.save.save')}
+                        {dirty ? t('course.editPage.save.saveChanges') : t('common.save')}
                     </Button>
                     <Button leftSection={<X size={14} />} size="xs" variant="default" onClick={() => guardedNavigate(-1)}>
-                        {dirty ? t('course.editPage.save.cancelChanges') : t('course.editPage.save.cancel')}
+                        {dirty ? t('course.editPage.save.cancelChanges') : t('common.cancel')}
                     </Button>
                 </Group>
                 <Text c="dimmed" size="xs">

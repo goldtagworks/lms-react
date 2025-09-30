@@ -103,7 +103,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             )}
             {navOpened && (
                 <div
-                    aria-label="메뉴 배경"
+                    aria-label={t('a11y.menuBackdrop')}
                     role="button"
                     style={{
                         backdropFilter: 'blur(2px)',

@@ -1,6 +1,0 @@
-{
-    "today": "today",
-    "daysAgo": "{{count}} day(s) ago",
-    "monthsAgo": "{{count}} month(s) ago",
-    "yearsAgo": "{{count}} year(s) ago"
-}

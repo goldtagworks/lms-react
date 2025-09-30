@@ -89,8 +89,8 @@ export default function CourseDetailPage() {
             title: willDeactivate ? t('course.detail.toggle.deactivateTitle') : t('course.detail.toggle.activateTitle'),
             centered: true,
             labels: {
-                confirm: willDeactivate ? t('course.detail.toggle.confirmDeactivate') : t('course.detail.toggle.confirmActivate'),
-                cancel: t('course.detail.toggle.cancel')
+                confirm: willDeactivate ? t('common.deactivate') : t('common.activate'),
+                cancel: t('common.cancel')
             },
             confirmProps: { color: willDeactivate ? 'red' : 'teal' },
             children: <TextBody>{willDeactivate ? t('course.detail.toggle.deactivateConfirmBody') : t('course.detail.toggle.activateConfirmBody')}</TextBody>,
@@ -182,10 +182,10 @@ export default function CourseDetailPage() {
                                 modals.close('course-featured-modal');
                             }}
                         >
-                            {t('course.detail.featured.modal.save')}
+                            {t('common.save')}
                         </Button>
                         <Button size="sm" variant="default" onClick={() => modals.close('course-featured-modal')}>
-                            {t('course.detail.featured.modal.cancel')}
+                            {t('common.cancel')}
                         </Button>
                     </Group>
                 </Stack>
@@ -246,10 +246,10 @@ export default function CourseDetailPage() {
                                     modals.close('course-marketing-modal');
                                 }}
                             >
-                                {t('course.detail.marketing.modal.save')}
+                                {t('common.save')}
                             </Button>
                             <Button size="sm" variant="default" onClick={() => modals.close('course-marketing-modal')}>
-                                {t('course.detail.marketing.modal.cancel')}
+                                {t('common.cancel')}
                             </Button>
                         </Group>
                     </Group>
@@ -329,7 +329,7 @@ export default function CourseDetailPage() {
                         <PageHeader description={course.summary || ''} descriptionSize="md" title={course.title} titleSize="xl" />
                         {course.is_featured && (
                             <Badge color="teal" size="sm" variant="filled">
-                                {course.featured_badge_text || t('course.badge.featuredDefault')}
+                                {course.featured_badge_text || t('course.featuredDefault')}
                             </Badge>
                         )}
                     </Group>
@@ -337,7 +337,7 @@ export default function CourseDetailPage() {
                 <Group gap={4} mt={8} wrap="nowrap">
                     {!course.is_active && (
                         <Badge color="red" mr={4} size="sm" variant="light">
-                            {t('course.badge.inactive')}
+                            {t('common.status.inactive')}
                         </Badge>
                     )}
                     {user?.role === 'admin' && (
@@ -367,9 +367,9 @@ export default function CourseDetailPage() {
                         </Tooltip>
                     )}
                     {user?.role === 'admin' && (
-                        <Tooltip withArrow label={course.is_active ? t('course.deactivate') : t('course.activate')}>
+                        <Tooltip withArrow label={course.is_active ? t('common.deactivate') : t('common.activate')}>
                             <ActionIcon
-                                aria-label={course.is_active ? t('course.deactivate') : t('course.activate')}
+                                aria-label={course.is_active ? t('common.deactivate') : t('common.activate')}
                                 color={course.is_active ? 'red' : 'teal'}
                                 variant="subtle"
                                 onClick={handleToggleActive}
@@ -412,7 +412,7 @@ export default function CourseDetailPage() {
                             )}
                             {wish && (
                                 <Badge color="pink" size="sm">
-                                    {t('terms.favoriteAdd')}
+                                    {t('common.favorite.add')}
                                 </Badge>
                             )}
                             {!enrolled && !wish && (
@@ -428,8 +428,8 @@ export default function CourseDetailPage() {
                             labels={{
                                 enroll: t('course.detail.sidebar.enroll'),
                                 loginRequired: t('course.detail.sidebar.loginRequired'),
-                                wishAdd: t('terms.favoriteAdd'),
-                                wishRemove: t('terms.favoriteRemove')
+                                wishAdd: t('common.favorite.add'),
+                                wishRemove: t('common.favorite.remove')
                             }}
                             size="sm"
                             userId={userId}

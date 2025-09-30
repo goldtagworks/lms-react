@@ -12,6 +12,7 @@ import { Course } from '@main/types/course';
 import { Enrollment } from '@main/types/enrollment';
 import { Lesson } from '@main/types/lesson';
 import { UserRole } from '@main/lib/nav';
+import { t } from '@main/lib/i18n';
 
 // Storage Keys
 const K_COURSES = 'lms_courses_v1';
@@ -207,7 +208,7 @@ export function upsertInstructorProfile(instructorId: string, patch: { display_n
     const existing = map[instructorId];
     const profile: InstructorProfile = {
         instructor_id: instructorId,
-        display_name: patch.display_name ?? existing?.display_name ?? '강사',
+        display_name: patch.display_name ?? existing?.display_name ?? t('empty.instructorLabel', undefined, '강사'),
         bio_md: patch.bio_md ?? existing?.bio_md,
         links: patch.links ?? existing?.links,
         avatar_url: existing?.avatar_url,
@@ -227,7 +228,7 @@ export function ensureInstructorProfile(instructorId: string, seed?: { display_n
     if (!map[instructorId]) {
         map[instructorId] = {
             instructor_id: instructorId,
-            display_name: seed?.display_name || '강사',
+            display_name: seed?.display_name || t('empty.instructorLabel', undefined, '강사'),
             bio_md: seed?.bio_md,
             updated_at: new Date().toISOString()
         };

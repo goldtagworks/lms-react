@@ -136,19 +136,19 @@ export default function AdminInstructorAppsPage() {
                 actions={
                     <Group gap={6} wrap="wrap">
                         <Badge color="grape" leftSection={<Clock size={12} />}>
-                            {t('admin.instructorApps.badge.pending')} {pendingAll.length}
+                            {t('common.status.pending')} {pendingAll.length}
                         </Badge>
                         <Badge color="teal" leftSection={<Check size={12} />}>
-                            {t('admin.instructorApps.badge.approved')} {decidedAll.filter((a) => a.status === 'APPROVED').length}
+                            {t('common.status.approved')} {decidedAll.filter((a) => a.status === 'APPROVED').length}
                         </Badge>
                         <Badge color="red" leftSection={<X size={12} />}>
-                            {t('admin.instructorApps.badge.rejected')} {decidedAll.filter((a) => a.status === 'REJECTED').length}
+                            {t('common.status.rejected')} {decidedAll.filter((a) => a.status === 'REJECTED').length}
                         </Badge>
                         <Badge color="gray" leftSection={<ShieldAlert size={12} />}>
-                            {t('admin.instructorApps.badge.revoked')} {revokedCount}
+                            {t('common.status.revoked')} {revokedCount}
                         </Badge>
                         <Badge color="gray" variant="outline">
-                            {t('admin.instructorApps.badge.total')} {apps.length}
+                            {t('common.total')} {apps.length}
                         </Badge>
                     </Group>
                 }

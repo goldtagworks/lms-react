@@ -37,11 +37,13 @@ function CourseCardBase({ course, to }: CourseCardProps) {
             </Group>
             <Group align="center" gap={8} mb={4}>
                 <Text c={hasDiscount ? 'red.6' : 'dark'} fw={700} size="lg">
-                    {course.effectivePriceCents.toLocaleString()}원
+                    {course.effectivePriceCents.toLocaleString()}
+                    {t('price.currencyWon', undefined, '원').replace('{{value}}', '')}
                 </Text>
                 {hasDiscount && (
                     <Text c="dimmed" className="text-strike" size="sm">
-                        {course.list_price_cents.toLocaleString()}원
+                        {course.list_price_cents.toLocaleString()}
+                        {t('price.currencyWon', undefined, '원').replace('{{value}}', '')}
                     </Text>
                 )}
             </Group>

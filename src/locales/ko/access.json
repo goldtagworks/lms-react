@@ -1,8 +1,0 @@
-{
-    "forbidden": "접근 불가",
-    "instructorOnly": "강사 전용 페이지입니다. 강사 신청 후 승인되면 접근할 수 있습니다.",
-    "adminOnly": "관리자 전용 페이지입니다.",
-    "applyInstructorCta": "강사 신청하기",
-    "goHome": "홈으로",
-    "requiredRole": "필요 권한: {{required}} / 현재 역할: {{current}}"
-}

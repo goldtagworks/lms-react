@@ -1,18 +1,21 @@
 import { Title, Text, Button } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
+import { useI18n } from '@main/lib/i18n';
 
 const NotFoundPage = () => {
+    const { t } = useI18n();
+
     return (
         <PageContainer roleMain py={48} ta="center">
             <Title mb="md" order={1}>
-                404 Not Found
+                {t('notFound.title')}
             </Title>
             <Text c="dimmed" mb="lg">
-                요청하신 페이지를 찾을 수 없습니다.
+                {t('notFound.message')}
             </Text>
             <Button color="primary" component={Link} to="/" variant="filled">
-                홈으로 이동
+                {t('notFound.home')}
             </Button>
         </PageContainer>
     );

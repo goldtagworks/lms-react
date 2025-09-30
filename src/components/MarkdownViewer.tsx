@@ -1,4 +1,5 @@
 import { Box, Text } from '@mantine/core';
+import { useI18n } from '@main/lib/i18n';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -13,16 +14,15 @@ export interface MarkdownViewerProps {
  * - GFM 지원 (테이블/체크박스 등)
  * - Mantine Typography와 기본 spacing 조정
  */
-export default function MarkdownViewer({
-    source,
-    emptyFallback = (
+export default function MarkdownViewer({ source, emptyFallback, maxHeight }: MarkdownViewerProps) {
+    const { t } = useI18n();
+    const fallback = emptyFallback || (
         <Text c="dimmed" size="sm">
-            소개가 아직 없습니다.
+            {t('course.intro.missing')}
         </Text>
-    ),
-    maxHeight
-}: MarkdownViewerProps) {
-    if (!source || !source.trim()) return <>{emptyFallback}</>;
+    );
+
+    if (!source || !source.trim()) return <>{fallback}</>;
 
     return (
         <Box style={maxHeight ? { maxHeight, overflowY: 'auto' } : undefined}>

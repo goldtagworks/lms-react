@@ -112,7 +112,7 @@ export default function AdminCertificatesPage() {
                                     </Table.Td>
                                     <Table.Td ta="center">
                                         <Badge color={isDeact ? 'gray' : 'green'} size="sm" variant="light">
-                                            {isDeact ? t('certificate.deactivated') : t('certificate.active')}
+                                            {isDeact ? t('common.status.inactive') : t('common.status.active')}
                                         </Badge>
                                     </Table.Td>
                                     <Table.Td ta="center">
@@ -122,7 +122,7 @@ export default function AdminCertificatesPage() {
                                                     <RotateCcw size={14} />
                                                 </ActionIcon>
                                             </Tooltip>
-                                            <Tooltip label={isDeact ? t('certificate.activate') : t('certificate.deactivate')}>
+                                            <Tooltip label={isDeact ? t('common.activate') : t('common.deactivate')}>
                                                 <ActionIcon aria-label={t('certificate.toggleActive')} color={isDeact ? 'green' : 'red'} size="sm" variant="subtle" onClick={() => toggleDeactivate(c)}>
                                                     {isDeact ? <Save size={14} /> : <X size={14} />}
                                                 </ActionIcon>

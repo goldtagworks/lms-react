@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Card, Group, Stack, Text, TextInput, Textarea, Badge, Alert, Divider } from '@mantine/core';
+import { t } from '@main/lib/i18n';
 import { useAuth } from '@main/lib/auth';
 import { applyInstructor, useMyInstructorApplication } from '@main/lib/repository';
 import { ConsentCheckboxes, ConsentState } from '@main/components/auth/ConsentCheckboxes';
@@ -22,7 +23,7 @@ export function InstructorApplyPage() {
     if (!user) {
         return (
             <Card>
-                <Text>로그인이 필요합니다.</Text>
+                <Text>{t('instructor.apply.loginRequired')}</Text>
             </Card>
         );
     }
@@ -31,10 +32,10 @@ export function InstructorApplyPage() {
         return (
             <Card withBorder shadow="sm">
                 <Stack>
-                    <Text fw={600}>이미 승인된 강사입니다.</Text>
-                    <Badge color="green">승인 완료</Badge>
+                    <Text fw={600}>{t('instructor.apply.alreadyApproved')}</Text>
+                    <Badge color="green">{t('common.status.approved')}</Badge>
                     <Text c="dimmed" size="sm">
-                        이제 강의 생성을 시작할 수 있습니다.
+                        {t('instructor.apply.approvedDesc')}
                     </Text>
                 </Stack>
             </Card>
@@ -60,28 +61,35 @@ export function InstructorApplyPage() {
     return (
         <Stack maw={640} mx="auto" p="md">
             <Text fw={700} fz={28}>
-                강사 신청
+                {t('instructor.apply.title')}
             </Text>
             {app && app.status === 'PENDING' && (
                 <Alert color="blue" variant="light">
-                    승인 대기 중입니다. 관리자가 검토 후 승인/반려 처리합니다.
+                    {t('instructor.apply.pendingNotice')}
                 </Alert>
             )}
             <Card withBorder radius="md" shadow="sm">
                 <Stack>
-                    <TextInput required disabled={!!app} label="표시 이름" placeholder="공개될 강사명" value={displayName} onChange={(e) => setDisplayName(e.currentTarget.value)} />
+                    <TextInput
+                        required
+                        disabled={!!app}
+                        label={t('instructor.apply.displayNameLabel')}
+                        placeholder={t('instructor.apply.displayNamePh')}
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.currentTarget.value)}
+                    />
                     <Textarea
                         disabled={!!app}
-                        label="소개 (Markdown 가능)"
+                        label={t('instructor.apply.bioLabel')}
                         minRows={4}
-                        placeholder="간단한 경력, 전문 분야 등을 작성하세요"
+                        placeholder={t('instructor.apply.bioPh')}
                         rows={6}
                         value={bio}
                         onChange={(e) => setBio(e.currentTarget.value)}
                     />
                     <Stack gap={4}>
                         <Group justify="space-between">
-                            <Text fw={500}>관련 링크</Text>
+                            <Text fw={500}>{t('instructor.apply.linksTitle')}</Text>
                         </Group>
                         {links.length > 0 && (
                             <Stack>
@@ -99,26 +107,32 @@ export function InstructorApplyPage() {
                         )}
                         {!app && (
                             <Group align="flex-end" wrap="nowrap">
-                                <TextInput label="라벨" placeholder="GitHub" style={{ flex: 1 }} value={linkLabel} onChange={(e) => setLinkLabel(e.currentTarget.value)} />
-                                <TextInput label="URL" placeholder="https://github.com/username" style={{ flex: 2 }} value={linkUrl} onChange={(e) => setLinkUrl(e.currentTarget.value)} />
+                                <TextInput
+                                    label={t('instructor.apply.linkLabel')}
+                                    placeholder={t('instructor.apply.linkLabelPh')}
+                                    style={{ flex: 1 }}
+                                    value={linkLabel}
+                                    onChange={(e) => setLinkLabel(e.currentTarget.value)}
+                                />
+                                <TextInput label="URL" placeholder={t('instructor.apply.linkUrlPh')} style={{ flex: 2 }} value={linkUrl} onChange={(e) => setLinkUrl(e.currentTarget.value)} />
                                 <Button size="sm" variant="light" onClick={addLink}>
-                                    추가
+                                    {t('common.addLink')}
                                 </Button>
                             </Group>
                         )}
                     </Stack>
                     <Divider my="sm" />
                     <Stack>
-                        <Text fw={600}>약관 동의</Text>
+                        <Text fw={600}>{t('instructor.apply.consentTitle')}</Text>
                         <ConsentCheckboxes compact requireAge requireInstructorPolicy onChange={setConsent} />
                     </Stack>
                     <Group justify="flex-end">
                         {!app && (
                             <Button disabled={!displayName.trim() || !consent?.terms || !consent.privacy} size="sm" onClick={submit}>
-                                신청 제출
+                                {t('instructor.apply.submit')}
                             </Button>
                         )}
-                        {app?.status === 'PENDING' && <Badge color="yellow">대기중</Badge>}
+                        {app?.status === 'PENDING' && <Badge color="yellow">{t('common.status.pending')}</Badge>}
                     </Group>
                 </Stack>
             </Card>

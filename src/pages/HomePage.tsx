@@ -1,5 +1,6 @@
 import React from 'react';
 import { Divider, Group, SimpleGrid } from '@mantine/core';
+import { t } from '@main/lib/i18n';
 
 import { HeroSection } from '../features/home/components/HeroSection';
 import { CategoryChips } from '../features/home/components/CategoryChips';
@@ -46,7 +47,7 @@ const HomePage = () => {
                 <RecentNoticesSection />
 
                 {isLoading ? (
-                    <PageSection aria-busy="true" aria-live="polite" title="인기 강의">
+                    <PageSection aria-busy="true" aria-live="polite" title={t('home.popular')}>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
                             {Array.from({ length: 3 }).map((_, i) => (
                                 <CourseCardSkeleton key={i} />
@@ -54,11 +55,11 @@ const HomePage = () => {
                         </SimpleGrid>
                     </PageSection>
                 ) : (
-                    <CoursesSection courses={popular} title="인기 강의" />
+                    <CoursesSection courses={popular} title={t('home.popular')} />
                 )}
 
                 {isLoading ? (
-                    <PageSection aria-busy="true" aria-live="polite" title="신규 강의">
+                    <PageSection aria-busy="true" aria-live="polite" title={t('home.new')}>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xl">
                             {Array.from({ length: 3 }).map((_, i) => (
                                 <CourseCardSkeleton key={i} />
@@ -66,18 +67,18 @@ const HomePage = () => {
                         </SimpleGrid>
                     </PageSection>
                 ) : (
-                    <CoursesSection courses={newCourses} title="신규 강의" />
+                    <CoursesSection courses={newCourses} title={t('home.new')} />
                 )}
 
                 {!isLoading && (
-                    <PageSection withGapTop title="수강생 리뷰 베스트">
+                    <PageSection withGapTop title={t('home.bestReviews')}>
                         <Divider />
                         <ReviewsSection reviews={bestReviews} />
                     </PageSection>
                 )}
 
                 {isLoading ? (
-                    <PageSection aria-busy="true" title="강사 소개">
+                    <PageSection aria-busy="true" title={t('home.instructors')}>
                         <Group gap={24}>
                             {Array.from({ length: 2 }).map((_, i) => (
                                 <InstructorCardSkeleton key={i} />
@@ -85,22 +86,22 @@ const HomePage = () => {
                         </Group>
                     </PageSection>
                 ) : (
-                    <InstructorsSection instructors={instructors} title="강사 소개" />
+                    <InstructorsSection instructors={instructors} title={t('home.instructors')} />
                 )}
 
                 {isLoading ? (
-                    <PageSection aria-busy title="프로모션">
+                    <PageSection aria-busy title={t('home.promotion')}>
                         <PromoBannerSkeleton />
                     </PageSection>
                 ) : (
                     promoBanners[0] && <PromoBannerSection banner={promoBanners[0]} />
                 )}
 
-                <PageSection withGapTop title="이용 가이드">
+                <PageSection withGapTop title={t('home.guide')}>
                     <Divider mb="md" />
                     <GuideSection bare />
                 </PageSection>
-                <PageSection withGapTop title="고객 지원">
+                <PageSection withGapTop title={t('home.support')}>
                     <SupportSection bare />
                 </PageSection>
             </PageContainer>

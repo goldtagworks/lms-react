@@ -1,8 +1,0 @@
-{
-    "forbidden": "Access Denied",
-    "instructorOnly": "Instructor only page. Apply and get approved to access.",
-    "adminOnly": "Admin only page.",
-    "applyInstructorCta": "Apply as Instructor",
-    "goHome": "Go Home",
-    "requiredRole": "Required: {{required}} / Current: {{current}}"
-}

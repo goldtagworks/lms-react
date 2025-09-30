@@ -44,12 +44,12 @@ export default function WishlistPage() {
 
     return (
         <PageContainer roleMain>
-            <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('terms.favoriteAdd', {}, '찜')} />
+            <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('common.favorite.add', {}, '찜')} />
             <Card withBorder p="lg" radius="md" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
-                            {t('terms.favoriteAdd')} 강의
+                            {t('common.favorite.add')} 강의
                         </Text>
                         {userId && wishlist.length > 0 && (
                             <Badge color="pink" variant="light">
@@ -94,7 +94,7 @@ export default function WishlistPage() {
                                                 )}
                                                 {wish && (
                                                     <Badge color="pink" size="sm">
-                                                        {t('terms.favoriteAdd')}
+                                                        {t('common.favorite.add')}
                                                     </Badge>
                                                 )}
                                             </Group>

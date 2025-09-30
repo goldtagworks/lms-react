@@ -64,7 +64,7 @@ export default function InstructorProfileEditModal({ opened, profile, onClose, o
                         <TextInput disabled value={t('instructor.edit.linkLabel')} w={100} />
                         <TextInput disabled size="sm" value={t('instructor.edit.linkLabel')} w={100} />
                     </Group>
-                    <ActionIcon aria-label={t('instructor.edit.linkAdd')} variant="light" onClick={addLink}>
+                    <ActionIcon aria-label={t('common.addLink')} variant="light" onClick={addLink}>
                         <Plus size={16} />
                     </ActionIcon>
                 </Group>

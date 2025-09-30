@@ -41,7 +41,7 @@ export default function MyPage() {
                             {t('nav.courses', {}, '코스 목록')}
                         </Button>
                         <Button color="green" component={Link} leftSection={<Heart size={16} />} size="sm" to="/my/wishlist" variant="light">
-                            {t('terms.favoriteAdd')}
+                            {t('common.favorite.add')}
                         </Button>
                         <Button color="violet" component={Link} leftSection={<Award size={16} />} size="sm" to="/my/certificates" variant="light">
                             {t('nav.certificates', {}, '수료증')}
@@ -51,7 +51,11 @@ export default function MyPage() {
                         </Button>
                     </Group>
                 }
-                description={t('empty.myPageIntro', { favorite: t('terms.favoriteAdd', {}, '찜') }, `내 정보, 수강 내역, 수료증, ${t('terms.favoriteAdd', {}, '찜')} 목록 등을 관리할 수 있습니다.`)}
+                description={t(
+                    'empty.myPageIntro',
+                    { favorite: t('common.favorite.add', {}, '찜') },
+                    `내 정보, 수강 내역, 수료증, ${t('common.favorite.add', {}, '찜')} 목록 등을 관리할 수 있습니다.`
+                )}
                 title={t('nav.myPage', {}, '마이페이지')}
             />
             <Card withBorder p="lg" radius="md" shadow="sm">
@@ -103,7 +107,7 @@ export default function MyPage() {
                                                 )}
                                                 {wish && (
                                                     <Badge color="pink" size="xs">
-                                                        {t('terms.favoriteAdd')}
+                                                        {t('common.favorite.add')}
                                                     </Badge>
                                                 )}
                                             </Group>

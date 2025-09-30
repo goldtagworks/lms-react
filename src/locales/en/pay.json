@@ -1,9 +1,0 @@
-{
-    "start": "Pay",
-    "processing": "Processing payment…",
-    "delayed": "Payment confirmation is delayed. Please check My Page shortly.",
-    "cancelled": "Payment was cancelled.",
-    "duplicate": "This order was already processed.",
-    "error": "An error occurred during payment.",
-    "receipt": "View Receipt"
-}

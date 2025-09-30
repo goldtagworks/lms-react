@@ -3,6 +3,7 @@
 import type { Certificate } from '@main/types/exam';
 
 import { getAttemptMeta } from '@main/lib/repository';
+import { t } from '@main/lib/i18n';
 
 interface PrintParams {
     certificate: Certificate;
@@ -18,10 +19,10 @@ export function openCertificatePrintView({ certificate, courseTitle }: PrintPara
     const issued = new Date(certificate.issued_at).toLocaleString();
     const score = meta?.score != null ? meta.score + '점' : '—';
     const passScore = meta?.pass_score != null ? meta.pass_score + '점' : '—';
-    const passedLabel = meta?.passed == null ? '—' : meta.passed ? '합격' : '불합격';
+    const passedLabel = meta?.passed == null ? '—' : meta.passed ? t('exam.pass', undefined, '합격') : t('exam.fail', undefined, '불합격');
 
     win.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8" />
-<title>수료증 ${certificate.serial_no}</title>
+<title>${t('certificate.demoTitle', undefined, '수료증 (Demo)')} ${certificate.serial_no}</title>
 <style>
 body { font-family: system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; margin:40px; color:#222; }
 .hdr { text-align:center; margin-bottom:40px; }
@@ -37,9 +38,9 @@ hr { border:none; border-top:1px solid #ddd; margin:32px 0; }
 @media print { .print-btn { display:none; } body { margin:0; } }
 </style>
 </head><body>
-<button class="print-btn" onclick="window.print()">인쇄</button>
+<button class="print-btn" onclick="window.print()">${t('certificate.print', undefined, '인쇄')}</button>
 <div class="hdr">
-  <h1 style="margin:0 0 8px; font-size:32px;">수료증 (Demo)</h1>
+  <h1 style="margin:0 0 8px; font-size:32px;">${t('certificate.demoTitle', undefined, '수료증 (Demo)')}</h1>
   <div class="label">CERTIFICATE OF COMPLETION</div>
 </div>
 <div class="cert-box">
@@ -49,7 +50,7 @@ hr { border:none; border-top:1px solid #ddd; margin:32px 0; }
   <div class="row"><span class="label">SCORE / PASS</span><br/><span class="value">${score} / ${passScore}</span></div>
   <div class="row"><span class="label">RESULT</span><br/><span class="badge ${meta?.passed ? '' : 'fail'}">${passedLabel}</span></div>
   <hr />
-  <p style="line-height:1.5; font-size:14px;">본 수료증은 데모 환경에서 생성된 것으로 법적 효력이 없으며, 실제 서비스 도입 시 서버에서 서명된 PDF와 검증 API가 제공될 예정입니다.</p>
+  <p style="line-height:1.5; font-size:14px;">${t('certificate.demoDisclaimer', undefined, '본 수료증은 데모 환경에서 생성된 것으로 법적 효력이 없으며, 실제 서비스 도입 시 서버에서 서명된 PDF와 검증 API가 제공될 예정입니다.')}</p>
 </div>
 <div class="footer">© Demo LMS • This mock certificate is for presentation only.</div>
 <script>window.focus()</script>

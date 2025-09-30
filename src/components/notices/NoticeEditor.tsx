@@ -70,7 +70,7 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
             <Switch checked={pinned} label={t('notice.pin')} onChange={(e) => setPinned(e.currentTarget.checked)} />
             <Group justify="flex-end" mt="sm">
                 <Button leftSection={<Save size={16} />} size="sm" onClick={handleSubmit}>
-                    {isEdit ? t('common.edit') : t('common.register')}
+                    {isEdit ? t('common.edit') : t('common.submit')}
                 </Button>
                 <Button leftSection={<X size={16} />} size="sm" variant="default" onClick={onCancel}>
                     {t('common.cancel')}
