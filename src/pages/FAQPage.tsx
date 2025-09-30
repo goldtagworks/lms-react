@@ -23,7 +23,21 @@ const mdxModules = import.meta.glob('../faq/ko/*.mdx');
 export default function FAQPage() {
     const { t, i18n } = useTranslation();
     const [entries, setEntries] = useState<FaqEntry[]>([]);
-    const locale = i18n.language.split('-')[0]; // 'ko-KR' -> 'ko'
+    // i18n 초기화 지연 시 language가 undefined일 수 있으므로 방어
+    const rawLang = ((): string => {
+        const lang = (i18n as any)?.language;
+
+        if (typeof lang === 'string' && lang.length > 0) return lang;
+
+        const fallback = (i18n as any)?.options?.fallbackLng;
+
+        if (Array.isArray(fallback) && fallback.length > 0) return fallback[0];
+
+        if (typeof fallback === 'string') return fallback;
+
+        return 'ko';
+    })();
+    const locale = rawLang.split ? rawLang.split('-')[0] : rawLang; // 'ko-KR' -> 'ko'
 
     useEffect(() => {
         let cancelled = false;
