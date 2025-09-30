@@ -84,6 +84,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled }: Pro
                                 { value: 'ratingHigh', label: t('review.sort.ratingHigh', undefined, '평점 높은순') },
                                 { value: 'ratingLow', label: t('review.sort.ratingLow', undefined, '평점 낮은순') }
                             ]}
+                            radius="md"
                             size="sm"
                             value={sort}
                             w={160}
@@ -116,6 +117,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled }: Pro
                         <Group align="center" gap="sm" mb="xs">
                             <Select
                                 data={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: t('review.form.ratingValue', { rating: n }, `${n}점`) }))}
+                                radius="md"
                                 size="sm"
                                 value={String(ratingInput)}
                                 w={100}
@@ -132,6 +134,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled }: Pro
                             autosize
                             minRows={3}
                             placeholder={t('review.form.commentPlaceholder', undefined, '(선택) 코멘트를 입력하세요')}
+                            radius="md"
                             value={commentInput}
                             onChange={(e) => setCommentInput(e.currentTarget.value)}
                         />

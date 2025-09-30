@@ -46,7 +46,7 @@ export default function SignUpPage() {
                             <TextInput autoComplete="email" label={t('auth.email')} placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <TextInput
                                 autoComplete="new-password"
-                                label={t('auth.password')}
+                                label={t('auth.passwordLabel')}
                                 placeholder="••••••"
                                 size="sm"
                                 type="password"

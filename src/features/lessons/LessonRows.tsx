@@ -73,7 +73,7 @@ export const SectionRow = memo(function SectionRow({
     return (
         <Group key={lesson.id} gap={6} style={{ backgroundColor: 'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))' }} wrap="nowrap">
             <Badge color="gray" size="sm" variant="outline">
-                {t('a11y.lesson.section')}
+                {t('a11y.lesson.section.label')}
             </Badge>
             <ActionIcon aria-label={t('a11y.lesson.section.moveUp')} disabled={index === 0} variant="subtle" onClick={() => onMove(lesson.id, 'up')}>
                 <ArrowUp size={16} />

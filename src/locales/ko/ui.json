@@ -3,7 +3,7 @@
     "image": { "error": "이미지 오류" },
     "link": { "label": "링크" },
     "markdown": { "empty": "내용이 없습니다." },
-    "wishlist": { "add": "담기", "remove": "담기 취소", "empty": "위시리스트에 담긴 코스가 없습니다" },
+    "wishlist": { "add": "담기", "remove": "담기 취소", "empty": "찜 목록에 담긴 코스가 없습니다" },
     "enroll": { "enrolled": "수강중", "apply": "신청", "login": "로그인" },
     "enrollment": { "status": { "enrolled": "수강중" } },
     "user": { "fallbackName": "사용자" },
@@ -29,24 +29,114 @@
         "categorySelect": "카테고리 선택",
         "searchCertificatePlaceholder": "수료증 검색",
         "searchPlaceholder": "검색어 입력",
-        "sortSelect": "정렬 기준"
+        "sortSelect": "정렬 기준",
+        "admin": {
+            "activateToggle": "활성/비활성 전환",
+            "categoryNameInput": "카테고리 이름 입력",
+            "codeSearch": "코드 검색",
+            "filterActive": "활성 상태 필터",
+            "instantDeactivate": "즉시 비활성화",
+            "instructorAppsSearch": "강사 신청 검색",
+            "moveDown": "아래로 이동",
+            "moveUp": "위로 이동",
+            "usersSearch": "사용자 검색"
+        },
+        "consent": {
+            "panel": {
+                "instructor": "강사 이용약관 패널",
+                "privacy": "개인정보 처리방침 패널",
+                "terms": "이용약관 패널"
+            },
+            "tabs": "약관 탭 목록"
+        },
+        "lesson": {
+            "lesson": {
+                "cancel": "레슨 제목 변경 취소",
+                "delete": "레슨 삭제",
+                "editDetail": "레슨 상세 편집",
+                "moveDown": "레슨 아래로 이동",
+                "moveUp": "레슨 위로 이동",
+                "rename": "레슨 이름 변경",
+                "save": "레슨 제목 저장",
+                "titleInput": "레슨 제목 입력"
+            },
+            "preview": {
+                "badge": "미리보기 뱃지",
+                "set": "미리보기 설정",
+                "unset": "미리보기 해제"
+            },
+            "section": {
+                "label": "섹션",
+                "_": "섹션",
+                "cancel": "섹션 제목 변경 취소",
+                "delete": "섹션 삭제",
+                "editDetail": "섹션 상세 편집",
+                "moveDown": "섹션 아래로 이동",
+                "moveUp": "섹션 위로 이동",
+                "rename": "섹션 이름 변경",
+                "save": "섹션 제목 저장",
+                "titleInput": "섹션 제목 입력"
+            }
+        }
     },
     "auth": {
         "email": "이메일",
-        "password": "비밀번호",
+        "passwordLabel": "비밀번호",
         "newPassword": "새 비밀번호",
         "currentPassword": "현재 비밀번호",
         "confirmPassword": "비밀번호 확인",
         "signIn": "로그인",
         "signUp": "회원가입",
-        "forgot": "비밀번호 재설정"
+        "signOut": "로그아웃",
+        "forgot": "비밀번호 재설정",
+        "subtitleSignIn": "가입한 이메일과 비밀번호로 로그인하세요.",
+        "subtitleSignUp": "간단한 정보 입력 후 바로 학습을 시작할 수 있습니다.",
+        "changeTitle": "비밀번호 변경",
+        "changeSubtitle": "현재 비밀번호 확인 후 새 비밀번호로 변경합니다.",
+        "resetTitle": "비밀번호 재설정 요청",
+        "resetSubtitle": "가입 시 사용한 이메일을 입력하면 재설정 링크를 보내드립니다.",
+        "hero": {
+            "signIn": "신뢰할 수 있는 학습 계정으로 바로 시작",
+            "signUp": "몇 초 만에 계정을 생성하고 학습을 시작하세요",
+            "reset": "비밀번호 재설정 안내를 이메일로 받습니다",
+            "change": "새 비밀번호로 변경"
+        },
+        "list": {
+            "signin": { "1": "진행 중인 강의 이어서", "2": "수료증 관리", "3": "찜 목록 동기화" },
+            "reset": { "1": "가입 이메일 확인", "2": "재설정 링크 발송", "3": "새 비밀번호 설정" },
+            "change": { "1": "현재 비밀번호 확인", "2": "새 비밀번호 입력", "3": "즉시 반영" }
+        },
+        "reset": {
+            "emailPlaceholder": "이메일 입력",
+            "emailPrompt": "가입한 이메일을 입력하세요",
+            "sent": { "title": "재설정 메일 발송 완료", "desc": "메일함을 확인하시고 안내에 따라 새 비밀번호를 설정해 주세요" },
+            "submit": "재설정 링크 보내기"
+        },
+        "password": {
+            "change": "비밀번호 변경하기",
+            "changed": "비밀번호가 변경되었습니다",
+            "min": "비밀번호는 최소 8자 이상이어야 합니다",
+            "required": "비밀번호를 입력하세요"
+        },
+        "loginRequired": {
+            "title": "로그인이 필요합니다",
+            "message": { "generic": "이 기능을 이용하려면 먼저 로그인해주세요" }
+        },
+        "noAccountYet": "아직 계정이 없나요?",
+        "haveAccount": "이미 계정이 있습니다",
+        "continueWithEmail": "이메일로 계속",
+        "name": "이름",
+        "password.mismatch": "비밀번호가 일치하지 않습니다"
     },
     "errors": {
         "notFound": "요청하신 페이지를 찾을 수 없습니다",
         "forbidden": "접근 권한이 없습니다",
         "network": "네트워크 오류가 발생했습니다",
         "timeout": "요청 시간이 초과되었습니다",
-        "unknown": "알 수 없는 오류가 발생했습니다"
+        "unknown": "알 수 없는 오류가 발생했습니다",
+        "blocked": "차단됨",
+        "error": "오류",
+        "noticeTitleRequired": "제목은 필수 항목입니다"
     },
     "common": {
         "ok": "확인",
@@ -105,7 +195,7 @@
         "notices": "공지사항",
         "learn": "학습실",
         "myLearning": "내 학습",
-        "wishlist": "찜 리스트",
+        "wishlist": "찜 목록",
         "instructor": "강사",
         "instructorCourses": "강의 관리",
         "instructorProfile": "강사 프로필",

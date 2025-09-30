@@ -58,6 +58,7 @@ export const navGroups: NavGroup[] = [
             { id: 'certificates', label: '', labelKey: 'nav.certificates', href: '/my/certificates', auth: 'auth' }
         ]
     },
+    /*
     {
         id: 'instructor',
         label: '',
@@ -70,6 +71,7 @@ export const navGroups: NavGroup[] = [
             { id: 'instructor-profile', label: '', labelKey: 'nav.instructorProfile', href: '/instructor/__USER_ID__', auth: 'auth', roles: ['instructor'] }
         ]
     },
+    */
     {
         id: 'admin',
         label: '',
@@ -81,8 +83,8 @@ export const navGroups: NavGroup[] = [
             { id: 'admin-users', label: '', labelKey: 'nav.adminUsers', href: '/admin/users', roles: ['admin'], auth: 'auth' },
             { id: 'admin-categories', label: '', labelKey: 'nav.adminCategories', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
             { id: 'admin-coupons', label: '', labelKey: 'nav.adminCoupons', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-instructor-apps', label: '', labelKey: 'nav.adminInstructorApps', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
+            { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' }
+            // { id: 'admin-instructor-apps', label: '', labelKey: 'nav.adminInstructorApps', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
         ]
     },
     {

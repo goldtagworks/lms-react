@@ -83,21 +83,21 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                             </Menu>
                         );
                     })}
-                    {!user && <LinkButton href="/signin" label={t('auth.header.login')} variant="outline" />}
-                    {!user && <LinkButton href="/signup" label={t('auth.header.signup')} variant="filled" />}
+                    {!user && <LinkButton href="/signin" label={t('auth.signIn')} variant="outline" />}
+                    {!user && <LinkButton href="/signup" label={t('auth.signUp')} variant="filled" />}
                     <LanguageSwitch />
                     {user && (
                         <Menu withinPortal position="bottom-end" shadow="md" width={180}>
                             <Menu.Target>
                                 <Button variant="default">{user.name}</Button>
                             </Menu.Target>
-                            <Menu.Dropdown aria-label={t('auth.header.account')}>
-                                <Menu.Label>{t('auth.header.account')}</Menu.Label>
+                            <Menu.Dropdown aria-label={t('nav.myPage', undefined, t('common.view'))}>
+                                <Menu.Label>{t('nav.myPage')}</Menu.Label>
                                 <Menu.Item component={Link} to="/my">
-                                    {t('auth.header.myPage')}
+                                    {t('nav.myPage')}
                                 </Menu.Item>
                                 <Menu.Item component={Link} to="/password/change">
-                                    {t('auth.header.changePassword')}
+                                    {t('auth.newPassword')}
                                 </Menu.Item>
                                 <Menu.Item
                                     onClick={() => {
@@ -105,7 +105,7 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                                         navigate('/');
                                     }}
                                 >
-                                    {t('auth.header.logout')}
+                                    {t('common.logout', undefined, t('auth.signOut') || 'Logout')}
                                 </Menu.Item>
                             </Menu.Dropdown>
                         </Menu>
