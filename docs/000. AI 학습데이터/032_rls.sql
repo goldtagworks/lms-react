@@ -25,6 +25,8 @@ alter table if exists coupons                 enable row level security;
 alter table if exists coupon_redemptions      enable row level security;
 alter table if exists categories              enable row level security;
 alter table if exists course_categories       enable row level security;
+alter table if exists support_tickets         enable row level security;
+alter table if exists support_ticket_messages enable row level security;
 
 -- =============================
 -- Helpers (role checks via profiles.role)
@@ -344,3 +346,61 @@ for all using (
     where c.id = course_categories.course_id and c.instructor_id = auth.uid()
   )
 );
+
+-- =============================
+-- Support Tickets
+-- =============================
+-- 티켓: 작성자(owner)와 관리자만 접근. 메시지: 티켓 소유자/관리자, 단 is_private=true 는 관리자 전용
+
+-- support_tickets: read (owner or admin)
+create policy if not exists st_read_owner on support_tickets
+for select using (user_id = auth.uid() or is_admin());
+
+-- support_tickets: insert (self only)
+create policy if not exists st_insert_owner on support_tickets
+for insert with check (user_id = auth.uid());
+
+-- support_tickets: update (owner can update title/category, admin full). 단 status 변경은 관리자만 사용하도록 분기
+create policy if not exists st_update_owner on support_tickets
+for update using (user_id = auth.uid() or is_admin())
+with check (
+  (user_id = auth.uid() and status in ('OPEN','ANSWERED','CLOSED')) or is_admin()
+);
+
+-- support_tickets: delete (admin only)
+create policy if not exists st_delete_admin on support_tickets
+for delete using (is_admin());
+
+-- support_ticket_messages: read (admin OR (티켓 소유자 AND (메시지 공개 or 본인 작성)))
+create policy if not exists stm_read on support_ticket_messages
+for select using (
+  is_admin() OR EXISTS (
+    select 1 from support_tickets t
+    where t.id = support_ticket_messages.ticket_id
+      and t.user_id = auth.uid()
+      and (support_ticket_messages.is_private = false or support_ticket_messages.author_id = auth.uid())
+  )
+);
+
+-- support_ticket_messages: insert (티켓 소유자 공개 메시지 / 관리자 공개·비공개 모두)
+create policy if not exists stm_insert on support_ticket_messages
+for insert with check (
+  is_admin() OR (
+    EXISTS (
+      select 1 from support_tickets t
+      where t.id = support_ticket_messages.ticket_id
+        and t.user_id = auth.uid()
+    ) AND support_ticket_messages.is_private = false
+  )
+);
+
+-- support_ticket_messages: update (작성자 또는 관리자; 비공개 여부 변경은 관리자만)
+create policy if not exists stm_update on support_ticket_messages
+for update using (author_id = auth.uid() or is_admin())
+with check (
+  (author_id = auth.uid() and is_private = false) or is_admin()
+);
+
+-- support_ticket_messages: delete (작성자 또는 관리자)
+create policy if not exists stm_delete on support_ticket_messages
+for delete using (author_id = auth.uid() or is_admin());

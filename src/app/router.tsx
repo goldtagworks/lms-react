@@ -28,6 +28,9 @@ import TermsPage from '@main/pages/TermsPage';
 import PrivacyPage from '@main/pages/PrivacyPage';
 import NoticesPage from '@main/pages/NoticesPage';
 import NoticeDetailPage from '@main/pages/NoticeDetailPage';
+import SupportTicketsPage from '@main/pages/SupportTicketsPage';
+import SupportNewPage from '@main/pages/SupportNewPage';
+import FAQPage from '@main/pages/FAQPage';
 import InstructorApplyPage from '@main/pages/InstructorApplyPage';
 import AdminInstructorAppsPage from '@main/pages/AdminInstructorAppsPage';
 import RequireRole from '@main/components/RequireRole';
@@ -180,6 +183,24 @@ export default function AppRouter() {
                 {/* 약관/정책 */}
                 <Route element={<TermsPage />} path="/terms" />
                 <Route element={<PrivacyPage />} path="/privacy" />
+                {/* Support & FAQ */}
+                <Route
+                    element={
+                        <AuthAny>
+                            <SupportTicketsPage />
+                        </AuthAny>
+                    }
+                    path="/support"
+                />
+                <Route
+                    element={
+                        <AuthAny>
+                            <SupportNewPage />
+                        </AuthAny>
+                    }
+                    path="/support/new"
+                />
+                <Route element={<FAQPage />} path="/faq" />
                 {/* 404 fallback */}
                 <Route element={<NotFoundPage />} path="*" />
             </Route>

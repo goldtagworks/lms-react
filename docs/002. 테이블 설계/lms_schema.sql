@@ -1,5 +1,4 @@
--- =============================
--- LMS schema v1.1 (2025-09-28)
+-- LMS schema v1.2 (2025-09-30)
 -- Change Log:
 --  * v1.1: Removed course_sections table; simplified curriculum model.
 --          Added lessons.is_section boolean; deprecated lessons.section_id.
@@ -285,3 +284,48 @@ FROM courses c
 LEFT JOIN s ON s.course_id = c.id
 LEFT JOIN E ON E.course_id = c.id
 LEFT JOIN R ON R.course_id = c.id;
+
+-- =============================================
+-- [지원 티켓] 1:1 문의 (사용자와 관리자 간 대화)
+-- Scope:
+--   * support_tickets: 티켓 메타 (제목/상태/최종 업데이트)
+--   * support_ticket_messages: 메시지 스레드 (작성자/본문/가시성)
+-- Rationale:
+--   * FAQ로 해결되지 않는 개별 문의 처리
+--   * 추후 첨부파일/분류/우선순위 확장 가능 (필드 예약 주석)
+-- 규칙 요약:
+--   * 일반 사용자: 자신이 만든 티켓 + 그 메시지 읽기/작성
+--   * 관리자: 모든 티켓/메시지 읽기/작성/상태 변경
+--   * 상태(status): OPEN, ANSWERED(관리자 답변 후), CLOSED(종결)
+-- 파생 필드 계산 금지 (예: message_count) → 뷰 혹은 클라이언트 집계
+-- =============================================
+DROP TABLE IF EXISTS support_ticket_messages CASCADE;
+DROP TABLE IF EXISTS support_tickets CASCADE;
+
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 티켓 고유 ID
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 생성 사용자 ID
+  title text NOT NULL, -- 제목
+  status text NOT NULL CHECK (status IN ('OPEN','ANSWERED','CLOSED')) DEFAULT 'OPEN', -- 상태
+  category text, -- 분류(선택; ex: billing, technical, general)
+  last_message_at timestamptz NOT NULL DEFAULT now(), -- 마지막 메시지 시각 (트리거로 업데이트 고려)
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_user ON support_tickets(user_id);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status);
+
+CREATE TABLE IF NOT EXISTS support_ticket_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 메시지 고유 ID
+  ticket_id uuid NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE, -- 티켓 ID
+  author_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 작성자 ID (사용자/관리자)
+  body text NOT NULL, -- 메시지 본문 (Markdown 허용 가능)
+  is_private boolean NOT NULL DEFAULT false, -- 내부 메모(관리자만) 여부
+  created_at timestamptz NOT NULL DEFAULT now(), -- 작성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일(편집 허용 시)
+);
+CREATE INDEX IF NOT EXISTS idx_support_msgs_ticket ON support_ticket_messages(ticket_id);
+CREATE INDEX IF NOT EXISTS idx_support_msgs_author ON support_ticket_messages(author_id);
+
+-- 뷰 예시(향후): v_support_ticket_counts (상태별 카운트) 필요 시 추가
+
