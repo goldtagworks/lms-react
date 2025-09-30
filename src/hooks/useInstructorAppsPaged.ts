@@ -3,6 +3,8 @@ import type { PaginatedResult } from '@main/types/pagination';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
 import { qk } from '@main/lib/queryKeys';
+import { useDebouncedValue } from '@main/hooks/useDebouncedValue';
+import { mapSupabaseError } from '@main/lib/errors';
 
 export type InstructorAppBucket = 'PENDING' | 'DECIDED' | 'REVOKED';
 
@@ -62,22 +64,27 @@ async function fetchInstructorApps({ bucket, page, pageSize, search }: FetchPara
         query = query.or(`display_name.ilike.${pattern},user_id.ilike.${pattern}`);
     }
 
-    const { data, error, count } = await query.range(from, to);
+    try {
+        const { data, error, count } = await query.range(from, to);
 
-    if (error) throw error;
-    const items = (data || []) as InstructorApplicationRow[];
-    const total = count ?? items.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(page, pageCount);
-    const paged: PaginatedResult<InstructorApplicationRow> = { items, page: safePage, pageSize, total, pageCount };
+        if (error) throw error;
+        const items = (data || []) as InstructorApplicationRow[];
+        const total = count ?? items.length;
+        const pageCount = Math.max(1, Math.ceil(total / pageSize));
+        const safePage = Math.min(page, pageCount);
+        const paged: PaginatedResult<InstructorApplicationRow> = { items, page: safePage, pageSize, total, pageCount };
 
-    return paged;
+        return paged;
+    } catch (e) {
+        throw mapSupabaseError(e);
+    }
 }
 
 export function useInstructorAppsPaged(bucket: InstructorAppBucket, page: number, { pageSize = 10, search = '' }: UseInstructorAppsPagedOptions = {}) {
+    const debouncedSearch = useDebouncedValue(search, 300);
     const query = useQuery({
-        queryKey: qk.instructorApps({ bucket, page, pageSize, search }),
-        queryFn: () => fetchInstructorApps({ bucket, page, pageSize, search }),
+        queryKey: qk.instructorApps({ bucket, page, pageSize, search: debouncedSearch }),
+        queryFn: () => fetchInstructorApps({ bucket, page, pageSize, search: debouncedSearch }),
         staleTime: 30_000
     });
 

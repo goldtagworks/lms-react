@@ -1,8 +1,10 @@
-import type { PaginatedResult } from '@main/types/pagination';
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
+import { mapSupabaseError } from '@main/lib/errors';
 import { qk } from '@main/lib/queryKeys';
+import { COURSE_FIELDS_LIST, applyFeaturedOrder, queryPolicy } from '@main/lib/queryPolicy';
+import { computeRange, buildPagedResult } from '@main/lib/paging';
+import { useDebouncedValue } from '@main/hooks/useDebouncedValue';
 
 export interface CourseListRow {
     id: string;
@@ -43,14 +45,8 @@ interface FetchParams {
 }
 
 async function fetchCourses({ page, pageSize, categoryId, q, includeUnpublished }: FetchParams) {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-    let query = supabase
-        .from('courses')
-        .select(
-            'id,title,description,instructor_id,pricing_mode,price_cents,sale_price_cents,sale_ends_at,tax_included,currency,level,category_id,thumbnail_url,summary,tags,is_featured,featured_rank,featured_badge_text,published,created_at',
-            { count: 'exact' }
-        );
+    const { from, to } = computeRange(page, pageSize);
+    let query = supabase.from('courses').select(COURSE_FIELDS_LIST, { count: 'exact' });
 
     if (!includeUnpublished) query = query.eq('published', true);
     if (categoryId) query = query.eq('category_id', categoryId);
@@ -61,30 +57,28 @@ async function fetchCourses({ page, pageSize, categoryId, q, includeUnpublished 
         query = query.or(`title.ilike.${pattern},description.ilike.${pattern}`);
     }
 
-    const { data, error, count } = await query.range(from, to).order('is_featured', { ascending: false }).order('featured_rank', { ascending: true }).order('created_at', { ascending: false });
+    try {
+        const { data, error, count } = await applyFeaturedOrder(query).range(from, to);
 
-    if (error) throw error;
-    const items = (data || []) as CourseListRow[];
-    const total = count ?? items.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(page, pageCount);
+        if (error) throw error;
 
-    const paged: PaginatedResult<CourseListRow> = {
-        items,
-        page: safePage,
-        pageSize,
-        total,
-        pageCount
-    };
+        const items = (data || []) as CourseListRow[];
 
-    return paged;
+        return buildPagedResult({ items, count, page, pageSize });
+    } catch (e) {
+        throw mapSupabaseError(e);
+    }
 }
 
 export function useCoursesPaged(page: number, { pageSize = 12, categoryId, q, includeUnpublished = false }: UseCoursesPagedOptions = {}) {
+    const policy = queryPolicy.courses;
+    const debouncedQ = useDebouncedValue(q, 300);
     const query = useQuery({
-        queryKey: qk.courses({ page, pageSize, categoryId, q }),
-        queryFn: () => fetchCourses({ page, pageSize, categoryId, q, includeUnpublished }),
-        staleTime: 30_000
+        queryKey: qk.courses({ page, pageSize, categoryId, q: debouncedQ }),
+        queryFn: () => fetchCourses({ page, pageSize, categoryId, q: debouncedQ, includeUnpublished }),
+        staleTime: policy.staleTime
+        // react-query v5 'gcTime' 옵션 미사용 상태; v4 호환 위해 keepPreviousData 제거
+        // 페이지 변경 시 깜빡임 방지를 위해 enabled 제어 or skeleton 전략 별도 적용
     });
 
     return { data: query.data, isLoading: query.isLoading, error: query.error } as const;

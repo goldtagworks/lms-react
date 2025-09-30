@@ -822,5 +822,12 @@
     },
     "category": { "all": "전체", "frontend": "프론트엔드", "backend": "백엔드", "data": "데이터분석", "ai": "AI/ML", "cert": "자격증", "biz": "비즈니스" },
     "result": { "pass": "합격", "fail": "불합격" },
-    "notFound": { "title": "404 Not Found", "message": "요청하신 페이지를 찾을 수 없습니다.", "home": "홈으로 이동" }
+    "notFound": {
+        "title": "페이지를 찾을 수 없습니다",
+        "message": "존재하지 않거나 이동되었어요. 아래 추천 링크를 통해 계속 탐색해 보세요.",
+        "home": "홈으로 이동",
+        "browseCourses": "코스 둘러보기",
+        "goSupport": "고객지원",
+        "searchPlaceholder": "사이트 내 검색..."
+    }
 }

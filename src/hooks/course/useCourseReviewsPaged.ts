@@ -4,6 +4,8 @@ import type { CourseReview } from '@main/types/review';
 import { useQuery } from '@tanstack/react-query';
 import { qk } from '@main/lib/queryKeys';
 import { supabase } from '@main/lib/supabase';
+import { mapSupabaseError } from '@main/lib/errors';
+import { computeRange, buildPagedResult, emptyPage } from '@main/lib/paging';
 
 export type ReviewSort = 'latest' | 'ratingHigh' | 'ratingLow';
 
@@ -25,29 +27,31 @@ function buildOrder(sort: ReviewSort) {
 }
 
 export function useCourseReviewsPaged(courseId: string | undefined, page: number, { pageSize = 10, sort = 'latest' }: UseCourseReviewsPagedOptions = {}) {
+    const enabled = !!courseId;
+
     return useQuery({
         queryKey: courseId ? qk.reviews({ courseId, page, pageSize, sort }) : ['reviews', 'disabled'],
-        enabled: !!courseId,
+        enabled,
         queryFn: async (): Promise<PaginatedResult<CourseReview>> => {
-            const from = (page - 1) * pageSize;
-            const to = from + pageSize - 1;
+            const { from, to } = computeRange(page, pageSize);
             const order = buildOrder(sort);
 
-            // 총 카운트 + 페이지 데이터 동시 조회
-            const { data, error, count } = await supabase
-                .from('course_reviews')
-                .select('*', { count: 'exact' })
-                .eq('course_id', courseId!)
-                .order(order.column, { ascending: order.ascending })
-                .range(from, to);
+            try {
+                const { data, error, count } = await supabase
+                    .from('course_reviews')
+                    .select('*', { count: 'exact' })
+                    .eq('course_id', courseId!)
+                    .order(order.column, { ascending: order.ascending })
+                    .range(from, to);
 
-            if (error) throw error;
+                if (error) throw error;
 
-            const total = count ?? 0;
-            const pageCount = Math.max(1, Math.ceil(total / pageSize));
-
-            return { items: data as CourseReview[], page, pageSize, total, pageCount };
-        }
+                return buildPagedResult({ items: (data || []) as CourseReview[], count, page, pageSize });
+            } catch (e) {
+                throw mapSupabaseError(e);
+            }
+        },
+        placeholderData: !enabled ? emptyPage<CourseReview>(pageSize) : undefined
     });
 }
 

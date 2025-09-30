@@ -3,6 +3,7 @@ import type { PaginatedResult } from '@main/types/pagination';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
 import { qk } from '@main/lib/queryKeys';
+import { mapSupabaseError } from '@main/lib/errors';
 
 export interface InstructorCourseRow {
     id: string;
@@ -54,16 +55,21 @@ async function fetchInstructorCourses({ instructorId, page, pageSize, includeUnp
 
     if (!includeUnpublished) query = query.eq('published', true);
 
-    const { data, error, count } = await query.range(from, to).order('is_featured', { ascending: false }).order('featured_rank', { ascending: true }).order('created_at', { ascending: false });
+    try {
+        const { data, error, count } = await query.range(from, to).order('is_featured', { ascending: false }).order('featured_rank', { ascending: true }).order('created_at', { ascending: false });
 
-    if (error) throw error;
-    const items = (data || []) as InstructorCourseRow[];
-    const total = count ?? items.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(page, pageCount);
-    const paged: PaginatedResult<InstructorCourseRow> = { items, page: safePage, pageSize, total, pageCount };
+        if (error) throw error;
 
-    return paged;
+        const items = (data || []) as InstructorCourseRow[];
+        const total = count ?? items.length;
+        const pageCount = Math.max(1, Math.ceil(total / pageSize));
+        const safePage = Math.min(page, pageCount);
+        const paged: PaginatedResult<InstructorCourseRow> = { items, page: safePage, pageSize, total, pageCount };
+
+        return paged;
+    } catch (e) {
+        throw mapSupabaseError(e);
+    }
 }
 
 export function useInstructorCoursesPaged(page: number, { pageSize = 20, includeUnpublished = true, instructorId }: UseInstructorCoursesPagedOptions = {}) {

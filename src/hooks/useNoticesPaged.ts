@@ -2,6 +2,7 @@ import type { PaginatedResult } from '@main/types/pagination';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
+import { mapSupabaseError } from '@main/lib/errors';
 import { qk } from '@main/lib/queryKeys';
 
 export interface NoticeRow {
@@ -40,16 +41,21 @@ async function fetchNotices({ page, pageSize, includePinnedFirst, includeUnpubli
         query = query.order('created_at', { ascending: false });
     }
 
-    const { data, error, count } = await query.range(from, to);
+    try {
+        const { data, error, count } = await query.range(from, to);
 
-    if (error) throw error;
-    const items = (data || []) as NoticeRow[];
-    const total = count ?? items.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(page, pageCount);
-    const paged: PaginatedResult<NoticeRow> = { items, page: safePage, pageSize, total, pageCount };
+        if (error) throw error;
 
-    return paged;
+        const items = (data || []) as NoticeRow[];
+        const total = count ?? items.length;
+        const pageCount = Math.max(1, Math.ceil(total / pageSize));
+        const safePage = Math.min(page, pageCount);
+        const paged: PaginatedResult<NoticeRow> = { items, page: safePage, pageSize, total, pageCount };
+
+        return paged;
+    } catch (e) {
+        throw mapSupabaseError(e);
+    }
 }
 
 export function useNoticesPaged(page: number, { pageSize = 15, includePinnedFirst = true, includeUnpublished = false }: UseNoticesPagedOptions = {}) {

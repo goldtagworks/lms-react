@@ -3,6 +3,7 @@ import type { PaginatedResult } from '@main/types/pagination';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
 import { qk } from '@main/lib/queryKeys';
+import { mapSupabaseError } from '@main/lib/errors';
 
 export interface InstructorPublicCourseRow {
     id: string;
@@ -38,22 +39,27 @@ async function fetchInstructorPublicCourses({ instructorId, page, pageSize }: Fe
         .eq('instructor_id', instructorId)
         .eq('published', true);
 
-    const { data, error, count } = await query.range(from, to).order('is_featured', { ascending: false }).order('featured_rank', { ascending: true }).order('created_at', { ascending: false });
+    try {
+        const { data, error, count } = await query.range(from, to).order('is_featured', { ascending: false }).order('featured_rank', { ascending: true }).order('created_at', { ascending: false });
 
-    if (error) throw error;
-    const items = (data || []) as InstructorPublicCourseRow[];
-    const total = count ?? items.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(page, pageCount);
-    const paged: PaginatedResult<InstructorPublicCourseRow> = {
-        items,
-        page: safePage,
-        pageSize,
-        total,
-        pageCount
-    };
+        if (error) throw error;
 
-    return paged;
+        const items = (data || []) as InstructorPublicCourseRow[];
+        const total = count ?? items.length;
+        const pageCount = Math.max(1, Math.ceil(total / pageSize));
+        const safePage = Math.min(page, pageCount);
+        const paged: PaginatedResult<InstructorPublicCourseRow> = {
+            items,
+            page: safePage,
+            pageSize,
+            total,
+            pageCount
+        };
+
+        return paged;
+    } catch (e) {
+        throw mapSupabaseError(e);
+    }
 }
 
 export function useInstructorPublicCoursesPaged(instructorId: string | undefined, page: number, { pageSize = 12 }: UseInstructorPublicCoursesPagedOptions = {}) {

@@ -4,6 +4,8 @@ import type { CourseQuestion } from '@main/types/qna';
 import { useQuery } from '@tanstack/react-query';
 import { qk } from '@main/lib/queryKeys';
 import { supabase } from '@main/lib/supabase';
+import { mapSupabaseError } from '@main/lib/errors';
+import { computeRange, buildPagedResult, emptyPage } from '@main/lib/paging';
 
 interface UseCourseQnAPagedOptions {
     pageSize?: number;
@@ -11,20 +13,30 @@ interface UseCourseQnAPagedOptions {
 }
 
 export function useCourseQnAPaged(courseId: string | undefined, page: number, { pageSize = 10 }: UseCourseQnAPagedOptions = {}) {
+    const enabled = !!courseId;
+
     return useQuery({
         queryKey: courseId ? qk.qna({ courseId, page, pageSize }) : ['qna', 'disabled'],
-        enabled: !!courseId,
+        enabled,
         queryFn: async (): Promise<PaginatedResult<CourseQuestion>> => {
-            const from = (page - 1) * pageSize;
-            const to = from + pageSize - 1;
-            const { data, error, count } = await supabase.from('course_questions').select('*', { count: 'exact' }).eq('course_id', courseId!).order('created_at', { ascending: false }).range(from, to);
+            const { from, to } = computeRange(page, pageSize);
 
-            if (error) throw error;
-            const total = count ?? 0;
-            const pageCount = Math.max(1, Math.ceil(total / pageSize));
+            try {
+                const { data, error, count } = await supabase
+                    .from('course_questions')
+                    .select('*', { count: 'exact' })
+                    .eq('course_id', courseId!)
+                    .order('created_at', { ascending: false })
+                    .range(from, to);
 
-            return { items: data as CourseQuestion[], page, pageSize, total, pageCount };
-        }
+                if (error) throw error;
+
+                return buildPagedResult({ items: (data || []) as CourseQuestion[], count, page, pageSize });
+            } catch (e) {
+                throw mapSupabaseError(e);
+            }
+        },
+        placeholderData: !enabled ? emptyPage<CourseQuestion>(pageSize) : undefined
     });
 }
 

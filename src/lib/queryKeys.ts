@@ -13,6 +13,8 @@
  *  useSupportMessagesPaged → [...qk.supportMessages(ticketId), { page, pageSize }]
  */
 
+import { stableFilters } from '@main/lib/stableFilters';
+
 export const qk = {
     course: (id: string) => ['course', id] as const,
     lessons: (courseId: string) => ['lessons', courseId] as const,
@@ -31,21 +33,21 @@ export const qk = {
     // Categories (관리자)
     categories: () => ['categories'] as const,
     // Admin Users (검색/페이지 필터 객체 포함)
-    adminUsers: (filters: { q?: string; page?: number; pageSize?: number }) => ['adminUsers', filters] as const,
+    adminUsers: (filters: { q?: string; page?: number; pageSize?: number }) => ['adminUsers', stableFilters(filters)] as const,
     // Courses (목록)
-    courses: (filters: { page: number; pageSize: number; q?: string; categoryId?: string }) => ['courses', filters] as const,
+    courses: (filters: { page: number; pageSize: number; q?: string; categoryId?: string }) => ['courses', stableFilters(filters)] as const,
     // Instructor Courses (내부 - 초안 포함)
-    instructorCourses: (filters: { instructorId: string; page: number; pageSize: number; includeUnpublished?: boolean }) => ['instructorCourses', filters] as const,
+    instructorCourses: (filters: { instructorId: string; page: number; pageSize: number; includeUnpublished?: boolean }) => ['instructorCourses', stableFilters(filters)] as const,
     // Instructor Public Courses (공개된 것만)
-    instructorPublicCourses: (filters: { instructorId: string; page: number; pageSize: number }) => ['instructorPublicCourses', filters] as const,
+    instructorPublicCourses: (filters: { instructorId: string; page: number; pageSize: number }) => ['instructorPublicCourses', stableFilters(filters)] as const,
     // Notices (공지 목록)
-    notices: (filters: { page: number; pageSize: number; includePinnedFirst?: boolean }) => ['notices', filters] as const,
+    notices: (filters: { page: number; pageSize: number; includePinnedFirst?: boolean }) => ['notices', stableFilters(filters)] as const,
     // Instructor Applications (관리자)
-    instructorApps: (filters: { bucket: string; page: number; pageSize: number; search?: string }) => ['instructorApps', filters] as const,
+    instructorApps: (filters: { bucket: string; page: number; pageSize: number; search?: string }) => ['instructorApps', stableFilters(filters)] as const,
     // Course Reviews (페이지네이션)
-    reviews: (filters: { courseId: string; page: number; pageSize: number; sort?: string }) => ['reviews', filters] as const,
+    reviews: (filters: { courseId: string; page: number; pageSize: number; sort?: string }) => ['reviews', stableFilters(filters)] as const,
     // Course QnA (페이지네이션)
-    qna: (filters: { courseId: string; page: number; pageSize: number; viewerId?: string }) => ['qna', filters] as const
+    qna: (filters: { courseId: string; page: number; pageSize: number; viewerId?: string }) => ['qna', stableFilters(filters)] as const
 };
 
 export type QueryKey = ReturnType<(typeof qk)[keyof typeof qk]>;
