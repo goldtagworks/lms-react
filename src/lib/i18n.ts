@@ -8,12 +8,15 @@
 
 import type { I18nKey } from '@main/types/i18n-keys';
 
-import { useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore, useState } from 'react';
+
+import koUiStatic from '../locales/ko/ui.json';
 
 export type Locale = 'ko' | 'en';
 export const DEFAULT_LOCALE: Locale = 'ko';
 let currentLocale: Locale = DEFAULT_LOCALE;
 let version = 0; // increments on locale or namespace load to trigger subscribers
+let ready = false; // 최초 필수 namespace 로드 여부
 
 // Loaded resources cache: locale -> namespace -> record
 const resources: Record<Locale, Record<string, Record<string, string>>> = {
@@ -65,43 +68,47 @@ function nsImporter(locale: Locale, ns: string): LoadFn {
     return () => import(`../locales/${locale}/${ns}.json`) as Promise<any>;
 }
 
+function flattenRaw(raw: any): Record<string, string> {
+    const out: Record<string, string> = {};
+    const stack: Array<{ obj: any; prefix: string }> = [{ obj: raw, prefix: '' }];
+
+    while (stack.length) {
+        const { obj, prefix } = stack.pop()!;
+
+        if (obj && typeof obj === 'object') {
+            for (const [k, v] of Object.entries(obj)) {
+                if (k === '__meta') continue;
+                const nextPrefix = prefix ? `${prefix}.${k}` : k;
+
+                if (v && typeof v === 'object') {
+                    stack.push({ obj: v, prefix: nextPrefix });
+                } else if (typeof v === 'string') {
+                    out[nextPrefix] = v;
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
 async function loadNamespace(locale: Locale, ns: string) {
     if (resources[locale][ns]) return;
     try {
         const mod: any = await nsImporter(locale, ns)();
         const raw: any = mod && (mod.default || mod);
 
-        // Allow nested JSON objects; flatten to key.path form for lookup compatibility.
-        const out: Record<string, string> = {};
-        const stack: Array<{ obj: any; prefix: string }> = [{ obj: raw, prefix: '' }];
-
-        while (stack.length) {
-            const { obj, prefix } = stack.pop()!;
-
-            if (obj && typeof obj === 'object') {
-                for (const [k, v] of Object.entries(obj)) {
-                    if (k === '__meta') continue;
-                    const nextPrefix = prefix ? `${prefix}.${k}` : k;
-
-                    if (v && typeof v === 'object') {
-                        stack.push({ obj: v, prefix: nextPrefix });
-                    } else if (typeof v === 'string') {
-                        out[nextPrefix] = v;
-                    }
-                }
-            }
-        }
-        resources[locale][ns] = out;
+        resources[locale][ns] = flattenRaw(raw);
     } catch {
-        // Silently ignore missing namespace (caller may fallback)
         resources[locale][ns] = {};
     }
 }
 
 export async function initI18n(initialLocale: Locale = DEFAULT_LOCALE) {
     currentLocale = initialLocale;
-    // 단일 파일 로드
     await Promise.all(NAMESPACES.map((ns) => loadNamespace(initialLocale, ns)));
+    ready = true;
+    emit('namespacesLoaded');
 }
 
 export async function setLocale(locale: Locale, preload = true) {
@@ -181,10 +188,13 @@ export function t(fullKey: string, vars?: Record<string, string | number>, fallb
     return base;
 }
 
-// Convenience synchronous guard: ensure at least core namespaces are loaded.
-(async () => {
-    await initI18n();
-})();
+// --- Synchronous bootstrap (default ko locale) ------------------------------
+if (!resources.ko['ui']) {
+    resources.ko['ui'] = flattenRaw((koUiStatic as any).default || koUiStatic);
+}
+
+// 비동기 초기화 (기본 ko는 이미 채워짐)
+initI18n().catch(() => {});
 
 // --- React hook integration --------------------------------------------------
 function subscribe(callback: () => void) {
@@ -204,9 +214,14 @@ function getSnapshot() {
 
 export function useI18n() {
     useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+    const [isReady, setIsReady] = useState(ready);
+
     useEffect(() => {
-        // placeholder for side-effects (e.g., persisting locale) – kept lightweight
+        if (!isReady && ready) setIsReady(true);
+    }, [isReady]);
+    useEffect(() => {
+        // placeholder for side-effects (e.g., persisting locale)
     }, [currentLocale]);
 
-    return { t, locale: currentLocale, setLocale, ensureNamespaces };
+    return { t, locale: currentLocale, setLocale, ensureNamespaces, ready: isReady };
 }
