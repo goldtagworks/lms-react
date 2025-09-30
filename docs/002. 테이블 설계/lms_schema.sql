@@ -1,8 +1,9 @@
--- LMS schema v1.2 (2025-09-30)
+-- LMS schema v1.4 (2025-10-01)
 -- Change Log:
 --  * v1.1: Removed course_sections table; simplified curriculum model.
 --          Added lessons.is_section boolean; deprecated lessons.section_id.
 --          Rationale: 프론트/UX 단순화 요구. (섹션 헤더를 레슨 Row로 통합)
+--  * v1.4: Added notices, instructor_applications tables (migrating from in-memory repository)
 -- =============================
 
 -- [코스] 강의/클래스의 기본 정보 테이블
@@ -21,12 +22,19 @@ CREATE TABLE IF NOT EXISTS courses (
   level text, -- 난이도
   category_id uuid REFERENCES categories(id), -- 카테고리 ID
   thumbnail_url text, -- 썸네일 이미지
+  summary text, -- 짧은 소개 (목록/SEO) @optional
+  tags text[] DEFAULT '{}', -- 태그 배열 (간단 분류/검색) @optional
+  is_featured boolean NOT NULL DEFAULT false, -- 추천 여부
+  featured_rank int, -- 추천 정렬 우선순위(낮을수록 먼저)
+  featured_badge_text text, -- 추천 배지 커스텀 텍스트
   published boolean NOT NULL DEFAULT false, -- 공개 여부
   created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
   updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
 );
 CREATE INDEX IF NOT EXISTS idx_courses_instructor_id ON courses(instructor_id);
 CREATE INDEX IF NOT EXISTS idx_courses_category_id ON courses(category_id);
+CREATE INDEX IF NOT EXISTS idx_courses_featured ON courses(is_featured);
+CREATE INDEX IF NOT EXISTS idx_courses_featured_rank ON courses(featured_rank) WHERE featured_rank IS NOT NULL;
 
 -- [레슨] 강의 내 개별 학습 단위(구버전)
 DROP TABLE IF EXISTS lessons CASCADE;
@@ -284,6 +292,51 @@ FROM courses c
 LEFT JOIN s ON s.course_id = c.id
 LEFT JOIN E ON E.course_id = c.id
 LEFT JOIN R ON R.course_id = c.id;
+
+-- =============================================
+-- [공지사항] (기존 in-memory noticeRepo 대체)
+-- 규칙:
+--  * pinned = true 인 레코드는 목록에서 상단 고정
+--  * published=false 는 관리자 초안(클라이언트 기본 쿼리는 published=true 만)
+--  * 정렬: pinned DESC, created_at DESC
+-- =============================================
+DROP TABLE IF EXISTS notices CASCADE;
+CREATE TABLE IF NOT EXISTS notices (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 공지 고유 ID
+  title text NOT NULL, -- 제목
+  body text, -- 본문 (Markdown 허용)
+  pinned boolean NOT NULL DEFAULT false, -- 상단 고정 여부
+  published boolean NOT NULL DEFAULT true, -- 공개 여부
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_notices_pinned ON notices(pinned) WHERE pinned = true;
+CREATE INDEX IF NOT EXISTS idx_notices_created ON notices(created_at DESC);
+
+-- =============================================
+-- [강사 신청] instructor applications (mock -> DB 마이그레이션)
+-- 상태(status): PENDING | APPROVED | REJECTED | REVOKED
+-- 버킷 매핑:
+--   * PENDING  => status = PENDING
+--   * DECIDED  => status IN (APPROVED, REJECTED)
+--   * REVOKED  => status = REVOKED
+-- =============================================
+DROP TABLE IF EXISTS instructor_applications CASCADE;
+CREATE TABLE IF NOT EXISTS instructor_applications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 신청 고유 ID
+  user_id uuid NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE, -- 지원자 사용자 ID
+  display_name text NOT NULL, -- 공개 표시명
+  bio_md text, -- 자기소개 (Markdown)
+  links jsonb, -- 외부 링크 리스트 [{label,url}]
+  status text NOT NULL CHECK (status IN ('PENDING','APPROVED','REJECTED','REVOKED')) DEFAULT 'PENDING', -- 상태
+  created_at timestamptz NOT NULL DEFAULT now(), -- 신청일
+  decided_at timestamptz, -- 승인/거절 처리일
+  rejection_reason text, -- 거절 사유
+  revoked_at timestamptz, -- 승인 후 철회 처리일
+  revoke_reason text -- 철회 사유
+);
+CREATE INDEX IF NOT EXISTS idx_instr_apps_user ON instructor_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_instr_apps_status ON instructor_applications(status);
 
 -- =============================================
 -- [지원 티켓] 1:1 문의 (사용자와 관리자 간 대화)

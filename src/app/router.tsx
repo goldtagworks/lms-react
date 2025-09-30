@@ -72,7 +72,8 @@ export default function AppRouter() {
                     {/* Public / Eager */}
                     <Route element={<HomePage />} path="/" />
                     <Route element={<CourseListPage />} path="/courses" />
-                    <Route element={<CourseDetailPage />} path="/course/:id" />
+                    {/* Course detail: param 명을 courseId로 통일 */}
+                    <Route element={<CourseDetailPage />} path="/course/:courseId" />
                     <Route element={<NoticesPage />} path="/notices" />
                     <Route element={<NoticeDetailPage />} path="/notices/:id" />
                     <Route element={<SignInPage />} path="/signin" />

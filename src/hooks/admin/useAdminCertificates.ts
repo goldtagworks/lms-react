@@ -1,19 +1,14 @@
-import type { Certificate } from '@main/types/exam';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@main/lib/supabase';
 
-import { useEffect, useMemo, useState } from 'react';
-import { issueCertificate } from '@main/lib/repository';
-
-// sessionStorage mock loader
-function loadAllCertificates(): Certificate[] {
-    try {
-        const raw = sessionStorage.getItem('lms.certificates.v1');
-
-        if (!raw) return [];
-
-        return JSON.parse(raw) as Certificate[];
-    } catch {
-        return [];
-    }
+export interface AdminCertificateRow {
+    id: string;
+    enrollment_id: string;
+    exam_attempt_id: string;
+    issued_at: string;
+    serial_no: string;
+    pdf_path: string | null;
 }
 
 export interface UseAdminCertificatesOptions {
@@ -21,30 +16,39 @@ export interface UseAdminCertificatesOptions {
 }
 
 export function useAdminCertificates({ pageSize = 20 }: UseAdminCertificatesOptions = {}) {
-    const [items, setItems] = useState<Certificate[]>([]);
-    const [q, setQ] = useState(''); // filter: id or serial
+    const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
-    const [revision, setRevision] = useState(0);
+    const [q, setQ] = useState(''); // filter: id or serial
+    // soft deactivate local map (not persisted yet)
+    const [deactivated, setDeactivated] = useState<Record<string, string>>({});
 
     // reissue modal state
-    const [reissueTarget, setReissueTarget] = useState<Certificate | null>(null);
+    const [reissueTarget, setReissueTarget] = useState<AdminCertificateRow | null>(null);
     const [reissueNote, setReissueNote] = useState('');
     const [reissueErr, setReissueErr] = useState<string | null>(null);
 
-    // soft deactivated map (certId -> reason)
-    const [deactivated, setDeactivated] = useState<Record<string, string>>({});
+    const {
+        data: raw = [],
+        isLoading,
+        error
+    } = useQuery<AdminCertificateRow[]>({
+        queryKey: ['adminCertificates'],
+        queryFn: async () => {
+            const { data, error } = await supabase.from('certificates').select('id,enrollment_id,exam_attempt_id,issued_at,serial_no,pdf_path').order('issued_at', { ascending: false });
 
-    useEffect(() => {
-        setItems(loadAllCertificates());
-    }, [revision]);
+            if (error) throw error;
+
+            return (data || []) as AdminCertificateRow[];
+        }
+    });
 
     const filtered = useMemo(() => {
         const qq = q.trim().toLowerCase();
 
-        if (!qq) return items;
+        if (!qq) return raw;
 
-        return items.filter((c) => c.serial_no.toLowerCase().includes(qq) || c.id.toLowerCase().includes(qq));
-    }, [items, q]);
+        return raw.filter((c) => c.serial_no.toLowerCase().includes(qq) || c.id.toLowerCase().includes(qq));
+    }, [raw, q]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
     const pageSafe = Math.min(page, totalPages);
@@ -55,37 +59,42 @@ export function useAdminCertificates({ pageSize = 20 }: UseAdminCertificatesOpti
         setPage(1);
     }
 
-    function refresh() {
-        setRevision((r) => r + 1);
-    }
+    const refresh = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['adminCertificates'] });
+    }, [queryClient]);
 
-    function openReissue(c: Certificate) {
+    function openReissue(c: AdminCertificateRow) {
         setReissueTarget(c);
         setReissueNote('');
         setReissueErr(null);
     }
 
-    function commitReissue() {
-        if (!reissueTarget) return false;
-        try {
-            issueCertificate({
-                enrollment_id: reissueTarget.enrollment_id,
-                exam_attempt_id: reissueTarget.exam_attempt_id,
-                user_id: reissueTarget.serial_no.slice(0, 4) + '_U',
-                course_id: reissueTarget.serial_no.slice(5, 9) + '_C'
+    const reissueMutation = useMutation({
+        mutationFn: async () => {
+            if (!reissueTarget) throw new Error('NO_TARGET');
+            // TODO: 실제 서버 재발급 RPC 구현 필요. stub: no-op
+            const { error } = await supabase.rpc('reissue_certificate', {
+                p_certificate_id: reissueTarget.id,
+                p_note: reissueNote || null
             });
+
+            if (error) throw error;
+        },
+        onSuccess: () => {
             refresh();
             setReissueTarget(null);
+        },
+        onError: (e: any) => setReissueErr(e?.message || '재발급 실패')
+    });
 
-            return true;
-        } catch (e: any) {
-            setReissueErr(e?.message || '재발급 실패');
+    function commitReissue() {
+        if (!reissueTarget) return false;
+        reissueMutation.mutate();
 
-            return false;
-        }
+        return true;
     }
 
-    function toggleDeactivate(c: Certificate) {
+    function toggleDeactivate(c: AdminCertificateRow) {
         setDeactivated((prev) => {
             const next = { ...prev };
 
@@ -120,7 +129,9 @@ export function useAdminCertificates({ pageSize = 20 }: UseAdminCertificatesOpti
         toggleDeactivate,
         // paging
         setPage,
-        pageSize
+        pageSize,
+        isLoading,
+        error
     } as const;
 }
 

@@ -1,8 +1,9 @@
 import type { PaginatedResult } from '@main/types/pagination';
 import type { CourseReview } from '@main/types/review';
 
-import { useMemo } from 'react';
-import { useCourseReviewsState } from '@main/lib/repository';
+import { useQuery } from '@tanstack/react-query';
+import { qk } from '@main/lib/queryKeys';
+import { supabase } from '@main/lib/supabase';
 
 export type ReviewSort = 'latest' | 'ratingHigh' | 'ratingLow';
 
@@ -11,31 +12,43 @@ interface UseCourseReviewsPagedOptions {
     sort?: ReviewSort;
 }
 
+function buildOrder(sort: ReviewSort) {
+    switch (sort) {
+        case 'ratingHigh':
+            return { column: 'rating', ascending: false as const };
+        case 'ratingLow':
+            return { column: 'rating', ascending: true as const };
+        case 'latest':
+        default:
+            return { column: 'created_at', ascending: false as const };
+    }
+}
+
 export function useCourseReviewsPaged(courseId: string | undefined, page: number, { pageSize = 10, sort = 'latest' }: UseCourseReviewsPagedOptions = {}) {
-    const list = useCourseReviewsState(courseId);
+    return useQuery({
+        queryKey: courseId ? qk.reviews({ courseId, page, pageSize, sort }) : ['reviews', 'disabled'],
+        enabled: !!courseId,
+        queryFn: async (): Promise<PaginatedResult<CourseReview>> => {
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
+            const order = buildOrder(sort);
 
-    const sorted = useMemo(() => {
-        const arr = [...list];
+            // 총 카운트 + 페이지 데이터 동시 조회
+            const { data, error, count } = await supabase
+                .from('course_reviews')
+                .select('*', { count: 'exact' })
+                .eq('course_id', courseId!)
+                .order(order.column, { ascending: order.ascending })
+                .range(from, to);
 
-        switch (sort) {
-            case 'ratingHigh':
-                return arr.sort((a, b) => b.rating - a.rating || (a.created_at < b.created_at ? 1 : -1));
-            case 'ratingLow':
-                return arr.sort((a, b) => a.rating - b.rating || (a.created_at < b.created_at ? 1 : -1));
-            default:
-                return arr.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+            if (error) throw error;
+
+            const total = count ?? 0;
+            const pageCount = Math.max(1, Math.ceil(total / pageSize));
+
+            return { items: data as CourseReview[], page, pageSize, total, pageCount };
         }
-    }, [list, sort]);
-
-    const total = sorted.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(Math.max(1, page), pageCount);
-    const start = (safePage - 1) * pageSize;
-    const items: CourseReview[] = sorted.slice(start, start + pageSize);
-
-    const data: PaginatedResult<CourseReview> = { items, page: safePage, pageSize, total, pageCount };
-
-    return { data } as const;
+    });
 }
 
 export default useCourseReviewsPaged;

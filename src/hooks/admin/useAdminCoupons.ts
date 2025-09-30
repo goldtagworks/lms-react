@@ -1,7 +1,22 @@
 import type { PaginatedResult } from '@main/types/pagination';
 
 import { useEffect, useMemo, useState } from 'react';
-import { deactivateCoupon, listCouponsPaged, updateCoupon, createCoupon, Coupon } from '@main/lib/repository';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@main/lib/supabase';
+
+export interface CouponRow {
+    id: string;
+    code: string;
+    discount_type: 'percent' | 'fixed';
+    percent: number | null;
+    amount_cents: number | null;
+    starts_at: string | null;
+    ends_at: string | null;
+    max_redemptions: number | null;
+    per_user_limit: number | null;
+    is_active: boolean;
+    created_at: string;
+}
 
 export type CouponActiveFilter = 'all' | 'active' | 'inactive';
 
@@ -13,19 +28,41 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
     const [q, setQ] = useState('');
     const [activeFilter, setActiveFilter] = useState<CouponActiveFilter>('all');
     const [page, setPage] = useState(1);
-    const [revision, setRevision] = useState(0);
+    // revision state removed (React Query invalidation handles refresh)
 
-    const activeParam = useMemo(() => (activeFilter === 'all' ? undefined : activeFilter === 'active'), [activeFilter]);
-    const [rawPage, setRawPage] = useState(() => listCouponsPaged({ q: undefined, active: activeParam }, 1, pageSize));
-    const data: PaginatedResult<Coupon> = useMemo(
+    const activeParam = useMemo(() => (activeFilter === 'all' ? 'all' : activeFilter), [activeFilter]);
+    const queryClient = useQueryClient();
+    const { data: raw, isLoading } = useQuery({
+        queryKey: ['adminCoupons', { page, pageSize, q, active: activeParam }],
+        queryFn: async () => {
+            let query = supabase.from('coupons').select('*', { count: 'exact' });
+
+            if (q.trim()) query = query.ilike('code', `%${q.trim()}%`);
+            if (activeParam !== 'all') query = query.eq('is_active', activeParam === 'active');
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
+            const { data, error, count } = await query.order('created_at', { ascending: false }).range(from, to);
+
+            if (error) throw error;
+
+            return {
+                items: (data || []) as CouponRow[],
+                page,
+                pageSize,
+                total: count || 0,
+                pageCount: Math.max(1, Math.ceil((count || 0) / pageSize))
+            };
+        }
+    });
+    const data: PaginatedResult<CouponRow> = useMemo(
         () => ({
-            items: rawPage.items,
-            page: rawPage.page,
+            items: raw?.items || [],
+            page: raw?.page || page,
             pageSize,
-            total: rawPage.total,
-            pageCount: rawPage.totalPages
+            total: raw?.total || 0,
+            pageCount: raw?.pageCount || 1
         }),
-        [rawPage, pageSize]
+        [raw, page, pageSize]
     );
     const [createErr, setCreateErr] = useState<string | null>(null);
     const [editErr, setEditErr] = useState<string | null>(null);
@@ -43,14 +80,12 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
 
     // Editing state
     const [editId, setEditId] = useState<string | null>(null);
-    const [editDraft, setEditDraft] = useState<Partial<Coupon>>({});
+    const [editDraft, setEditDraft] = useState<Partial<CouponRow>>({});
 
     useEffect(() => {
-        const res = listCouponsPaged({ q: q.trim() || undefined, active: activeParam }, page, pageSize);
-
-        setRawPage(res);
-        if (page !== res.page) setPage(res.page);
-    }, [q, activeParam, page, pageSize, revision]);
+        // page reset when query/filter changes
+        setPage(1);
+    }, [q, activeParam]);
 
     function resetFilters() {
         setQ('');
@@ -59,14 +94,41 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
     }
 
     function triggerRefresh() {
-        setRevision((r) => r + 1);
+        queryClient.invalidateQueries({ queryKey: ['adminCoupons'] });
     }
 
-    function openEdit(c: Coupon) {
+    function openEdit(c: CouponRow) {
         setEditId(c.id);
         setEditDraft({ ...c });
         setEditErr(null);
     }
+
+    const updateMutation = useMutation({
+        mutationFn: async (payload: { id: string; patch: Partial<CouponRow> & { code?: string } }) => {
+            const { id, patch } = payload;
+            const { error, data } = await supabase
+                .from('coupons')
+                .update({
+                    code: patch.code?.trim(),
+                    discount_type: patch.discount_type,
+                    percent: patch.percent,
+                    amount_cents: patch.amount_cents,
+                    starts_at: patch.starts_at,
+                    ends_at: patch.ends_at,
+                    max_redemptions: patch.max_redemptions,
+                    per_user_limit: patch.per_user_limit,
+                    is_active: patch.is_active
+                })
+                .eq('id', id)
+                .select('*')
+                .single();
+
+            if (error) throw error;
+
+            return data as CouponRow;
+        },
+        onSuccess: () => triggerRefresh()
+    });
 
     function commitEdit() {
         if (!editId) return false;
@@ -75,37 +137,49 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
 
             return false;
         }
-        const r = updateCoupon(editId, {
-            code: editDraft.code,
-            type: editDraft.type,
-            value: editDraft.value,
-            currency_code: editDraft.currency_code,
-            max_uses: editDraft.max_uses,
-            per_user_limit: editDraft.per_user_limit,
-            starts_at: editDraft.starts_at,
-            ends_at: editDraft.ends_at,
-            active: editDraft.active
+        updateMutation.mutate({
+            id: editId,
+            patch: {
+                code: editDraft.code,
+                discount_type: editDraft.discount_type as any,
+                percent: (editDraft as any).percent ?? null,
+                amount_cents: (editDraft as any).amount_cents ?? null,
+                starts_at: (editDraft as any).starts_at ?? null,
+                ends_at: (editDraft as any).ends_at ?? null,
+                max_redemptions: (editDraft as any).max_redemptions ?? null,
+                per_user_limit: (editDraft as any).per_user_limit ?? null,
+                is_active: (editDraft as any).is_active
+            }
         });
-
-        if ('error' in r) {
-            setEditErr(r.error || 'error');
-
-            return false;
-        }
         setEditId(null);
-        triggerRefresh();
 
         return true;
     }
 
-    function toggleActive(c: Coupon) {
-        updateCoupon(c.id, { active: !c.active });
-        triggerRefresh();
+    const toggleActiveMutation = useMutation({
+        mutationFn: async (c: CouponRow) => {
+            const { error } = await supabase.from('coupons').update({ is_active: !c.is_active }).eq('id', c.id);
+
+            if (error) throw error;
+        },
+        onSuccess: () => triggerRefresh()
+    });
+
+    function toggleActive(c: CouponRow) {
+        toggleActiveMutation.mutate(c);
     }
 
-    function softDeactivate(c: Coupon) {
-        deactivateCoupon(c.id);
-        triggerRefresh();
+    const deactivateMutation = useMutation({
+        mutationFn: async (c: CouponRow) => {
+            const { error } = await supabase.from('coupons').update({ is_active: false }).eq('id', c.id);
+
+            if (error) throw error;
+        },
+        onSuccess: () => triggerRefresh()
+    });
+
+    function softDeactivate(c: CouponRow) {
+        deactivateMutation.mutate(c);
     }
 
     function resetCreateForm() {
@@ -118,6 +192,34 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
         setCEnd('');
     }
 
+    const createMutation = useMutation({
+        mutationFn: async (payload: {
+            code: string;
+            discount_type: 'percent' | 'fixed';
+            percent?: number;
+            amount_cents?: number;
+            starts_at?: string;
+            ends_at?: string;
+            max_redemptions?: number;
+            per_user_limit?: number;
+        }) => {
+            const insert: any = {
+                code: payload.code.trim(),
+                discount_type: payload.discount_type,
+                percent: payload.discount_type === 'percent' ? (payload.percent ?? 0) : null,
+                amount_cents: payload.discount_type === 'fixed' ? (payload.amount_cents ?? 0) : null,
+                starts_at: payload.starts_at || null,
+                ends_at: payload.ends_at || null,
+                max_redemptions: payload.max_redemptions ?? null,
+                per_user_limit: payload.per_user_limit ?? null
+            };
+            const { error } = await supabase.from('coupons').insert(insert);
+
+            if (error) throw error;
+        },
+        onSuccess: () => triggerRefresh()
+    });
+
     function createNew() {
         setCreateErr(null);
         if (!cCode.trim()) {
@@ -125,26 +227,19 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
 
             return false;
         }
-        const r = createCoupon({
-            code: cCode.trim(),
-            type: cType,
-            value: typeof cValue === 'number' ? cValue : 0,
-            currency_code: cType === 'fixed' ? cCurrency : undefined,
-            max_uses: typeof cMaxUses === 'number' ? cMaxUses : undefined,
+        createMutation.mutate({
+            code: cCode,
+            discount_type: cType,
+            percent: cType === 'percent' ? (typeof cValue === 'number' ? cValue : 0) : undefined,
+            amount_cents: cType === 'fixed' ? (typeof cValue === 'number' ? cValue : 0) : undefined,
+            max_redemptions: typeof cMaxUses === 'number' ? cMaxUses : undefined,
             per_user_limit: typeof cPerUser === 'number' ? cPerUser : undefined,
             starts_at: cStart || undefined,
             ends_at: cEnd || undefined
         });
-
-        if ('error' in r) {
-            setCreateErr(r.error || 'error');
-
-            return false;
-        }
         // success
         resetCreateForm();
         setCreateOpen(false);
-        triggerRefresh();
         setPage(1);
 
         return true;
@@ -152,6 +247,7 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
 
     return {
         data,
+        isLoading,
         page,
         q,
         activeFilter,

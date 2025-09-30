@@ -16,17 +16,36 @@
 export const qk = {
     course: (id: string) => ['course', id] as const,
     lessons: (courseId: string) => ['lessons', courseId] as const,
-    reviews: (courseId: string, page: number) => ['reviews', { courseId, page }] as const,
-    qna: (courseId: string, page: number) => ['qna', { courseId, page }] as const,
-    answers: (questionId: string) => ['answers', questionId] as const,
-    courseRating: (courseId: string) => ['courseRating', courseId] as const,
     // 티켓 목록 (filters 객체는 status 등 필터만, page/pageSize 는 훅이 확장해서 key 구성)
     supportTickets: (filters?: { status?: string }) => ['supportTickets', filters ?? {}] as const,
     supportTicket: (id: string) => ['supportTicket', id] as const,
     // 메시지 목록 (page/pageSize 확장 동일 규칙)
     supportMessages: (ticketId: string) => ['supportMessages', ticketId] as const,
     faqList: () => ['faqList'] as const,
-    faqItem: (slug: string) => ['faqItem', slug] as const
+    faqItem: (slug: string) => ['faqItem', slug] as const,
+    // Certificates
+    certificate: (id: string) => ['certificate', id] as const,
+    certificates: (userId?: string) => ['certificates', userId ?? 'me'] as const,
+    // Exam Attempts
+    examAttempts: (filter: { examId?: string; enrollmentId?: string }) => ['examAttempts', filter] as const,
+    // Categories (관리자)
+    categories: () => ['categories'] as const,
+    // Admin Users (검색/페이지 필터 객체 포함)
+    adminUsers: (filters: { q?: string; page?: number; pageSize?: number }) => ['adminUsers', filters] as const,
+    // Courses (목록)
+    courses: (filters: { page: number; pageSize: number; q?: string; categoryId?: string }) => ['courses', filters] as const,
+    // Instructor Courses (내부 - 초안 포함)
+    instructorCourses: (filters: { instructorId: string; page: number; pageSize: number; includeUnpublished?: boolean }) => ['instructorCourses', filters] as const,
+    // Instructor Public Courses (공개된 것만)
+    instructorPublicCourses: (filters: { instructorId: string; page: number; pageSize: number }) => ['instructorPublicCourses', filters] as const,
+    // Notices (공지 목록)
+    notices: (filters: { page: number; pageSize: number; includePinnedFirst?: boolean }) => ['notices', filters] as const,
+    // Instructor Applications (관리자)
+    instructorApps: (filters: { bucket: string; page: number; pageSize: number; search?: string }) => ['instructorApps', filters] as const,
+    // Course Reviews (페이지네이션)
+    reviews: (filters: { courseId: string; page: number; pageSize: number; sort?: string }) => ['reviews', filters] as const,
+    // Course QnA (페이지네이션)
+    qna: (filters: { courseId: string; page: number; pageSize: number; viewerId?: string }) => ['qna', filters] as const
 };
 
 export type QueryKey = ReturnType<(typeof qk)[keyof typeof qk]>;

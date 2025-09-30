@@ -1,79 +1,121 @@
-import { useEffect, useMemo, useState } from 'react';
-import { listCategories, createCategory, moveCategory, updateCategory, deactivateCategory, CategoryItem } from '@main/lib/repository';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@main/lib/supabase';
+import { qk } from '@main/lib/queryKeys';
 
-export type CategoryActiveFilter = 'all' | 'active' | 'inactive';
+export interface CategoryRow {
+    id: string;
+    slug: string;
+    name: string;
+}
 
-interface UseAdminCategoriesOptions {
+export interface UseAdminCategoriesOptions {
     pageSize?: number;
 }
 
-export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions = {}) {
-    const [items, setItems] = useState<CategoryItem[]>([]);
-    const [q, setQ] = useState('');
-    const [filterActive, setFilterActive] = useState<CategoryActiveFilter>('all');
-    const [page, setPage] = useState(1);
-    const [revision, setRevision] = useState(0);
+function slugify(name: string) {
+    return name
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
 
+async function fetchCategories(): Promise<CategoryRow[]> {
+    const { data, error } = await supabase.from('categories').select('id,slug,name').order('name', { ascending: true });
+
+    if (error) throw error;
+
+    return (data as CategoryRow[]) || [];
+}
+
+export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions = {}) {
+    const [q, setQ] = useState('');
+    const [page, setPage] = useState(1);
     const [createOpen, setCreateOpen] = useState(false);
     const [newName, setNewName] = useState('');
-    const [creatingErr, setCreatingErr] = useState<string | null>(null);
     const [renameId, setRenameId] = useState<string | null>(null);
     const [renameValue, setRenameValue] = useState('');
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const qc = useQueryClient();
 
-    useEffect(() => {
-        setItems(listCategories());
-    }, [revision]);
+    const query = useQuery({ queryKey: qk.categories(), queryFn: fetchCategories, staleTime: 60_000 });
+    const items = query.data || [];
 
     const filtered = useMemo(() => {
-        return items
-            .filter((c) => (filterActive === 'all' ? true : filterActive === 'active' ? c.active : !c.active))
-            .filter((c) => {
-                if (!q.trim()) return true;
-                const qq = q.trim().toLowerCase();
+        if (!q.trim()) return items;
+        const qq = q.trim().toLowerCase();
 
-                return c.name.toLowerCase().includes(qq) || c.slug.toLowerCase().includes(qq);
-            });
-    }, [items, q, filterActive]);
+        return items.filter((c) => c.name.toLowerCase().includes(qq) || c.slug.toLowerCase().includes(qq));
+    }, [items, q]);
 
-    const pagedCalc = useMemo(() => {
+    const paged = useMemo(() => {
         const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-        const pageSafe = Math.min(page, totalPages);
-        const slice = filtered.slice((pageSafe - 1) * pageSize, pageSafe * pageSize);
+        const safe = Math.min(page, totalPages);
+        const slice = filtered.slice((safe - 1) * pageSize, safe * pageSize);
 
-        return { items: slice, totalPages, page: pageSafe };
+        return { items: slice, totalPages, page: safe };
     }, [filtered, page, pageSize]);
 
     function resetFilters() {
         setQ('');
-        setFilterActive('all');
         setPage(1);
     }
 
-    function refresh() {
-        setRevision((r) => r + 1);
+    function invalidate() {
+        qc.invalidateQueries({ queryKey: qk.categories() });
     }
+
+    const createMut = useMutation({
+        mutationFn: async (name: string) => {
+            const base = slugify(name);
+            let candidate = base;
+            let i = 1;
+
+            // 간단 충돌 회피: 최대 20회 시도
+            while (i < 20) {
+                const { data: exists, error } = await supabase.from('categories').select('id').eq('slug', candidate).limit(1);
+
+                if (error) throw error;
+                if (!exists || exists.length === 0) break;
+                candidate = `${base}-${i++}`;
+            }
+            const { error } = await supabase.from('categories').insert({ name, slug: candidate });
+
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            invalidate();
+            setNewName('');
+            setCreateOpen(false);
+        },
+        onError: (e: any) => setErrorMsg(e.message || 'error')
+    });
 
     function handleCreate() {
-        setCreatingErr(null);
         if (!newName.trim()) {
-            setCreatingErr('이름 필수');
+            setErrorMsg('이름 필수');
 
             return;
         }
-        const r = createCategory(newName.trim());
-
-        if ('error' in r) {
-            setCreatingErr(r.error || 'error');
-
-            return;
-        }
-        setNewName('');
-        setCreateOpen(false);
-        refresh();
-        setPage(1);
+        createMut.mutate(newName.trim());
     }
 
-    function startRename(cat: CategoryItem) {
+    const renameMut = useMutation({
+        mutationFn: async ({ id, name }: { id: string; name: string }) => {
+            const { error } = await supabase.from('categories').update({ name }).eq('id', id);
+
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            invalidate();
+            setRenameId(null);
+        },
+        onError: (e: any) => setErrorMsg(e.message || 'error')
+    });
+
+    function startRename(cat: CategoryRow) {
         setRenameId(cat.id);
         setRenameValue(cat.name);
     }
@@ -82,50 +124,30 @@ export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions 
         const name = renameValue.trim();
 
         if (!name) return;
-        updateCategory(renameId, { name });
-        setRenameId(null);
-        refresh();
-        setPage(1);
+        renameMut.mutate({ id: renameId, name });
     }
 
-    function toggleActive(cat: CategoryItem) {
-        updateCategory(cat.id, { active: !cat.active });
-        refresh();
-    }
-
-    function deactivate(cat: CategoryItem) {
-        deactivateCategory(cat.id);
-        refresh();
-    }
-
-    function move(cat: CategoryItem, dir: 'up' | 'down') {
-        moveCategory(cat.id, dir);
-        refresh();
-    }
+    // 삭제 기능 필요 시 구현 (스키마 상 soft delete 컬럼 없음) → 추후 확장 지점
 
     return {
-        // data
-        items: pagedCalc.items,
-        page: pagedCalc.page,
-        totalPages: pagedCalc.totalPages,
+        items: paged.items,
+        page: paged.page,
+        totalPages: paged.totalPages,
         filteredCount: filtered.length,
         // filters
         q,
-        filterActive,
         setQ,
-        setFilterActive,
         resetFilters,
         // pagination
         setPage,
         pageSize,
-        // creation
+        // create
         createOpen,
         setCreateOpen,
         newName,
         setNewName,
-        creatingErr,
-        setCreatingErr,
         handleCreate,
+        creating: createMut.isPending,
         // rename
         renameId,
         renameValue,
@@ -133,11 +155,12 @@ export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions 
         setRenameId,
         startRename,
         commitRename,
-        // actions
-        toggleActive,
-        deactivate,
-        move,
-        refresh
+        renaming: renameMut.isPending,
+        // error & state
+        errorMsg,
+        setErrorMsg,
+        isLoading: query.isLoading,
+        refresh: invalidate
     } as const;
 }
 

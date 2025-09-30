@@ -1,36 +1,52 @@
 import type { PaginatedResult } from '@main/types/pagination';
 
-import { useEffect, useMemo, useState } from 'react';
-import { listUsers } from '@main/lib/repository';
-import { paginateArray } from '@main/lib/paginate';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { supabase } from '@main/lib/supabase';
+import { qk } from '@main/lib/queryKeys';
 
 export interface UseAdminUsersPagedOptions {
     pageSize?: number;
-    q?: string; // 간단 이메일/이름 검색 (mock)
+    q?: string; // 이름/이메일 부분 검색
+}
+
+interface UserRow {
+    user_id: string;
+    name: string | null;
+    email: string | null; // profiles에 email 없다면 view 필요 (가정)
+}
+
+async function fetchUsers(): Promise<UserRow[]> {
+    // NOTE: email 컬럼이 profiles에 없을 경우: 서버 측 view v_admin_users 필요.
+    const { data, error } = await supabase.from('profiles').select('user_id,name,email').limit(1000);
+
+    if (error) throw error;
+
+    return (data as any as UserRow[]) || [];
 }
 
 export function useAdminUsersPaged(page: number, { pageSize = 20, q }: UseAdminUsersPagedOptions = {}) {
-    const [revision, setRevision] = useState(0);
-    const [raw, setRaw] = useState(() => listUsers());
-
-    useEffect(() => {
-        setRaw(listUsers());
-    }, [revision]);
+    const query = useQuery({ queryKey: qk.adminUsers({ q: q || '', page, pageSize }), queryFn: fetchUsers, staleTime: 60_000 });
+    const list = query.data || [];
 
     const filtered = useMemo(() => {
-        if (!q) return raw;
-        const query = q.toLowerCase();
+        if (!q || !q.trim()) return list;
+        const qq = q.trim().toLowerCase();
 
-        return raw.filter((u) => u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query));
-    }, [raw, q]);
+        return list.filter((u) => (u.name || '').toLowerCase().includes(qq) || (u.email || '').toLowerCase().includes(qq));
+    }, [list, q]);
 
-    const data: PaginatedResult<any> = useMemo(() => paginateArray(filtered, page, pageSize), [filtered, page, pageSize]);
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const safe = Math.min(page, totalPages);
+    const slice = filtered.slice((safe - 1) * pageSize, safe * pageSize);
+    const data: PaginatedResult<UserRow> = { items: slice, page: safe, pageSize, total, pageCount: totalPages };
 
     function refresh() {
-        setRevision((r) => r + 1);
+        query.refetch();
     }
 
-    return { data, refresh } as const;
+    return { data, refresh, isLoading: query.isLoading, error: query.error } as const;
 }
 
 export default useAdminUsersPaged;

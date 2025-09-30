@@ -1,42 +1,65 @@
 import type { PaginatedResult } from '@main/types/pagination';
-import type { Notice } from '@main/types/notice';
 
-import { useMemo } from 'react';
-import { useNotices } from '@main/lib/noticeRepo';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@main/lib/supabase';
+import { qk } from '@main/lib/queryKeys';
+
+export interface NoticeRow {
+    id: string;
+    title: string;
+    body: string | null;
+    pinned: boolean;
+    published: boolean;
+    created_at: string;
+    updated_at: string;
+}
 
 interface UseNoticesPagedOptions {
     pageSize?: number;
-    includePinnedFirst?: boolean;
+    includePinnedFirst?: boolean; // pinned 우선 정렬 (기본 true)
+    includeUnpublished?: boolean; // 관리자 모드에서 초안 포함
 }
 
-export function useNoticesPaged(page: number, { pageSize = 15, includePinnedFirst = true }: UseNoticesPagedOptions = {}) {
-    const notices = useNotices();
+interface FetchParams {
+    page: number;
+    pageSize: number;
+    includePinnedFirst: boolean;
+    includeUnpublished: boolean;
+}
 
-    const ordered = useMemo(() => {
-        const base = [...notices];
+async function fetchNotices({ page, pageSize, includePinnedFirst, includeUnpublished }: FetchParams) {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    let query = supabase.from('notices').select('id,title,body,pinned,published,created_at,updated_at', { count: 'exact' });
 
-        if (!includePinnedFirst) return base;
+    if (!includeUnpublished) query = query.eq('published', true);
 
-        return base.sort((a, b) => {
-            const ap = a.pinned ? 1 : 0;
-            const bp = b.pinned ? 1 : 0;
+    if (includePinnedFirst) {
+        query = query.order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    } else {
+        query = query.order('created_at', { ascending: false });
+    }
 
-            if (ap !== bp) return bp - ap; // pinned 먼저
-            // 최신순 (created_at DESC)
+    const { data, error, count } = await query.range(from, to);
 
-            return a.created_at < b.created_at ? 1 : -1;
-        });
-    }, [notices, includePinnedFirst]);
-
-    const total = ordered.length;
+    if (error) throw error;
+    const items = (data || []) as NoticeRow[];
+    const total = count ?? items.length;
     const pageCount = Math.max(1, Math.ceil(total / pageSize));
-    const safePage = Math.min(Math.max(1, page), pageCount);
-    const start = (safePage - 1) * pageSize;
-    const items: Notice[] = ordered.slice(start, start + pageSize);
+    const safePage = Math.min(page, pageCount);
+    const paged: PaginatedResult<NoticeRow> = { items, page: safePage, pageSize, total, pageCount };
 
-    const data: PaginatedResult<Notice> = { items, page: safePage, pageSize, total, pageCount };
+    return paged;
+}
 
-    return { data } as const;
+export function useNoticesPaged(page: number, { pageSize = 15, includePinnedFirst = true, includeUnpublished = false }: UseNoticesPagedOptions = {}) {
+    const query = useQuery({
+        queryKey: qk.notices({ page, pageSize, includePinnedFirst }),
+        queryFn: () => fetchNotices({ page, pageSize, includePinnedFirst, includeUnpublished }),
+        staleTime: 30_000
+    });
+
+    return { data: query.data, isLoading: query.isLoading, error: query.error } as const;
 }
 
 export default useNoticesPaged;

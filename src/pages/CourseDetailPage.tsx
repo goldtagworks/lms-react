@@ -37,7 +37,7 @@ import CourseQnASection from '@main/components/qna/CourseQnASection';
 import useCourseQnAPaged from '@main/hooks/course/useCourseQnAPaged';
 
 export default function CourseDetailPage() {
-    const { id: rawId } = useParams();
+    const { courseId: rawId } = useParams();
     // 라우터가 숫자 id (/course/1)로 들어오면 seed id(c1..) 매핑
     const mappedId = !rawId ? undefined : rawId.startsWith('c') ? rawId : 'c' + rawId;
     const course = useCourse(mappedId);

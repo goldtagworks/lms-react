@@ -28,7 +28,7 @@ const CourseListPage = () => {
     const [category, setCategory] = useState<string>('all');
     const [query, setQuery] = useState<string>('');
 
-    const { data } = useCoursesPaged(page, { pageSize: 12, category, query });
+    const { data } = useCoursesPaged(page, { pageSize: 12, categoryId: category !== 'all' ? category : undefined, q: query });
     const filteredTotal = data?.total || 0;
     const totalPages = data?.pageCount || 1;
     const paged = data?.items || [];
@@ -115,19 +115,23 @@ const CourseListPage = () => {
                                 <Group gap={4} mb={4}>
                                     {course.is_featured && (
                                         <Badge color="teal" size="xs" variant="filled">
-                                            {course.featured_badge_text || '추천'}
+                                            {course.featured_badge_text || (course.featured_rank ? `추천 #${course.featured_rank}` : '추천')}
                                         </Badge>
                                     )}
                                     {course.tags?.map((tag) => (
                                         <TagChip key={tag} label={tag} />
                                     ))}
                                 </Group>
-                                {course.summary && (
-                                    <TextBody c="dimmed" lineClamp={2} mb={6}>
-                                        {course.summary}
-                                    </TextBody>
-                                )}
-                                <PriceText discount={course.sale_price_cents ?? undefined} price={course.list_price_cents} />
+                                {(() => {
+                                    const summary = course.summary || (course.description || '').slice(0, 120);
+
+                                    return summary ? (
+                                        <TextBody c="dimmed" lineClamp={2} mb={6}>
+                                            {summary}
+                                        </TextBody>
+                                    ) : null;
+                                })()}
+                                <PriceText discount={course.sale_price_cents ?? undefined} price={course.price_cents} />
                                 <Group gap={8} mb="md" mt={4}>
                                     <TextMeta c="yellow.7">★ 4.8</TextMeta>
                                     <TextMeta>수강생 1,200명</TextMeta>

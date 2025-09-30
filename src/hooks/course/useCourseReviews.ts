@@ -1,7 +1,10 @@
 import type { CourseReview } from '@main/types/review';
 
 import { useMemo, useState } from 'react';
-import { useCourseReviewsState, useCourseRatingSummaryState, upsertCourseReview } from '@main/lib/repository';
+import { useCourseReviewsState, useCourseRatingSummaryState } from '@main/lib/repository'; // legacy (삭제 예정)
+import { supabase } from '@main/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { qk } from '@main/lib/queryKeys';
 
 export type ReviewSort = 'latest' | 'ratingHigh' | 'ratingLow';
 
@@ -51,17 +54,36 @@ export function useCourseReviews(courseId: string | undefined, opts?: UseCourseR
 
 export function useCreateOrUpdateReview(courseId: string | undefined, userId: string | undefined) {
     const [error, setError] = useState<string | undefined>();
-    const mutate = (rating: number, comment?: string): CourseReview | undefined => {
+    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
+
+    const mutate = async (rating: number, comment?: string): Promise<CourseReview | undefined> => {
         setError(undefined);
         if (!courseId || !userId) return undefined;
+        setLoading(true);
         try {
-            return upsertCourseReview({ course_id: courseId, user_id: userId, rating, comment });
+            // upsert: UNIQUE(course_id,user_id)
+            const { data, error: err } = await supabase
+                .from('course_reviews')
+                .upsert({ course_id: courseId, user_id: userId, rating, comment }, { onConflict: 'course_id,user_id' })
+                .select('*')
+                .single();
+
+            if (err) throw err;
+
+            // 관련 캐시 무효화 (페이지네이션 전체 페이지 invalidate: 간단히 key prefix 사용)
+            queryClient.invalidateQueries({ queryKey: ['reviews'] });
+            queryClient.invalidateQueries({ queryKey: qk.course(courseId) }); // 상세에서 메트릭 재계산 훅 예상
+
+            return data as CourseReview;
         } catch (e: any) {
             setError(e?.message || 'ERROR');
 
             return undefined;
+        } finally {
+            setLoading(false);
         }
     };
 
-    return { mutate, error };
+    return { mutate, error, loading } as const;
 }

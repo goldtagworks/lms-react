@@ -1,12 +1,12 @@
-import { ActionIcon, Badge, Button, Group, Modal, Select, Stack, Table, TextInput, Tooltip, Notification } from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Select, Stack, Table, TextInput, Tooltip, Notification } from '@mantine/core';
 import { useI18n } from '@main/lib/i18n';
 import { TextBody, TextMeta } from '@main/components/typography';
 import { useEffect, useState } from 'react';
 import PageContainer from '@main/components/layout/PageContainer';
-import { upsertUserRole, removeUser, ensureUser, initiatePasswordReset } from '@main/lib/repository';
+import { removeUser, ensureUser, initiatePasswordReset } from '@main/lib/repository';
 import { useAuth } from '@main/lib/auth';
 import { UserRole } from '@main/lib/nav';
-import { Trash2, Shield, RefreshCw, KeyRound, Save, X } from 'lucide-react';
+import { Trash2, RefreshCw, KeyRound, X } from 'lucide-react';
 import PaginationBar from '@main/components/PaginationBar';
 import PageHeader from '@main/components/layout/PageHeader';
 import useAdminUsersPaged from '@main/hooks/admin/useAdminUsersPaged';
@@ -16,11 +16,7 @@ interface RoleOption {
     label: string;
 }
 
-const ROLE_OPTIONS: RoleOption[] = [
-    { value: 'student', label: 'student' },
-    { value: 'instructor', label: 'instructor' },
-    { value: 'admin', label: 'admin' }
-];
+const ROLE_OPTIONS: RoleOption[] = [];
 
 // 간단 seed: Auth Provider 에 저장된 사용자 외 추가 목록 비어 있을 수 있음
 function seedFromAuthIfNeeded() {
@@ -40,11 +36,10 @@ function seedFromAuthIfNeeded() {
 const AdminUsersPage = () => {
     const { user: current } = useAuth();
     const [query, setQuery] = useState('');
-    const [roleFilter, setRoleFilter] = useState<string | null>(null);
+    const [roleFilter, setRoleFilter] = useState<string | null>(null); // 역할 필터 (현재 backend role 미구현) → placeholder
     const [page, setPage] = useState(1);
     const pageSize = 20;
-    const [editUserId, setEditUserId] = useState<string | null>(null);
-    const [editRole, setEditRole] = useState<UserRole>('student');
+    // role 관련 state 제거 (backend role 미구현)
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
     const [resetTarget, setResetTarget] = useState<string | null>(null);
     const [resetDone, setResetDone] = useState(false);
@@ -56,12 +51,13 @@ const AdminUsersPage = () => {
     // useAdminUsersPaged 훅: role filter와 query는 훅 외부에서 필터링 필요 → 간단히 훅 호출 후 클라이언트 필터 추가
     const { data } = useAdminUsersPaged(page, { pageSize, q: undefined });
     const filtered = data.items
-        .filter((u) => (roleFilter ? u.role === roleFilter : true))
+        // roleFilter placeholder (UserRow에 role 없음)
+        .filter(() => true)
         .filter((u) => {
             if (!query.trim()) return true;
             const qLower = query.trim().toLowerCase();
 
-            return u.name.toLowerCase().includes(qLower) || u.email.toLowerCase().includes(qLower) || u.id.toLowerCase().includes(qLower);
+            return (u.name || '').toLowerCase().includes(qLower) || (u.email || '').toLowerCase().includes(qLower) || u.user_id.toLowerCase().includes(qLower);
         });
     const total = filtered.length;
     const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -71,14 +67,7 @@ const AdminUsersPage = () => {
 
     if (pageSafe !== page) setPage(pageSafe);
 
-    function openEdit(uId: string, current: UserRole) {
-        setEditUserId(uId);
-        setEditRole(current);
-    }
-    function saveRole() {
-        if (editUserId) upsertUserRole(editUserId, editRole);
-        setEditUserId(null);
-    }
+    // role 변경 기능 비활성 (placeholder omitted)
     function handleRemove() {
         if (confirmRemove) removeUser(confirmRemove);
         setConfirmRemove(null);
@@ -145,9 +134,7 @@ const AdminUsersPage = () => {
                             <Table.Th style={{ width: 220 }} ta="center">
                                 {t('admin.users.table.email')}
                             </Table.Th>
-                            <Table.Th style={{ width: 100 }} ta="center">
-                                {t('admin.users.table.role')}
-                            </Table.Th>
+                            {/* 역할 컬럼 제거 (role 미구현) */}
                             <Table.Th style={{ width: 80 }} ta="center">
                                 {t('admin.users.table.actions')}
                             </Table.Th>
@@ -164,38 +151,28 @@ const AdminUsersPage = () => {
                             </Table.Tr>
                         )}
                         {pageItems.map((u) => (
-                            <Table.Tr key={u.id}>
+                            <Table.Tr key={u.user_id}>
                                 <Table.Td>
                                     <TextBody fw={500} sizeOverride="sm">
-                                        {u.id}
+                                        {u.user_id}
                                     </TextBody>
                                 </Table.Td>
                                 <Table.Td>
-                                    <TextBody>{u.name}</TextBody>
+                                    <TextBody>{u.name || '—'}</TextBody>
                                 </Table.Td>
                                 <Table.Td>
-                                    <TextBody>{u.email}</TextBody>
-                                </Table.Td>
-                                <Table.Td ta="center">
-                                    <Badge color={u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'blue' : 'gray'} size="sm" variant="light">
-                                        {u.role}
-                                    </Badge>
+                                    <TextBody>{u.email || '—'}</TextBody>
                                 </Table.Td>
                                 <Table.Td ta="center">
                                     <Group align="center" gap={4} justify="center">
-                                        <Tooltip label={t('admin.users.action.changeRole')}>
-                                            <ActionIcon aria-label={t('admin.users.action.changeRole')} size="sm" variant="subtle" onClick={() => openEdit(u.id, u.role)}>
-                                                <Shield size={14} />
-                                            </ActionIcon>
-                                        </Tooltip>
-                                        <Tooltip label={u.id === current?.id ? t('admin.users.action.selfDeactivateBlock') : t('common.deactivate')}>
+                                        <Tooltip label={u.user_id === current?.id ? t('admin.users.action.selfDeactivateBlock') : t('common.deactivate')}>
                                             <ActionIcon
                                                 aria-label={t('common.deactivate')}
                                                 color="red"
-                                                disabled={u.id === current?.id}
+                                                disabled={u.user_id === current?.id}
                                                 size="sm"
                                                 variant="subtle"
-                                                onClick={() => u.id !== current?.id && setConfirmRemove(u.id)}
+                                                onClick={() => u.user_id !== current?.id && setConfirmRemove(u.user_id)}
                                             >
                                                 <Trash2 size={14} />
                                             </ActionIcon>
@@ -207,7 +184,7 @@ const AdminUsersPage = () => {
                                                 size="sm"
                                                 variant="subtle"
                                                 onClick={() => {
-                                                    setResetTarget(u.id);
+                                                    setResetTarget(u.user_id);
                                                 }}
                                             >
                                                 <KeyRound size={14} />
@@ -221,27 +198,7 @@ const AdminUsersPage = () => {
                 </Table>
                 <PaginationBar align="right" page={page} size="sm" totalPages={pageCount} onChange={(p) => setPage(p)} />
             </Stack>
-            <Modal centered opened={!!editUserId} radius="md" title={t('admin.users.modal.changeRoleTitle')} onClose={() => setEditUserId(null)}>
-                <Stack gap="sm" mt="xs">
-                    <Select
-                        data={ROLE_OPTIONS}
-                        disabled={current?.id === editUserId && editRole === 'student'}
-                        label={t('admin.users.modal.roleLabel')}
-                        size="sm"
-                        value={editRole}
-                        // Prevent self downgrade to learner (spec AC: self downgrade forbidden)
-                        onChange={(v) => v && setEditRole(v as UserRole)}
-                    />
-                    <Group justify="flex-end" mt="sm">
-                        <Button leftSection={<Save size={14} />} size="sm" onClick={saveRole}>
-                            {t('common.save')}
-                        </Button>
-                        <Button leftSection={<X size={14} />} size="sm" variant="default" onClick={() => setEditUserId(null)}>
-                            {t('common.cancel')}
-                        </Button>
-                    </Group>
-                </Stack>
-            </Modal>
+            {/* 역할 변경 모달 제거 (role 미구현) */}
             <Modal centered opened={!!confirmRemove} radius="md" title={t('admin.users.modal.deactivateTitle')} onClose={() => setConfirmRemove(null)}>
                 <TextBody>{t('admin.users.modal.deactivateConfirm')}</TextBody>
                 <Group justify="flex-end" mt="md">

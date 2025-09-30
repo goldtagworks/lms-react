@@ -1,13 +1,13 @@
+import type { CouponRow } from '@main/hooks/admin/useAdminCoupons';
+
 import { ActionIcon, Badge, Button, Divider, Group, Modal, NumberInput, Notification, Select, Stack, Switch, Table, TextInput, Tooltip } from '@mantine/core';
 import { TextBody, TextMeta } from '@main/components/typography';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
 import { Plus, Pencil, Ban, RotateCcw, RefreshCw, Save, X } from 'lucide-react';
-import { useState } from 'react';
 import { useI18n } from '@main/lib/i18n';
-import useAdminCouponsPaged from '@main/hooks/admin/useAdminCouponsPaged';
-import { createCoupon, updateCoupon, deactivateCoupon, type Coupon } from '@main/lib/repository';
+import { useAdminCoupons } from '@main/hooks/admin/useAdminCoupons';
 
 type ActiveFilter = 'all' | 'active' | 'inactive';
 
@@ -15,120 +15,48 @@ type ActiveFilter = 'all' | 'active' | 'inactive';
 
 const AdminCouponsPage = () => {
     const { t } = useI18n();
-    const pageSize = 20;
-    const [page, setPage] = useState(1);
-    const [q, setQ] = useState('');
-    const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
-    const { data, refresh } = useAdminCouponsPaged(page, { pageSize, q, active: activeFilter });
-
-    // creation state
-    const [createOpen, setCreateOpen] = useState(false);
-    const [cCode, setCCode] = useState('');
-    const [cType, setCType] = useState<'percent' | 'fixed'>('percent');
-    const [cValue, setCValue] = useState<number | ''>(10);
-    const [cCurrency, setCCurrency] = useState('KRW');
-    const [cMaxUses, setCMaxUses] = useState<number | ''>('');
-    const [cPerUser, setCPerUser] = useState<number | ''>('');
-    const [cStart, setCStart] = useState('');
-    const [cEnd, setCEnd] = useState('');
-    const [createErr, setCreateErr] = useState<string | null>(null);
-
-    // edit state
-    const [editId, setEditId] = useState<string | null>(null);
-    const [editDraft, setEditDraft] = useState<Partial<Coupon>>({});
-    const [editErr, setEditErr] = useState<string | null>(null);
-
-    function resetFilters() {
-        setQ('');
-        setActiveFilter('all');
-        setPage(1);
-    }
-
-    function openEdit(c: Coupon) {
-        setEditId(c.id);
-        setEditDraft({ ...c });
-        setEditErr(null);
-    }
-
-    function commitEdit() {
-        if (!editId) return false;
-        if (editDraft.code && !editDraft.code.trim()) {
-            setEditErr('코드 필수');
-
-            return false;
-        }
-        const r = updateCoupon(editId, {
-            code: editDraft.code,
-            type: editDraft.type,
-            value: editDraft.value,
-            currency_code: editDraft.currency_code,
-            max_uses: editDraft.max_uses,
-            per_user_limit: editDraft.per_user_limit,
-            starts_at: editDraft.starts_at,
-            ends_at: editDraft.ends_at,
-            active: editDraft.active
-        });
-        // error check
-
-        if ('error' in r) {
-            setEditErr(r.error || 'error');
-
-            return false;
-        }
-        setEditId(null);
-        refresh();
-
-        return true;
-    }
-
-    function toggleActive(c: Coupon) {
-        updateCoupon(c.id, { active: !c.active });
-        refresh();
-    }
-    function softDeactivate(c: Coupon) {
-        deactivateCoupon(c.id);
-        refresh();
-    }
-    function resetCreateForm() {
-        setCCode('');
-        setCType('percent');
-        setCValue(10);
-        setCMaxUses('');
-        setCPerUser('');
-        setCStart('');
-        setCEnd('');
-    }
-    function createNew() {
-        setCreateErr(null);
-        if (!cCode.trim()) {
-            setCreateErr('코드 필수');
-
-            return false;
-        }
-        const r = createCoupon({
-            code: cCode.trim(),
-            type: cType,
-            value: typeof cValue === 'number' ? cValue : 0,
-            currency_code: cType === 'fixed' ? cCurrency : undefined,
-            max_uses: typeof cMaxUses === 'number' ? cMaxUses : undefined,
-            per_user_limit: typeof cPerUser === 'number' ? cPerUser : undefined,
-            starts_at: cStart || undefined,
-            ends_at: cEnd || undefined
-        });
-        // error check
-
-        if ('error' in r) {
-            setCreateErr(r.error || 'error');
-
-            return false;
-        }
-        resetCreateForm();
-        setCreateOpen(false);
-        refresh();
-        setPage(1);
-
-        return true;
-    }
+    const {
+        data,
+        page,
+        setPage,
+        q,
+        setQ,
+        activeFilter,
+        setActiveFilter,
+        createOpen,
+        setCreateOpen,
+        cCode,
+        setCCode,
+        cType,
+        setCType,
+        cValue,
+        setCValue,
+        cCurrency,
+        setCCurrency,
+        cMaxUses,
+        setCMaxUses,
+        cPerUser,
+        setCPerUser,
+        cStart,
+        setCStart,
+        cEnd,
+        setCEnd,
+        createNew,
+        createErr,
+        editId,
+        editDraft,
+        setEditDraft,
+        openEdit,
+        commitEdit,
+        toggleActive,
+        softDeactivate,
+        resetFilters,
+        editErr,
+        setEditErr,
+        setCreateErr,
+        isLoading,
+        setEditId
+    } = useAdminCoupons({ pageSize: 20 });
 
     return (
         <PageContainer roleMain py={48} size="lg">
@@ -191,7 +119,7 @@ const AdminCouponsPage = () => {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        {data.items.length === 0 && (
+                        {data.items.length === 0 && !isLoading && (
                             <Table.Tr>
                                 <Table.Td colSpan={7}>
                                     <TextMeta py={20} ta="center">
@@ -200,35 +128,34 @@ const AdminCouponsPage = () => {
                                 </Table.Td>
                             </Table.Tr>
                         )}
-                        {data.items.map((c) => {
+                        {data.items.map((c: CouponRow) => {
                             const period = c.starts_at || c.ends_at ? `${c.starts_at ? c.starts_at.slice(0, 10) : '—'} ~ ${c.ends_at ? c.ends_at.slice(0, 10) : '—'}` : '—';
+                            const valueText = c.discount_type === 'percent' ? `${c.percent ?? 0}%` : `${(c.amount_cents ?? 0).toLocaleString()} KRW`;
 
                             return (
-                                <Table.Tr key={c.id} style={{ opacity: c.active ? 1 : 0.55 }}>
+                                <Table.Tr key={c.id} style={{ opacity: c.is_active ? 1 : 0.55 }}>
                                     <Table.Td>
                                         <TextBody fw={600} sizeOverride="sm">
                                             {c.code}
                                         </TextBody>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Badge color={c.type === 'percent' ? 'indigo' : 'teal'} size="sm" variant="light">
-                                            {c.type}
+                                        <Badge color={c.discount_type === 'percent' ? 'indigo' : 'teal'} size="sm" variant="light">
+                                            {c.discount_type}
                                         </Badge>
                                     </Table.Td>
                                     <Table.Td>
-                                        <TextMeta>{c.type === 'percent' ? `${c.value}%` : `${c.value.toLocaleString()} ${c.currency_code || ''}`}</TextMeta>
+                                        <TextMeta>{valueText}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
                                         <TextMeta>{period}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <TextMeta>
-                                            {c.used_count}/{c.max_uses ?? '∞'}
-                                        </TextMeta>
+                                        <TextMeta>0/{c.max_redemptions ?? '∞'}</TextMeta>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Badge color={c.active ? 'green' : 'gray'} size="sm" variant="light">
-                                            {t(c.active ? 'status.active' : 'status.inactive')}
+                                        <Badge color={c.is_active ? 'green' : 'gray'} size="sm" variant="light">
+                                            {t(c.is_active ? 'status.active' : 'status.inactive')}
                                         </Badge>
                                     </Table.Td>
                                     <Table.Td ta="center">
@@ -238,12 +165,18 @@ const AdminCouponsPage = () => {
                                                     <Pencil size={14} />
                                                 </ActionIcon>
                                             </Tooltip>
-                                            <Tooltip label={t(c.active ? 'admin.categories.tooltip.deactivate' : 'admin.categories.tooltip.activate')}>
-                                                <ActionIcon aria-label={t('a11y.admin.activateToggle')} color={c.active ? 'red' : 'green'} size="sm" variant="subtle" onClick={() => toggleActive(c)}>
-                                                    {c.active ? <Ban size={14} /> : <RotateCcw size={14} />}
+                                            <Tooltip label={t(c.is_active ? 'admin.categories.tooltip.deactivate' : 'admin.categories.tooltip.activate')}>
+                                                <ActionIcon
+                                                    aria-label={t('a11y.admin.activateToggle')}
+                                                    color={c.is_active ? 'red' : 'green'}
+                                                    size="sm"
+                                                    variant="subtle"
+                                                    onClick={() => toggleActive(c)}
+                                                >
+                                                    {c.is_active ? <Ban size={14} /> : <RotateCcw size={14} />}
                                                 </ActionIcon>
                                             </Tooltip>
-                                            {c.active && (
+                                            {c.is_active && (
                                                 <Tooltip label={t('admin.categories.tooltip.instantDeactivate')}>
                                                     <ActionIcon aria-label={t('a11y.admin.instantDeactivate')} color="orange" size="sm" variant="subtle" onClick={() => softDeactivate(c)}>
                                                         <Ban size={14} />
@@ -334,24 +267,24 @@ const AdminCouponsPage = () => {
                                 ]}
                                 label={t('admin.coupons.form.type')}
                                 radius="md"
-                                value={editDraft.type}
-                                onChange={(v) => v && setEditDraft((d) => ({ ...d, type: v as 'percent' | 'fixed' }))}
+                                value={editDraft.discount_type as any}
+                                onChange={(v) => v && setEditDraft((d) => ({ ...d, discount_type: v as 'percent' | 'fixed' }))}
                             />
                             <NumberInput
                                 label={t('admin.coupons.form.value')}
                                 min={1}
                                 radius="md"
-                                value={editDraft.value as number | undefined}
-                                onChange={(val) => setEditDraft((d) => ({ ...d, value: typeof val === 'number' ? val : d.value }))}
+                                value={(editDraft.discount_type === 'percent' ? editDraft.percent : editDraft.amount_cents) as number | undefined}
+                                onChange={(val) =>
+                                    setEditDraft((d: any) => ({
+                                        ...d,
+                                        ...(d.discount_type === 'percent' ? { percent: typeof val === 'number' ? val : d.percent } : { amount_cents: typeof val === 'number' ? val : d.amount_cents })
+                                    }))
+                                }
                             />
                         </Group>
-                        {editDraft.type === 'fixed' && (
-                            <TextInput
-                                label={t('admin.coupons.form.currency')}
-                                radius="md"
-                                value={editDraft.currency_code || ''}
-                                onChange={(e) => setEditDraft((d) => ({ ...d, currency_code: e.currentTarget.value.toUpperCase() }))}
-                            />
+                        {editDraft.discount_type === 'fixed' && (
+                            <TextInput label={t('admin.coupons.form.currency')} radius="md" value={cCurrency} onChange={(e) => setCCurrency(e.currentTarget.value.toUpperCase())} />
                         )}
                         <Group grow>
                             <NumberInput
@@ -359,8 +292,8 @@ const AdminCouponsPage = () => {
                                 min={1}
                                 placeholder={t('admin.coupons.form.unlimited')}
                                 radius="md"
-                                value={editDraft.max_uses as number | undefined}
-                                onChange={(val) => setEditDraft((d) => ({ ...d, max_uses: typeof val === 'number' ? val : undefined }))}
+                                value={editDraft.max_redemptions as number | undefined}
+                                onChange={(val) => setEditDraft((d) => ({ ...d, max_redemptions: typeof val === 'number' ? val : undefined }))}
                             />
                             <NumberInput
                                 label={t('admin.coupons.form.perUser')}
@@ -385,7 +318,7 @@ const AdminCouponsPage = () => {
                                 onChange={(e) => setEditDraft((d) => ({ ...d, ends_at: e.currentTarget.value || undefined }))}
                             />
                         </Group>
-                        <Switch checked={!!editDraft.active} label={t('admin.coupons.form.activeState')} onChange={(e) => setEditDraft((d) => ({ ...d, active: e.currentTarget.checked }))} />
+                        <Switch checked={!!editDraft.is_active} label={t('admin.coupons.form.activeState')} onChange={(e) => setEditDraft((d) => ({ ...d, is_active: e.currentTarget.checked }))} />
                         <Group justify="flex-end" mt="sm">
                             <Button leftSection={<Save size={14} />} size="sm" onClick={commitEdit}>
                                 {t('common.save')}

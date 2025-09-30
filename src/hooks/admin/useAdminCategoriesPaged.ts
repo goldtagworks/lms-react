@@ -1,47 +1,51 @@
 import type { PaginatedResult } from '@main/types/pagination';
 
-import { useEffect, useMemo, useState } from 'react';
-import { listCategories } from '@main/lib/repository';
-import { paginateArray } from '@main/lib/paginate';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { supabase } from '@main/lib/supabase';
+import { qk } from '@main/lib/queryKeys';
 
 export interface UseAdminCategoriesPagedOptions {
     pageSize?: number;
-    q?: string; // 검색 (이름 / slug)
-    active?: 'all' | 'active' | 'inactive';
-    sort?: 'order' | 'name';
+    q?: string;
 }
 
-export function useAdminCategoriesPaged(page: number, { pageSize = 50, q, active = 'all', sort = 'order' }: UseAdminCategoriesPagedOptions = {}) {
-    const [raw, setRaw] = useState(() => listCategories());
-    const [revision, setRevision] = useState(0);
+interface CategoryRow {
+    id: string;
+    slug: string;
+    name: string;
+}
 
-    useEffect(() => {
-        setRaw(listCategories());
-    }, [revision]);
+async function fetchAll(): Promise<CategoryRow[]> {
+    const { data, error } = await supabase.from('categories').select('id,slug,name').order('name', { ascending: true });
+
+    if (error) throw error;
+
+    return (data as CategoryRow[]) || [];
+}
+
+export function useAdminCategoriesPaged(page: number, { pageSize = 50, q }: UseAdminCategoriesPagedOptions = {}) {
+    const query = useQuery({ queryKey: qk.categories(), queryFn: fetchAll, staleTime: 60_000 });
+    const list = query.data || [];
+
     const filtered = useMemo(() => {
-        let arr = raw;
+        if (!q || !q.trim()) return list;
+        const qq = q.trim().toLowerCase();
 
-        if (active !== 'all') arr = arr.filter((c) => (active === 'active' ? c.active : !c.active));
+        return list.filter((c) => c.name.toLowerCase().includes(qq) || c.slug.toLowerCase().includes(qq));
+    }, [list, q]);
 
-        if (q && q.trim()) {
-            const qq = q.trim().toLowerCase();
-
-            arr = arr.filter((c) => c.name.toLowerCase().includes(qq) || c.slug.toLowerCase().includes(qq));
-        }
-
-        if (sort === 'name') arr = [...arr].sort((a, b) => a.name.localeCompare(b.name));
-        else arr = [...arr].sort((a, b) => a.sort_order - b.sort_order);
-
-        return arr;
-    }, [raw, q, active, sort]);
-
-    const data: PaginatedResult<any> = useMemo(() => paginateArray(filtered, page, pageSize), [filtered, page, pageSize]);
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const safe = Math.min(page, totalPages);
+    const slice = filtered.slice((safe - 1) * pageSize, safe * pageSize);
+    const data: PaginatedResult<CategoryRow> = { items: slice, page: safe, pageSize, total, pageCount: totalPages };
 
     function refresh() {
-        setRevision((r) => r + 1);
+        query.refetch();
     }
 
-    return { data, refresh } as const;
+    return { data, refresh, isLoading: query.isLoading, error: query.error } as const;
 }
 
 export default useAdminCategoriesPaged;

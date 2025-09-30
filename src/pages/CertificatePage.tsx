@@ -2,19 +2,17 @@ import { Alert, Badge, Box, Button, Card, CopyButton, Divider, Grid, Group, Stac
 import { Link, useParams } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
-import { findCertificateById, getAttemptMeta, upsertAttemptMeta, useCertificate, useCourses } from '@main/lib/repository';
+import { getAttemptMeta, upsertAttemptMeta, useCourses } from '@main/lib/repository';
+import useCertificateQuery from '@main/hooks/useCertificateQuery';
 import { openCertificatePrintView } from '@main/lib/certificatePrint';
 import { useEffect, useMemo } from 'react';
 import { formatDateTime, formatScore } from '@main/lib/format';
 import { useI18n } from '@main/lib/i18n';
 
 // (임시) 방문 시 샘플 attempt 메타 자동 주입: 실제 구현에서는 채점 완료 시 저장
-function ensureSampleAttemptMeta(certId: string | undefined) {
-    if (!certId) return;
-    const cert = findCertificateById(certId);
-
-    if (cert && !getAttemptMeta(cert.exam_attempt_id)) {
-        // 가변 데모 점수
+function ensureSampleAttemptMeta(cert: any | null | undefined) {
+    if (!cert) return;
+    if (!getAttemptMeta(cert.exam_attempt_id)) {
         const score = 92;
         const pass = 70;
 
@@ -24,12 +22,12 @@ function ensureSampleAttemptMeta(certId: string | undefined) {
 
 const CertificatePage = () => {
     const { id } = useParams();
-    const cert = useCertificate(id);
+    const { data: cert, isLoading } = useCertificateQuery(id);
     const courses = useCourses();
 
     useEffect(() => {
-        ensureSampleAttemptMeta(id);
-    }, [id]);
+        ensureSampleAttemptMeta(cert);
+    }, [cert]);
 
     const attemptMeta = getAttemptMeta(cert?.exam_attempt_id);
     const courseTitle = useMemo(() => {
@@ -53,7 +51,7 @@ const CertificatePage = () => {
         );
     }
 
-    if (!cert) {
+    if (!isLoading && !cert) {
         return (
             <PageContainer roleMain>
                 <Alert color="yellow" title={t('certificate.notFoundTitle')}>
@@ -102,8 +100,8 @@ const CertificatePage = () => {
                                     {t('certificate.serial')}
                                 </Text>
                                 <Group gap="xs" wrap="nowrap">
-                                    <Text fw={500}>{cert.serial_no}</Text>
-                                    <CopyButton timeout={1500} value={cert.serial_no}>
+                                    <Text fw={500}>{cert?.serial_no}</Text>
+                                    <CopyButton timeout={1500} value={cert?.serial_no || ''}>
                                         {({ copied, copy }) => (
                                             <Tooltip withArrow label={copied ? t('common.copied') : t('common.copyLink')}>
                                                 <Button color={copied ? 'teal' : 'gray'} size="sm" variant={copied ? 'filled' : 'light'} onClick={copy}>
@@ -120,7 +118,7 @@ const CertificatePage = () => {
                                 <Text c="dimmed" size="sm">
                                     {t('certificate.issuedDateLabel')}
                                 </Text>
-                                <Text fw={500}>{formatDateTime(cert.issued_at)}</Text>
+                                <Text fw={500}>{cert ? formatDateTime(cert.issued_at) : ''}</Text>
                             </Stack>
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -143,9 +141,11 @@ const CertificatePage = () => {
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Box mt="sm">
-                                <Button size="sm" variant="filled" onClick={() => openCertificatePrintView({ certificate: cert, courseTitle })}>
-                                    {t('certificate.pdfDownload')}
-                                </Button>
+                                {cert && (
+                                    <Button size="sm" variant="filled" onClick={() => openCertificatePrintView({ certificate: cert as any, courseTitle })}>
+                                        {t('certificate.pdfDownload')}
+                                    </Button>
+                                )}
                             </Box>
                         </Grid.Col>
                     </Grid>
