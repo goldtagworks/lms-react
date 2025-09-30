@@ -4,41 +4,79 @@ import { ArrowDown, ArrowUp, Edit3, Plus, Save, X, RefreshCw } from 'lucide-reac
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
-import useAdminCategories from '@main/hooks/admin/useAdminCategories';
 import { useI18n } from '@main/lib/i18n';
+import useAdminCategoriesPaged from '@main/hooks/admin/useAdminCategoriesPaged';
+import { listCategories, createCategory, updateCategory, deactivateCategory, moveCategory } from '@main/lib/repository';
+import { useEffect, useState } from 'react';
 
 export default function AdminCategoriesPage() {
     const { t } = useI18n();
-    const {
-        items,
-        page,
-        totalPages,
-        q,
-        filterActive,
-        setQ,
-        setFilterActive,
-        resetFilters,
-        setPage,
-        createOpen,
-        setCreateOpen,
-        newName,
-        setNewName,
-        creatingErr,
-        setCreatingErr,
-        handleCreate,
-        renameId,
-        renameValue,
-        setRenameValue,
-        setRenameId,
-        startRename,
-        commitRename,
-        toggleActive,
-        deactivate,
-        move
-    } = useAdminCategories({ pageSize: 15 });
+    const [page, setPage] = useState(1);
+    const pageSize = 15;
+    const [q, setQ] = useState('');
+    const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
+    const [createOpen, setCreateOpen] = useState(false);
+    const [newName, setNewName] = useState('');
+    const [creatingErr, setCreatingErr] = useState<string | null>(null);
+    const [renameId, setRenameId] = useState<string | null>(null);
+    const [renameValue, setRenameValue] = useState('');
+    const { data, refresh } = useAdminCategoriesPaged(page, { pageSize, q, active: filterActive, sort: 'order' });
 
-    const paged = items; // 훅이 이미 page size slice 반환
-    const pageSafe = page; // naming 유지 호환
+    // 간단 refresh (실 서버 전환 시 useQuery 대체)
+    useEffect(() => {
+        // 초기 시드 (훅이 내부에서 listCategories 호출하지만 외부 side-effect 로직 유지)
+        listCategories();
+    }, []);
+
+    const paged = data.items;
+    const pageCount = data.pageCount;
+    const safePage = data.page;
+
+    function resetFilters() {
+        setQ('');
+        setFilterActive('all');
+        setPage(1);
+    }
+    function handleCreate() {
+        setCreatingErr(null);
+        if (!newName.trim()) {
+            setCreatingErr('이름 필수');
+
+            return false;
+        }
+        createCategory(newName.trim());
+        setNewName('');
+        setCreateOpen(false);
+        setPage(1);
+        refresh();
+
+        return true;
+    }
+    function startRename(c: any) {
+        setRenameId(c.id);
+        setRenameValue(c.name);
+    }
+    function commitRename() {
+        if (!renameId) return false;
+        if (!renameValue.trim()) return false;
+        updateCategory(renameId, { name: renameValue.trim() });
+        setRenameId(null);
+        refresh();
+
+        return true;
+    }
+    function toggleActive(c: any) {
+        updateCategory(c.id, { active: !c.active });
+        refresh();
+    }
+    function deactivate(c: any) {
+        deactivateCategory(c.id);
+        refresh();
+    }
+    function move(c: any, dir: 'up' | 'down') {
+        moveCategory(c.id, dir);
+        refresh();
+    }
 
     return (
         <PageContainer roleMain py={48} size="lg">
@@ -107,12 +145,12 @@ export default function AdminCategoriesPage() {
                             <Table.Tr key={c.id} style={{ opacity: c.active ? 1 : 0.55 }}>
                                 <Table.Td ta="center">
                                     <Group align="center" gap={4} justify="center" wrap="nowrap">
-                                        <ActionIcon aria-label={t('a11y.admin.moveUp')} disabled={idx === 0 && pageSafe === 1} size="sm" variant="subtle" onClick={() => move(c, 'up')}>
+                                        <ActionIcon aria-label={t('a11y.admin.moveUp')} disabled={idx === 0 && safePage === 1} size="sm" variant="subtle" onClick={() => move(c, 'up')}>
                                             <ArrowUp size={14} />
                                         </ActionIcon>
                                         <ActionIcon
                                             aria-label={t('a11y.admin.moveDown')}
-                                            disabled={idx === paged.length - 1 && pageSafe === totalPages}
+                                            disabled={idx === paged.length - 1 && safePage === pageCount}
                                             size="sm"
                                             variant="subtle"
                                             onClick={() => move(c, 'down')}
@@ -177,7 +215,7 @@ export default function AdminCategoriesPage() {
                 </Table>
             </Stack>
 
-            <PaginationBar align="right" page={pageSafe} totalPages={totalPages} onChange={(p) => setPage(p)} />
+            <PaginationBar align="right" page={safePage} totalPages={pageCount} onChange={setPage} />
 
             <Modal centered opened={createOpen} radius="md" size="sm" title={t('admin.categories.modal.newTitle')} onClose={() => setCreateOpen(false)}>
                 <Stack gap="sm">

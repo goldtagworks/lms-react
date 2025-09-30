@@ -1,7 +1,12 @@
+import type { PaginatedResult } from '@main/types/pagination';
+import type { CourseReview } from '@main/types/review';
+
 import { useState, useMemo } from 'react';
-import { Badge, Box, Button, Card, Divider, Group, Pagination, Progress, Select, Stack, Textarea } from '@mantine/core';
+import { Badge, Box, Button, Card, Divider, Group, Progress, Select, Stack, Textarea } from '@mantine/core';
 import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
-import { useCreateOrUpdateReview, useCourseReviews, ReviewSort } from '@main/hooks/useCourseReviews';
+import { useCreateOrUpdateReview } from '@main/hooks/course/useCourseReviews'; // mutate 재사용 (legacy hook 중 유지되는 부분)
+import { ReviewSort } from '@main/hooks/course/useCourseReviewsPaged';
+import { useCourseRatingSummaryState } from '@main/lib/repository';
 import { Save } from 'lucide-react';
 import { useI18n } from '@main/lib/i18n';
 
@@ -9,6 +14,9 @@ interface Props {
     courseId: string;
     userId?: string;
     enrolled: boolean;
+    data: PaginatedResult<CourseReview> | undefined; // 외부에서 제공되는 표준 페이지네이션 결과
+    sort: ReviewSort;
+    onChangeSort: (s: ReviewSort) => void;
 }
 
 function Stars({ value }: { value: number }) {
@@ -20,13 +28,11 @@ function Stars({ value }: { value: number }) {
     );
 }
 
-export default function CourseReviewsSection({ courseId, userId, enrolled }: Props) {
-    const [page, setPage] = useState(1);
-    const [sort, setSort] = useState<ReviewSort>('latest');
+export default function CourseReviewsSection({ courseId, userId, enrolled, data, sort, onChangeSort }: Props) {
     const [ratingInput, setRatingInput] = useState(5);
     const [commentInput, setCommentInput] = useState('');
-    const { reviews, summary, pageCount } = useCourseReviews(courseId, { page, sort, pageSize: 5 });
     const { mutate, error } = useCreateOrUpdateReview(courseId, userId);
+    const summary = useCourseRatingSummaryState(courseId);
 
     const distributionPercents = useMemo(() => {
         const total = summary.count || 1;
@@ -88,13 +94,12 @@ export default function CourseReviewsSection({ courseId, userId, enrolled }: Pro
                             size="sm"
                             value={sort}
                             w={160}
-                            onChange={(v) => v && setSort(v as ReviewSort)}
+                            onChange={(v) => v && onChangeSort(v as ReviewSort)}
                         />
-                        {pageCount > 1 && <Pagination size="sm" total={pageCount} value={page} onChange={setPage} />}
                     </Group>
                     <Stack gap="sm">
-                        {reviews.length === 0 && <TextBody c="dimmed">{t('review.none', undefined, '아직 후기가 없습니다')}</TextBody>}
-                        {reviews.map((r) => (
+                        {(!data || data.items.length === 0) && <TextBody c="dimmed">{t('review.none', undefined, '아직 후기가 없습니다')}</TextBody>}
+                        {data?.items.map((r) => (
                             <Card key={r.id} withBorder p="sm" radius="md">
                                 <Group align="center" gap={6} mb={4}>
                                     <Stars value={r.rating} />

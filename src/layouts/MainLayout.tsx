@@ -1,7 +1,7 @@
 import { AppShell } from '@mantine/core';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
 
 import Header from './Header';
 import Navbar from './Navbar';
@@ -13,7 +13,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
     const [navOpened, { toggle: toggleNav, close: closeNav }] = useDisclosure(false);
-    const { t } = useTranslation();
+    const { t } = useI18n();
     const isMobile = useMediaQuery('(max-width: 48em)'); // Mantine sm breakpoint (≈768px)
     const burgerRef = useRef<HTMLButtonElement>(null!);
     const firstNavFocusRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);

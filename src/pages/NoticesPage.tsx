@@ -9,8 +9,9 @@ import { useI18n } from '@main/lib/i18n';
 import { formatDate } from '@main/utils/format';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
+import useNoticesPaged from '@main/hooks/useNoticesPaged';
 import { useAuth } from '@main/lib/auth';
 import NoticeEditor from '@main/components/notices/NoticeEditor';
 import { Pin, Pencil, Trash2 } from 'lucide-react';
@@ -19,14 +20,10 @@ export default function NoticesPage() {
     const { t } = useI18n();
     // reactive notices (pin 토글/수정 즉시 반영)
     const notices = useNotices();
-    const PAGE_SIZE = 15;
     const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(notices.length / PAGE_SIZE));
-    const paged = notices.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages, notices.length]);
+    const { data } = useNoticesPaged(page, { pageSize: 15, includePinnedFirst: true });
+    const totalPages = data?.pageCount || 1;
+    const paged = data?.items || [];
     const navigate = useNavigate();
 
     const { user } = useAuth(); // 사용자 컨텍스트 (admin 여부 판단)

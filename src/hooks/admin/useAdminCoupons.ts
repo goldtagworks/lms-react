@@ -1,3 +1,5 @@
+import type { PaginatedResult } from '@main/types/pagination';
+
 import { useEffect, useMemo, useState } from 'react';
 import { deactivateCoupon, listCouponsPaged, updateCoupon, createCoupon, Coupon } from '@main/lib/repository';
 
@@ -14,7 +16,17 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
     const [revision, setRevision] = useState(0);
 
     const activeParam = useMemo(() => (activeFilter === 'all' ? undefined : activeFilter === 'active'), [activeFilter]);
-    const [paged, setPaged] = useState(() => listCouponsPaged({ q: undefined, active: activeParam }, 1, pageSize));
+    const [rawPage, setRawPage] = useState(() => listCouponsPaged({ q: undefined, active: activeParam }, 1, pageSize));
+    const data: PaginatedResult<Coupon> = useMemo(
+        () => ({
+            items: rawPage.items,
+            page: rawPage.page,
+            pageSize,
+            total: rawPage.total,
+            pageCount: rawPage.totalPages
+        }),
+        [rawPage, pageSize]
+    );
     const [createErr, setCreateErr] = useState<string | null>(null);
     const [editErr, setEditErr] = useState<string | null>(null);
 
@@ -36,8 +48,8 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
     useEffect(() => {
         const res = listCouponsPaged({ q: q.trim() || undefined, active: activeParam }, page, pageSize);
 
-        setPaged(res);
-        if (page !== res.page) setPage(res.page); // auto correct
+        setRawPage(res);
+        if (page !== res.page) setPage(res.page);
     }, [q, activeParam, page, pageSize, revision]);
 
     function resetFilters() {
@@ -139,7 +151,7 @@ export function useAdminCoupons({ pageSize = 20 }: UseAdminCouponsOptions = {}) 
     }
 
     return {
-        paged,
+        data,
         page,
         q,
         activeFilter,

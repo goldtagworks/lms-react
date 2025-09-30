@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import PageContainer from '@main/components/layout/PageContainer';
+import { useI18n } from '@main/lib/i18n';
 
 interface MDXModule {
     default: React.ComponentType<any>;
@@ -21,23 +22,10 @@ interface FaqEntry {
 const mdxModules = import.meta.glob('../faq/ko/*.mdx');
 
 export default function FAQPage() {
-    const { t, i18n } = useTranslation();
+    const { t, locale } = useI18n();
     const [entries, setEntries] = useState<FaqEntry[]>([]);
     // i18n 초기화 지연 시 language가 undefined일 수 있으므로 방어
-    const rawLang = ((): string => {
-        const lang = (i18n as any)?.language;
-
-        if (typeof lang === 'string' && lang.length > 0) return lang;
-
-        const fallback = (i18n as any)?.options?.fallbackLng;
-
-        if (Array.isArray(fallback) && fallback.length > 0) return fallback[0];
-
-        if (typeof fallback === 'string') return fallback;
-
-        return 'ko';
-    })();
-    const locale = rawLang.split ? rawLang.split('-')[0] : rawLang; // 'ko-KR' -> 'ko'
+    // locale already normalized in useI18n
 
     useEffect(() => {
         let cancelled = false;
@@ -50,16 +38,19 @@ export default function FAQPage() {
                 if (!path.includes(`/${locale}/`)) continue;
                 const mod = (await loader()) as MDXModule;
                 const fm = mod.frontmatter || {};
+                const derivedSlug =
+                    fm.slug ||
+                    path
+                        .split('/')
+                        .pop()!
+                        .replace(/\.mdx?$/, '');
+                // i18n key 우선: faq.items.<slug>.question → 없으면 fm.question → slug
+                const question = fm.question || t(`faq.items.${derivedSlug}.question`, undefined, derivedSlug);
 
                 loaded.push({
-                    slug:
-                        fm.slug ||
-                        path
-                            .split('/')
-                            .pop()!
-                            .replace(/\.mdx?$/, ''),
+                    slug: derivedSlug,
                     order: fm.order ?? 999,
-                    question: fm.question || fm.slug || '—',
+                    question,
                     Component: mod.default
                 });
             }
@@ -76,7 +67,7 @@ export default function FAQPage() {
     const content = useMemo(() => entries, [entries]);
 
     return (
-        <div>
+        <PageContainer roleMain py={48} size="sm">
             <h1>{t('faq.title')}</h1>
             <p>{t('faq.subtitle')}</p>
             <dl>
@@ -93,6 +84,6 @@ export default function FAQPage() {
                     );
                 })}
             </dl>
-        </div>
+        </PageContainer>
     );
 }

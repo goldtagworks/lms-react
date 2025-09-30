@@ -4,8 +4,10 @@ import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import PaginationBar from '@main/components/PaginationBar';
 import { Plus, Pencil, Ban, RotateCcw, RefreshCw, Save, X } from 'lucide-react';
-import useAdminCoupons from '@main/hooks/admin/useAdminCoupons';
+import { useState } from 'react';
 import { useI18n } from '@main/lib/i18n';
+import useAdminCouponsPaged from '@main/hooks/admin/useAdminCouponsPaged';
+import { createCoupon, updateCoupon, deactivateCoupon, type Coupon } from '@main/lib/repository';
 
 type ActiveFilter = 'all' | 'active' | 'inactive';
 
@@ -13,48 +15,120 @@ type ActiveFilter = 'all' | 'active' | 'inactive';
 
 const AdminCouponsPage = () => {
     const { t } = useI18n();
-    const {
-        paged,
-        q,
-        activeFilter,
-        setQ,
-        setActiveFilter,
-        setPage,
-        resetFilters,
-        // creation
-        createOpen,
-        setCreateOpen,
-        cCode,
-        cType,
-        cValue,
-        cCurrency,
-        cMaxUses,
-        cPerUser,
-        cStart,
-        cEnd,
-        setCCode,
-        setCType,
-        setCValue,
-        setCCurrency,
-        setCMaxUses,
-        setCPerUser,
-        setCStart,
-        setCEnd,
-        createErr,
-        setCreateErr,
-        createNew,
-        // edit
-        editId,
-        editDraft,
-        setEditDraft,
-        setEditId,
-        setEditErr,
-        editErr,
-        openEdit,
-        commitEdit,
-        toggleActive,
-        softDeactivate
-    } = useAdminCoupons({ pageSize: 20 });
+    const pageSize = 20;
+    const [page, setPage] = useState(1);
+    const [q, setQ] = useState('');
+    const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
+    const { data, refresh } = useAdminCouponsPaged(page, { pageSize, q, active: activeFilter });
+
+    // creation state
+    const [createOpen, setCreateOpen] = useState(false);
+    const [cCode, setCCode] = useState('');
+    const [cType, setCType] = useState<'percent' | 'fixed'>('percent');
+    const [cValue, setCValue] = useState<number | ''>(10);
+    const [cCurrency, setCCurrency] = useState('KRW');
+    const [cMaxUses, setCMaxUses] = useState<number | ''>('');
+    const [cPerUser, setCPerUser] = useState<number | ''>('');
+    const [cStart, setCStart] = useState('');
+    const [cEnd, setCEnd] = useState('');
+    const [createErr, setCreateErr] = useState<string | null>(null);
+
+    // edit state
+    const [editId, setEditId] = useState<string | null>(null);
+    const [editDraft, setEditDraft] = useState<Partial<Coupon>>({});
+    const [editErr, setEditErr] = useState<string | null>(null);
+
+    function resetFilters() {
+        setQ('');
+        setActiveFilter('all');
+        setPage(1);
+    }
+
+    function openEdit(c: Coupon) {
+        setEditId(c.id);
+        setEditDraft({ ...c });
+        setEditErr(null);
+    }
+
+    function commitEdit() {
+        if (!editId) return false;
+        if (editDraft.code && !editDraft.code.trim()) {
+            setEditErr('코드 필수');
+
+            return false;
+        }
+        const r = updateCoupon(editId, {
+            code: editDraft.code,
+            type: editDraft.type,
+            value: editDraft.value,
+            currency_code: editDraft.currency_code,
+            max_uses: editDraft.max_uses,
+            per_user_limit: editDraft.per_user_limit,
+            starts_at: editDraft.starts_at,
+            ends_at: editDraft.ends_at,
+            active: editDraft.active
+        });
+        // error check
+
+        if ('error' in r) {
+            setEditErr(r.error || 'error');
+
+            return false;
+        }
+        setEditId(null);
+        refresh();
+
+        return true;
+    }
+
+    function toggleActive(c: Coupon) {
+        updateCoupon(c.id, { active: !c.active });
+        refresh();
+    }
+    function softDeactivate(c: Coupon) {
+        deactivateCoupon(c.id);
+        refresh();
+    }
+    function resetCreateForm() {
+        setCCode('');
+        setCType('percent');
+        setCValue(10);
+        setCMaxUses('');
+        setCPerUser('');
+        setCStart('');
+        setCEnd('');
+    }
+    function createNew() {
+        setCreateErr(null);
+        if (!cCode.trim()) {
+            setCreateErr('코드 필수');
+
+            return false;
+        }
+        const r = createCoupon({
+            code: cCode.trim(),
+            type: cType,
+            value: typeof cValue === 'number' ? cValue : 0,
+            currency_code: cType === 'fixed' ? cCurrency : undefined,
+            max_uses: typeof cMaxUses === 'number' ? cMaxUses : undefined,
+            per_user_limit: typeof cPerUser === 'number' ? cPerUser : undefined,
+            starts_at: cStart || undefined,
+            ends_at: cEnd || undefined
+        });
+        // error check
+
+        if ('error' in r) {
+            setCreateErr(r.error || 'error');
+
+            return false;
+        }
+        resetCreateForm();
+        setCreateOpen(false);
+        refresh();
+        setPage(1);
+
+        return true;
+    }
 
     return (
         <PageContainer roleMain py={48} size="lg">
@@ -117,7 +191,7 @@ const AdminCouponsPage = () => {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        {paged.items.length === 0 && (
+                        {data.items.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={7}>
                                     <TextMeta py={20} ta="center">
@@ -126,7 +200,7 @@ const AdminCouponsPage = () => {
                                 </Table.Td>
                             </Table.Tr>
                         )}
-                        {paged.items.map((c) => {
+                        {data.items.map((c) => {
                             const period = c.starts_at || c.ends_at ? `${c.starts_at ? c.starts_at.slice(0, 10) : '—'} ~ ${c.ends_at ? c.ends_at.slice(0, 10) : '—'}` : '—';
 
                             return (
@@ -183,7 +257,7 @@ const AdminCouponsPage = () => {
                         })}
                     </Table.Tbody>
                 </Table>
-                <PaginationBar page={paged.page} totalPages={paged.totalPages} onChange={(p) => setPage(p)} />
+                <PaginationBar page={page} totalPages={data.pageCount} onChange={setPage} />
             </Stack>
 
             {/* 생성 모달 */}

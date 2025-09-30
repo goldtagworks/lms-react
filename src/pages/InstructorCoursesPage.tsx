@@ -3,23 +3,23 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Eye, Edit } from 'lucide-react';
 import { t } from '@main/lib/i18n';
-import { loadCoursesPaged } from '@main/lib/repository';
 import PaginationBar from '@main/components/PaginationBar';
 import PageContainer from '@main/components/layout/PageContainer';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
 import { TagChip } from '@main/components/TagChip';
+import useInstructorCoursesPaged from '@main/hooks/instructor/useInstructorCoursesPaged';
 
 const InstructorCoursesPage = () => {
     const PAGE_SIZE = 10;
     const [page, setPage] = useState(1);
-    const { items: pagedCourses, total, totalPages } = loadCoursesPaged(page, PAGE_SIZE);
+    const { data } = useInstructorCoursesPaged(page, { pageSize: PAGE_SIZE });
 
     // page가 범위를 벗어나면 보정
     useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+        if (data && page > data.pageCount) setPage(data.pageCount);
+    }, [page, data]);
 
     return (
         <PageContainer roleMain py={48}>
@@ -32,14 +32,14 @@ const InstructorCoursesPage = () => {
             <Text c="dimmed" mb="md" size="sm">
                 {t('instructor.courses.subtitle')}
             </Text>
-            {total === 0 && (
+            {data.total === 0 && (
                 <Text c="dimmed" size="sm">
                     {t('instructor.courses.empty')}
                 </Text>
             )}
-            {total > 0 && (
+            {data.total > 0 && (
                 <CourseGrid mt="md">
-                    {pagedCourses.map((c) => (
+                    {data.items.map((c: any) => (
                         <Card key={c.id} withBorder p="lg" radius="md" shadow="sm">
                             <AppImage alt={c.title} height={120} mb={12} radius="lg" src={c.thumbnail_url || ''} />
                             <Group align="center" justify="space-between" mb={4} wrap="nowrap">
@@ -75,7 +75,7 @@ const InstructorCoursesPage = () => {
                     ))}
                 </CourseGrid>
             )}
-            <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
+            <PaginationBar align="right" page={page} totalPages={data.pageCount} onChange={setPage} />
         </PageContainer>
     );
 };

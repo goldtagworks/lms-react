@@ -1,6 +1,6 @@
 import { Card, Button, Group, Select, TextInput, Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState } from 'react';
 import { TagChip } from '@main/components/TagChip';
 import { Link } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -9,7 +9,8 @@ import PageSection from '@main/components/layout/PageSection';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
-import { useCourses, enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
+import { enrollAndNotify, isEnrolled, isWishlisted, toggleWishlistAndNotify } from '@main/lib/repository';
+import useCoursesPaged from '@main/hooks/course/useCoursesPaged';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import EmptyState from '@main/components/EmptyState';
 import { useI18n } from '@main/lib/i18n';
@@ -21,55 +22,16 @@ import { useAuth } from '@main/lib/auth';
 // 기존 mock 제거 → repository seed 사용
 
 const CourseListPage = () => {
-    const courses = useCourses();
+    const [page, setPage] = useState(1);
     const { user } = useAuth();
     const userId = user?.id;
     const [category, setCategory] = useState<string>('all');
     const [query, setQuery] = useState<string>('');
 
-    const filtered = useMemo(() => {
-        const base = courses.filter((c) => {
-            if (category !== 'all' && c.category !== category) return false;
-            if (query.trim()) {
-                const q = query.trim().toLowerCase();
-                const inTitle = c.title.toLowerCase().includes(q);
-                const inSummary = (c.summary || '').toLowerCase().includes(q);
-                const inTags = (c.tags || []).some((t) => t.toLowerCase().includes(q));
-
-                if (!inTitle && !inSummary && !inTags) return false;
-            }
-
-            return true;
-        });
-
-        return base.slice().sort((a, b) => {
-            // featured 먼저, rank 오름차순
-            const af = a.is_featured ? 1 : 0;
-            const bf = b.is_featured ? 1 : 0;
-
-            if (af !== bf) return bf - af; // true 먼저
-
-            if (a.is_featured && b.is_featured) {
-                const ar = a.featured_rank ?? 999;
-                const br = b.featured_rank ?? 999;
-
-                if (ar !== br) return ar - br;
-            }
-
-            return 0;
-        });
-    }, [courses, category, query]);
-
-    // Pagination state (client-side for mock data)
-    const PAGE_SIZE = 12;
-    const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-    const start = (page - 1) * PAGE_SIZE;
-    const paged = filtered.slice(start, start + PAGE_SIZE);
-
-    useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+    const { data } = useCoursesPaged(page, { pageSize: 12, category, query });
+    const filteredTotal = data?.total || 0;
+    const totalPages = data?.pageCount || 1;
+    const paged = data?.items || [];
 
     const handleEnroll = (courseId: string, enrolled: boolean) => {
         if (!userId || enrolled) return;
@@ -184,7 +146,7 @@ const CourseListPage = () => {
                             </Card>
                         );
                     })}
-                    {filtered.length === 0 && (
+                    {filteredTotal === 0 && (
                         <EmptyState
                             actionLabel={t('common.resetFilters', {}, '필터 초기화')}
                             message={t('empty.coursesFiltered', {}, '검색어나 필터를 조정해 다시 시도해 주세요.')}

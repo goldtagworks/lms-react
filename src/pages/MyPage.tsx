@@ -5,9 +5,10 @@ import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
-import { useEnrollmentsState, useCourses, isEnrolled, isWishlisted } from '@main/lib/repository';
+import { isEnrolled, isWishlisted } from '@main/lib/repository';
+import useEnrollmentsPaged from '@main/hooks/useEnrollmentsPaged';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import { useI18n } from '@main/lib/i18n';
 import AppImage from '@main/components/AppImage';
@@ -19,18 +20,10 @@ export default function MyPage() {
     const { t } = useI18n();
     const { user } = useAuth();
     const userId = user?.id;
-    const enrollments = useEnrollmentsState(userId);
-    const courses = useCourses();
-
-    const enrolledCourses = enrollments.map((e) => courses.find((c) => c.id === e.course_id)).filter((c): c is NonNullable<typeof c> => !!c);
-    const PAGE_SIZE = 8;
     const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(enrolledCourses.length / PAGE_SIZE));
-    const paged = enrolledCourses.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+    const { data } = useEnrollmentsPaged(userId, page, { pageSize: 8 });
+    const enrolledCourses = data?.items || [];
+    const totalPages = data?.pageCount || 1;
 
     return (
         <PageContainer roleMain>
@@ -88,7 +81,7 @@ export default function MyPage() {
                     )}
                     {userId && enrolledCourses.length > 0 && (
                         <CourseGrid mt="md">
-                            {paged.map((course) => {
+                            {enrolledCourses.map((course) => {
                                 const wish = isWishlisted(userId!, course.id);
                                 const enrolled = isEnrolled(userId!, course.id);
 

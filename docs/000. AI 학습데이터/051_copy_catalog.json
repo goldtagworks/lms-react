@@ -241,6 +241,38 @@
         "applied": "쿠폰이 적용되었습니다"
     },
 
+    "admin": {
+        "coupons": {
+            "title": "쿠폰 관리",
+            "description": "쿠폰 생성 · 수정 · 비활성화",
+            "search": "코드/설명 검색",
+            "filter": { "all": "전체", "active": "활성", "inactive": "비활성" },
+            "table": {
+                "code": "코드",
+                "type": "유형",
+                "value": "값",
+                "period": "기간",
+                "usage": "사용현황",
+                "status": "상태",
+                "actions": "작업",
+                "empty": "등록된 쿠폰이 없습니다"
+            },
+            "form": {
+                "code": "코드",
+                "type": "할인 유형",
+                "value": "할인 값",
+                "currency": "통화",
+                "maxUses": "전체 최대 사용횟수",
+                "perUser": "사용자당 최대",
+                "start": "시작일",
+                "end": "종료일",
+                "unlimited": "무제한",
+                "activeState": "활성화"
+            },
+            "modal": { "newTitle": "새 쿠폰", "editTitle": "쿠폰 수정" }
+        }
+    },
+
     "category": {
         "manage": "카테고리 관리",
         "empty": "등록된 카테고리가 없습니다"
@@ -250,6 +282,9 @@
         "subtitle": "궁금한 점을 남겨주시면 최대한 빠르게 답변해 드립니다.",
         "newTicket": "새 문의 작성",
         "newTicketTitle": "새 문의 작성",
+        "listDescription": "등록된 문의 내역을 확인하세요.",
+        "empty": "문의 내역이 없습니다",
+        "lastMessageAt": "마지막 메시지",
         "form": {
             "titleLabel": "제목",
             "bodyLabel": "내용"
@@ -299,6 +334,42 @@
         },
         "reviewExtra": {
             "popular": "Popular Reviews"
+        },
+        "admin": {
+            "coupons": {
+                "title": "Coupon Management",
+                "description": "Create, edit and deactivate coupons",
+                "search": "Search code/description",
+                "filter": { "all": "All", "active": "Active", "inactive": "Inactive" },
+                "table": {
+                    "code": "Code",
+                    "type": "Type",
+                    "value": "Value",
+                    "period": "Period",
+                    "usage": "Usage",
+                    "status": "Status",
+                    "actions": "Actions",
+                    "empty": "No coupons"
+                },
+                "form": {
+                    "code": "Code",
+                    "type": "Discount Type",
+                    "value": "Discount Value",
+                    "currency": "Currency",
+                    "maxUses": "Global Max Uses",
+                    "perUser": "Per User Max",
+                    "start": "Start Date",
+                    "end": "End Date",
+                    "unlimited": "Unlimited",
+                    "activeState": "Active"
+                },
+                "modal": { "newTitle": "New Coupon", "editTitle": "Edit Coupon" }
+            }
+        },
+        "support": {
+            "listDescription": "Check your submitted tickets.",
+            "empty": "No tickets yet",
+            "lastMessageAt": "Last Message"
         }
     }
 }

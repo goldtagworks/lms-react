@@ -6,7 +6,8 @@ import { useI18n } from '@main/lib/i18n';
 import { useAuth } from '@main/lib/auth';
 import { useState, useEffect } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
-import { useCourses, useEnrollmentsState, issueCertificate, useCertificates } from '@main/lib/repository';
+import { useCourses, useEnrollmentsState, issueCertificate } from '@main/lib/repository';
+import useCertificatesPaged from '@main/hooks/useCertificatesPaged';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import CertificateCard from '@main/components/CertificateCard';
 import { notifications } from '@mantine/notifications';
@@ -26,19 +27,18 @@ const CertificatesListPage = () => {
         courseMap[c.id] = c.title;
     });
 
-    const rawCerts = useCertificates(userId);
-    const certs = rawCerts.map((c) => ({
+    const PAGE_SIZE = 12;
+    const [page, setPage] = useState(1);
+    const { data } = useCertificatesPaged(page, { pageSize: PAGE_SIZE, userId });
+    const certs = data.items.map((c: any) => ({
         ...c,
         courseTitle: courseMap[c.enrollment_id.split('-').slice(-1)[0]] || t('certificate.title')
     }));
-    const PAGE_SIZE = 12;
-    const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(certs.length / PAGE_SIZE));
-    const paged = certs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const paged = certs; // data.items 이미 현재 페이지 slice
 
     useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+        if (page > data.pageCount) setPage(data.pageCount);
+    }, [page, data.pageCount]);
 
     const handleIssueOne = () => {
         if (!userId) return;
@@ -77,15 +77,15 @@ const CertificatesListPage = () => {
                         <Text fw={700} size="lg">
                             {t('empty.certificatesHeader')}
                         </Text>
-                        {userId && certs.length > 0 && (
+                        {userId && data.total > 0 && (
                             <Badge color="indigo" variant="light">
-                                {certs.length}개
+                                {data.total}개
                             </Badge>
                         )}
                     </Group>
                     {!userId && <EmptyState actionLabel={t('common.login')} message={t('empty.certificatesLoginNeeded')} title={t('empty.loginRequired')} to="/signin" />}
-                    {userId && certs.length === 0 && <EmptyState actionLabel={t('empty.exploreCourses')} message={t('empty.certificatesNone')} title={t('empty.certificatesEmpty')} to="/courses" />}
-                    {userId && certs.length > 0 && (
+                    {userId && data.total === 0 && <EmptyState actionLabel={t('empty.exploreCourses')} message={t('empty.certificatesNone')} title={t('empty.certificatesEmpty')} to="/courses" />}
+                    {userId && data.total > 0 && (
                         <CourseGrid mt="md">
                             {paged.map((c) => (
                                 <CertificateCard key={c.id} courseTitle={c.courseTitle} id={c.id} issuedAt={c.issued_at} pdfPath={c.pdf_path} serialNo={c.serial_no} />
@@ -97,7 +97,7 @@ const CertificatesListPage = () => {
                             {t('empty.certificateIssueNote')}
                         </Text>
                     )}
-                    <PaginationBar align="right" page={page} totalPages={totalPages} onChange={setPage} />
+                    <PaginationBar align="right" page={page} totalPages={data.pageCount} onChange={setPage} />
                 </Stack>
             </Card>
         </PageContainer>

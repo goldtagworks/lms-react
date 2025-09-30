@@ -11,6 +11,11 @@ interface UseCourseReviewsOptions {
     page?: number;
 }
 
+/**
+ * @deprecated 표준 페이지네이션 훅(useCourseReviewsPaged)으로 대체되었습니다.
+ *  - 새 코드에서는 useCourseReviewsPaged + PaginatedResult 패턴 사용
+ *  - summary 값만 필요한 경우 useCourseRatingSummaryState 사용
+ */
 export function useCourseReviews(courseId: string | undefined, opts?: UseCourseReviewsOptions) {
     const { pageSize = 10, sort = 'latest', page = 1 } = opts || {};
     const list = useCourseReviewsState(courseId);

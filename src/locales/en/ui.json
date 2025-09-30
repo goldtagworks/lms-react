@@ -1,0 +1,20 @@
+{
+    "__meta": "Minimal English resource subset for demo; extend incrementally.",
+    "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Check common questions before starting a course or making a payment.",
+        "more": "For anything else, submit a 1:1 support ticket.",
+        "empty": "No FAQ entries yet"
+    },
+    "nav": {
+        "home": "Home",
+        "faq": "FAQ",
+        "support": "Support",
+        "supportNew": "New Ticket"
+    },
+    "common": {
+        "ok": "OK",
+        "cancel": "Cancel",
+        "loading": "Loading"
+    }
+}

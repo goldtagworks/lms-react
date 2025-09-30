@@ -1,5 +1,7 @@
 // Placeholder repository/API layer for Support feature
 // 실제 Supabase 클라이언트 연동 전 타입/쿼리 키 중심 스텁
+import type { PaginatedResult } from '@main/types/pagination';
+
 import { SupportTicket, SupportTicketMessage } from './types';
 
 // 임시 인메모리 스토어 (초기 UI 개발용)
@@ -10,12 +12,34 @@ export function listSupportTickets(): Promise<SupportTicket[]> {
     return Promise.resolve(_tickets);
 }
 
+export function listSupportTicketsPaged(page: number, pageSize: number, status?: SupportTicket['status']): Promise<PaginatedResult<SupportTicket>> {
+    const arr = _tickets.filter((t) => (status ? t.status === status : true)).sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
+    const total = arr.length;
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(Math.max(1, page), pageCount);
+    const start = (safePage - 1) * pageSize;
+    const items = arr.slice(start, start + pageSize);
+
+    return Promise.resolve({ items, page: safePage, pageSize, total, pageCount });
+}
+
 export function getSupportTicket(id: string): Promise<SupportTicket | undefined> {
     return Promise.resolve(_tickets.find((t) => t.id === id));
 }
 
 export function listSupportMessages(ticketId: string): Promise<SupportTicketMessage[]> {
     return Promise.resolve(_messages.filter((m) => m.ticket_id === ticketId));
+}
+
+export function listSupportMessagesPaged(ticketId: string, page: number, pageSize: number): Promise<PaginatedResult<SupportTicketMessage>> {
+    const arr = _messages.filter((m) => m.ticket_id === ticketId).sort((a, b) => a.created_at.localeCompare(b.created_at)); // 오래된 -> 최신 순 (UI에서 reverse 필요 시 변경)
+    const total = arr.length;
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(Math.max(1, page), pageCount);
+    const start = (safePage - 1) * pageSize;
+    const items = arr.slice(start, start + pageSize);
+
+    return Promise.resolve({ items, page: safePage, pageSize, total, pageCount });
 }
 
 export function createSupportTicket(data: { title: string; body: string; category?: string | null }): Promise<SupportTicket> {

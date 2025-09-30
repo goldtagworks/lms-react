@@ -5,9 +5,10 @@ import { useI18n } from '@main/lib/i18n';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
 import { useAuth } from '@main/lib/auth';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PaginationBar from '@main/components/PaginationBar';
-import { useCourses, useWishlistState, isWishlisted, toggleWishlistAndNotify, isEnrolled, enrollAndNotify } from '@main/lib/repository';
+import { useWishlistState, isWishlisted, toggleWishlistAndNotify, isEnrolled, enrollAndNotify } from '@main/lib/repository';
+import useWishlistPaged from '@main/hooks/useWishlistPaged';
 import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import AppImage from '@main/components/AppImage';
 import PriceText from '@main/components/price/PriceText';
@@ -19,18 +20,11 @@ export default function WishlistPage() {
     const { t } = useI18n();
     const { user } = useAuth();
     const userId = user?.id;
-    const allCourses = useCourses();
     const wishlist = useWishlistState(userId);
-
-    const wishCourses = allCourses.filter((c) => (userId ? isWishlisted(userId, c.id) : false));
-    const PAGE_SIZE = 12;
     const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(wishCourses.length / PAGE_SIZE));
-    const paged = wishCourses.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
+    const { data } = useWishlistPaged(userId, page, { pageSize: 12 });
+    const totalPages = data?.pageCount || 1;
+    const paged = data?.items || [];
 
     const handleToggle = (courseId: string) => {
         if (!userId) return;

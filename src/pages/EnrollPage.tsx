@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import EmptyState from '@main/components/EmptyState';
 import { useI18n } from '@main/lib/i18n';
-import { useCourseByRouteId } from '@main/hooks/useCourseByRouteId';
+import { useCourseByRouteId } from '@main/hooks/course/useCourseByRouteId';
 import PriceText from '@main/components/price/PriceText';
 import { enrollCourse, isEnrolled } from '@main/lib/repository';
 import { useAuth } from '@main/lib/auth';

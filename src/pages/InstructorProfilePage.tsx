@@ -5,7 +5,7 @@ import { useAuth } from '@main/lib/auth';
 import { ensureInstructorProfile, useInstructorProfile, upsertInstructorProfile, curateInstructorCourses } from '@main/lib/repository';
 import CourseGrid from '@main/components/layout/CourseGrid';
 import AppImage from '@main/components/AppImage';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
 import PriceText from '@main/components/price/PriceText';
 import { TagChip } from '@main/components/TagChip';
 import MarkdownViewer from '@main/components/MarkdownViewer';
@@ -23,9 +23,11 @@ const InstructorProfilePage = () => {
     const [editOpen, setEditOpen] = useState(false);
 
     // 초기 프로필 보장 (승인된 강사 시나리오는 mock, 여기서는 단순 보장)
+    const { t } = useI18n();
+
     useEffect(() => {
         if (instructorId) ensureInstructorProfile(instructorId, { display_name: t('instructor.edit.displayName') });
-    }, [instructorId]);
+    }, [instructorId, t]);
 
     const curation = useMemo(() => curateInstructorCourses(instructorId, { limit: 4 }), [instructorId]);
 
@@ -91,7 +93,7 @@ const InstructorProfilePage = () => {
         );
     }
 
-    const { t } = useTranslation();
+    // t already from useI18n()
 
     return (
         <PageContainer roleMain py={48} size="lg">

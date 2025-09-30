@@ -30,15 +30,24 @@ import EnrollWishlistActions from '@main/components/EnrollWishlistActions';
 import { useI18n } from '@main/lib/i18n';
 import EmptyState from '@main/components/EmptyState';
 import CourseReviewsSection from '@main/components/reviews/CourseReviewsSection';
+import PaginationBar from '@main/components/PaginationBar';
+import { useState } from 'react';
+import useCourseReviewsPaged, { ReviewSort as ReviewSortPaged } from '@main/hooks/course/useCourseReviewsPaged';
 import CourseQnASection from '@main/components/qna/CourseQnASection';
+import useCourseQnAPaged from '@main/hooks/course/useCourseQnAPaged';
 
 export default function CourseDetailPage() {
     const { id: rawId } = useParams();
     // 라우터가 숫자 id (/course/1)로 들어오면 seed id(c1..) 매핑
     const mappedId = !rawId ? undefined : rawId.startsWith('c') ? rawId : 'c' + rawId;
     const course = useCourse(mappedId);
+    const [reviewsPage, setReviewsPage] = useState(1);
+    const [reviewsSort, setReviewsSort] = useState<ReviewSortPaged>('latest');
+    const { data: reviewsPaged } = useCourseReviewsPaged(course?.id, reviewsPage, { pageSize: 10, sort: reviewsSort });
+    const [qnaPage, setQnaPage] = useState(1);
     const { user } = useAuth();
     const userId = user?.id;
+    const { data: qnaPaged } = useCourseQnAPaged(course?.id, qnaPage, { pageSize: 5, viewerId: userId });
     const enrolled = userId && course?.id ? isEnrolled(userId, course.id) : false;
     const wish = userId && course?.id ? isWishlisted(userId, course.id) : false;
     const { t } = useI18n();
@@ -555,10 +564,30 @@ export default function CourseDetailPage() {
                             )}
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="reviews">
-                            {course.id && <CourseReviewsSection courseId={course.id} enrolled={!!enrolled} userId={userId} />}
+                            {course.id && (
+                                <>
+                                    <CourseReviewsSection
+                                        courseId={course.id}
+                                        data={reviewsPaged}
+                                        enrolled={!!enrolled}
+                                        sort={reviewsSort}
+                                        userId={userId}
+                                        onChangeSort={(s) => {
+                                            setReviewsSort(s);
+                                            setReviewsPage(1);
+                                        }}
+                                    />
+                                    {reviewsPaged && reviewsPaged.pageCount > 1 && <PaginationBar page={reviewsPaged.page} totalPages={reviewsPaged.pageCount} onChange={(p) => setReviewsPage(p)} />}
+                                </>
+                            )}
                         </Tabs.Panel>
                         <Tabs.Panel pt="md" value="qna">
-                            {course.id && <CourseQnASection courseId={course.id} enrolled={!!enrolled} isInstructor={user?.role === 'instructor'} userId={userId} userRole={user?.role} />}
+                            {course.id && (
+                                <>
+                                    <CourseQnASection courseId={course.id} data={qnaPaged} enrolled={!!enrolled} isInstructor={user?.role === 'instructor'} userId={userId} userRole={user?.role} />
+                                    {qnaPaged && qnaPaged.pageCount > 1 && <PaginationBar page={qnaPaged.page} totalPages={qnaPaged.pageCount} onChange={(p) => setQnaPage(p)} />}
+                                </>
+                            )}
                         </Tabs.Panel>
                     </Tabs>
                 </Box>

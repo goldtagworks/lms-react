@@ -1,10 +1,10 @@
 import { FormEvent, useState } from 'react';
 import { useCreateSupportTicket } from '@main/features/support/hooks';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
 import { useNavigate } from 'react-router-dom';
 
 export default function SupportNewPage() {
-    const { t } = useTranslation();
+    const { t } = useI18n();
     const nav = useNavigate();
     const createMutation = useCreateSupportTicket();
 

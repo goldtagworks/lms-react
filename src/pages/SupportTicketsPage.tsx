@@ -1,10 +1,14 @@
-import { useSupportTickets } from '@main/features/support/hooks';
+import { useSupportTicketsPaged } from '@main/features/support/hooks';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
+import { useState } from 'react';
+import PaginationBar from '@main/components/PaginationBar';
 
 export default function SupportTicketsPage() {
-    const { data } = useSupportTickets();
-    const { t } = useTranslation();
+    const { t } = useI18n();
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+    const { data } = useSupportTicketsPaged(page, pageSize);
 
     return (
         <div>
@@ -12,12 +16,13 @@ export default function SupportTicketsPage() {
             <p>{t('support.subtitle')}</p>
             <Link to="/support/new">{t('support.newTicket')}</Link>
             <ul>
-                {(data ?? []).map((tkt) => (
+                {(data?.items ?? []).map((tkt) => (
                     <li key={tkt.id}>
-                        <a href={`/support/${tkt.id}`}>{tkt.title}</a> - {tkt.status}
+                        <Link to={`/support/${tkt.id}`}>{tkt.title}</Link> - {tkt.status}
                     </li>
                 ))}
             </ul>
+            {data && <PaginationBar page={data.page} totalPages={data.pageCount} onChange={setPage} />}
         </div>
     );
 }

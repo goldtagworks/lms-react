@@ -1,7 +1,10 @@
+import type { PaginatedResult } from '@main/types/pagination';
+import type { CourseQuestion } from '@main/types/qna';
+
 import { useState } from 'react';
-import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Pagination, Stack, Switch, Textarea, TextInput } from '@mantine/core';
+import { ActionIcon, Badge, Box, Button, Card, Collapse, Divider, Group, Stack, Switch, Textarea, TextInput } from '@mantine/core';
 import { TextTitle, TextBody, TextMeta } from '@main/components/typography';
-import { useAnswerQuestion, useAskQuestion, useCourseQuestions, useQuestionAnswers, useResolveQuestion, useUpdateQuestion, useQuestionPrivacy } from '@main/hooks/useCourseQnA';
+import { useAnswerQuestion, useAskQuestion, useQuestionAnswers, useResolveQuestion, useUpdateQuestion, useQuestionPrivacy } from '@main/hooks/course/useCourseQnA';
 import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useI18n } from '@main/lib/i18n';
 
@@ -11,13 +14,12 @@ interface Props {
     userRole?: string;
     enrolled: boolean;
     isInstructor: boolean;
+    data: PaginatedResult<CourseQuestion> | undefined; // 외부 페이지네이션 결과
 }
 
-export default function CourseQnASection({ courseId, userId, userRole, enrolled, isInstructor }: Props) {
+export default function CourseQnASection({ courseId, userId, userRole, enrolled, isInstructor, data }: Props) {
     const { t } = useI18n();
-    const [page, setPage] = useState(1);
-    const pageSize = 5;
-    const { questions, pageCount, total } = useCourseQuestions(courseId, { page, pageSize, viewerId: userId });
+    const total = data?.total || 0;
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [isPrivate, setIsPrivate] = useState(false);
@@ -37,7 +39,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
             setBody('');
             setIsPrivate(false);
 
-            if (page !== 1) setPage(1); // 새 질문은 최신순 맨 앞 (단순 가정)
+            // 상위에서 page 상태 관리 예정: 새 질문 추가 시 상위에서 1페이지 리셋
         }
     };
 
@@ -47,7 +49,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
                 <TextTitle fw={600} sizeOverride="md">
                     {t('qna.total', { count: total }, `전체 질문 ${total}개`)}
                 </TextTitle>
-                {pageCount > 1 && <Pagination size="sm" total={pageCount} value={page} onChange={setPage} />}
+                {/* PaginationBar는 상위에서 한 번만 렌더 */}
             </Group>
             <Box>
                 <TextTitle fw={600} mb={6}>
@@ -76,8 +78,8 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
             </Box>
             <Divider />
             <Stack gap="sm">
-                {questions.length === 0 && <TextBody c="dimmed">{t('qna.noQuestions', undefined, '아직 질문이 없습니다')}</TextBody>}
-                {questions.map((q) => {
+                {(!data || data.items.length === 0) && <TextBody c="dimmed">{t('qna.noQuestions', undefined, '아직 질문이 없습니다')}</TextBody>}
+                {data?.items.map((q) => {
                     return (
                         <QuestionItem
                             key={q.id}

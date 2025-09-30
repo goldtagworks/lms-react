@@ -1,10 +1,10 @@
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@main/lib/i18n';
 import { useSupportTickets } from '@main/features/support/hooks';
 import { updateTicketStatus } from '@main/features/support/api';
 import { useState } from 'react';
 
 export default function AdminSupportPage() {
-    const { t } = useTranslation();
+    const { t } = useI18n();
     const { data } = useSupportTickets();
     const [updating, setUpdating] = useState<string | null>(null);
 

@@ -3,6 +3,7 @@ import { Badge, Button, Group, Stack, Table, Textarea, Modal, Tabs, TextInput, A
 import { TextBody, TextMeta } from '@main/components/typography';
 import { notifications } from '@mantine/notifications';
 import { approveInstructorApplication, rejectInstructorApplication, revokeInstructorApplication, useInstructorApplications } from '@main/lib/repository';
+import useInstructorAppsPaged from '@main/hooks/useInstructorAppsPaged';
 import InstructorAppDetail from '@main/components/instructors/InstructorAppDetail';
 import { Search, XCircle, CheckCircle2, Clock, Check, X, ShieldAlert } from 'lucide-react';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -33,43 +34,15 @@ export default function AdminInstructorAppsPage() {
     const pageSize = 10;
 
     const pendingAll = useMemo(() => apps.filter((a) => a.status === 'PENDING'), [apps]);
-    const decidedAll = useMemo(() => apps.filter((a) => a.status !== 'PENDING' && a.status !== 'REVOKED'), [apps]); // APPROVED/REJECTED
-    const revokedAll = useMemo(() => apps.filter((a) => a.status === 'REVOKED'), [apps]);
+    const decidedAll = useMemo(() => apps.filter((a) => a.status !== 'PENDING' && a.status !== 'REVOKED'), [apps]);
     const revokedCount = useMemo(() => apps.filter((a) => a.status === 'REVOKED').length, [apps]);
 
-    const filteredPending = useMemo(
-        () =>
-            pendingAll.filter((a) => {
-                if (!search.trim()) return true;
-                const q = search.toLowerCase();
-
-                return a.display_name.toLowerCase().includes(q) || a.user_id.toLowerCase().includes(q);
-            }),
-        [pendingAll, search]
-    );
-    const filteredDecided = useMemo(
-        () =>
-            decidedAll.filter((a) => {
-                if (!search.trim()) return true;
-                const q = search.toLowerCase();
-
-                return a.display_name.toLowerCase().includes(q) || a.user_id.toLowerCase().includes(q);
-            }),
-        [decidedAll, search]
-    );
-    const filteredRevoked = useMemo(
-        () =>
-            revokedAll.filter((a) => {
-                if (!search.trim()) return true;
-                const q = search.toLowerCase();
-
-                return a.display_name.toLowerCase().includes(q) || a.user_id.toLowerCase().includes(q);
-            }),
-        [revokedAll, search]
-    );
-    const pending = filteredPending.slice((pendingPage - 1) * pageSize, pendingPage * pageSize);
-    const decided = filteredDecided.slice((decidedPage - 1) * pageSize, decidedPage * pageSize);
-    const revoked = filteredRevoked.slice((revokedPage - 1) * pageSize, revokedPage * pageSize);
+    const { data: pendingData } = useInstructorAppsPaged('PENDING', pendingPage, { pageSize, search });
+    const { data: decidedData } = useInstructorAppsPaged('DECIDED', decidedPage, { pageSize, search });
+    const { data: revokedData } = useInstructorAppsPaged('REVOKED', revokedPage, { pageSize, search });
+    const pending = pendingData?.items || [];
+    const decided = decidedData?.items || [];
+    const revoked = revokedData?.items || [];
 
     function approve(id: string) {
         approveInstructorApplication(id);
@@ -115,20 +88,14 @@ export default function AdminInstructorAppsPage() {
     }
     // 필터/탭 결과 변화 시 현재 page가 totalPages를 초과하면 마지막 페이지로 보정
     useEffect(() => {
-        const pendTotalPages = Math.max(1, Math.ceil(filteredPending.length / pageSize));
-
-        if (pendingPage > pendTotalPages) setPendingPage(pendTotalPages);
-    }, [filteredPending.length, pendingPage]);
+        if (pendingPage > (pendingData?.pageCount || 1)) setPendingPage(pendingData?.pageCount || 1);
+    }, [pendingData?.pageCount, pendingPage]);
     useEffect(() => {
-        const decTotalPages = Math.max(1, Math.ceil(filteredDecided.length / pageSize));
-
-        if (decidedPage > decTotalPages) setDecidedPage(decTotalPages);
-    }, [filteredDecided.length, decidedPage]);
+        if (decidedPage > (decidedData?.pageCount || 1)) setDecidedPage(decidedData?.pageCount || 1);
+    }, [decidedData?.pageCount, decidedPage]);
     useEffect(() => {
-        const revTotalPages = Math.max(1, Math.ceil(filteredRevoked.length / pageSize));
-
-        if (revokedPage > revTotalPages) setRevokedPage(revTotalPages);
-    }, [filteredRevoked.length, revokedPage]);
+        if (revokedPage > (revokedData?.pageCount || 1)) setRevokedPage(revokedData?.pageCount || 1);
+    }, [revokedData?.pageCount, revokedPage]);
 
     return (
         <PageContainer roleMain>
@@ -163,13 +130,13 @@ export default function AdminInstructorAppsPage() {
                     <Tabs keepMounted={false} value={activeTab} onChange={(v) => setActiveTab((v as 'PENDING' | 'DECIDED' | 'REVOKED') || 'PENDING')}>
                         <Tabs.List>
                             <Tabs.Tab value="PENDING">
-                                {t('admin.instructorApps.tabs.pending')} ({filteredPending.length})
+                                {t('admin.instructorApps.tabs.pending')} ({pendingData?.total || 0})
                             </Tabs.Tab>
                             <Tabs.Tab value="DECIDED">
-                                {t('admin.instructorApps.tabs.decided')} ({filteredDecided.length})
+                                {t('admin.instructorApps.tabs.decided')} ({decidedData?.total || 0})
                             </Tabs.Tab>
                             <Tabs.Tab value="REVOKED">
-                                {t('admin.instructorApps.tabs.revoked')} ({filteredRevoked.length})
+                                {t('admin.instructorApps.tabs.revoked')} ({revokedData?.total || 0})
                             </Tabs.Tab>
                         </Tabs.List>
                     </Tabs>
@@ -278,7 +245,7 @@ export default function AdminInstructorAppsPage() {
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={pendingPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredPending.length / pageSize))} onChange={setPendingPage} />
+                        <PaginationBar align="right" page={pendingPage} size="sm" totalPages={pendingData?.pageCount || 1} onChange={setPendingPage} />
                     </Stack>
                 )}
                 {activeTab === 'DECIDED' && (
@@ -360,7 +327,7 @@ export default function AdminInstructorAppsPage() {
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={decidedPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredDecided.length / pageSize))} onChange={setDecidedPage} />
+                        <PaginationBar align="right" page={decidedPage} size="sm" totalPages={decidedData?.pageCount || 1} onChange={setDecidedPage} />
                     </Stack>
                 )}
                 {activeTab === 'REVOKED' && (
@@ -406,7 +373,7 @@ export default function AdminInstructorAppsPage() {
                                 )}
                             </Table.Tbody>
                         </Table>
-                        <PaginationBar align="right" page={revokedPage} size="sm" totalPages={Math.max(1, Math.ceil(filteredRevoked.length / pageSize))} onChange={setRevokedPage} />
+                        <PaginationBar align="right" page={revokedPage} size="sm" totalPages={revokedData?.pageCount || 1} onChange={setRevokedPage} />
                     </Stack>
                 )}
             </Stack>

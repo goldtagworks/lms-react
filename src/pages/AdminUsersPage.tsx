@@ -1,14 +1,15 @@
 import { ActionIcon, Badge, Button, Group, Modal, Select, Stack, Table, TextInput, Tooltip, Notification } from '@mantine/core';
 import { useI18n } from '@main/lib/i18n';
 import { TextBody, TextMeta } from '@main/components/typography';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageContainer from '@main/components/layout/PageContainer';
-import { upsertUserRole, removeUser, useUsers, ensureUser, initiatePasswordReset } from '@main/lib/repository';
+import { upsertUserRole, removeUser, ensureUser, initiatePasswordReset } from '@main/lib/repository';
 import { useAuth } from '@main/lib/auth';
 import { UserRole } from '@main/lib/nav';
 import { Trash2, Shield, RefreshCw, KeyRound, Save, X } from 'lucide-react';
 import PaginationBar from '@main/components/PaginationBar';
 import PageHeader from '@main/components/layout/PageHeader';
+import useAdminUsersPaged from '@main/hooks/admin/useAdminUsersPaged';
 
 interface RoleOption {
     value: UserRole;
@@ -37,13 +38,11 @@ function seedFromAuthIfNeeded() {
 }
 
 const AdminUsersPage = () => {
-    const users = useUsers();
     const { user: current } = useAuth();
     const [query, setQuery] = useState('');
     const [roleFilter, setRoleFilter] = useState<string | null>(null);
-    // 간단한 클라이언트 페이지네이션 (서버 API 전환 시 교체)
     const [page, setPage] = useState(1);
-    const pageSize = 20; // spec: 서버 페이징 예정 → placeholder
+    const pageSize = 20;
     const [editUserId, setEditUserId] = useState<string | null>(null);
     const [editRole, setEditRole] = useState<UserRole>('student');
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
@@ -54,27 +53,23 @@ const AdminUsersPage = () => {
         seedFromAuthIfNeeded();
     }, []);
 
-    const filtered = useMemo(() => {
-        const base = users
-            .filter((u) => (roleFilter ? u.role === roleFilter : true))
-            .filter((u) => {
-                if (!query.trim()) return true;
-                const q = query.trim().toLowerCase();
+    // useAdminUsersPaged 훅: role filter와 query는 훅 외부에서 필터링 필요 → 간단히 훅 호출 후 클라이언트 필터 추가
+    const { data } = useAdminUsersPaged(page, { pageSize, q: undefined });
+    const filtered = data.items
+        .filter((u) => (roleFilter ? u.role === roleFilter : true))
+        .filter((u) => {
+            if (!query.trim()) return true;
+            const qLower = query.trim().toLowerCase();
 
-                return u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.id.toLowerCase().includes(q);
-            })
-            .sort((a, b) => a.name.localeCompare(b.name));
-
-        return base;
-    }, [users, query, roleFilter]);
-
+            return u.name.toLowerCase().includes(qLower) || u.email.toLowerCase().includes(qLower) || u.id.toLowerCase().includes(qLower);
+        });
     const total = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(total / pageSize));
-    const paged = useMemo(() => {
-        const start = (page - 1) * pageSize;
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const pageSafe = Math.min(Math.max(1, page), pageCount);
+    const start = (pageSafe - 1) * pageSize;
+    const pageItems = filtered.slice(start, start + pageSize);
 
-        return filtered.slice(start, start + pageSize);
-    }, [filtered, page]);
+    if (pageSafe !== page) setPage(pageSafe);
 
     function openEdit(uId: string, current: UserRole) {
         setEditUserId(uId);
@@ -159,7 +154,7 @@ const AdminUsersPage = () => {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        {paged.length === 0 && (
+                        {pageItems.length === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={5}>
                                     <TextMeta py={20} ta="center">
@@ -168,7 +163,7 @@ const AdminUsersPage = () => {
                                 </Table.Td>
                             </Table.Tr>
                         )}
-                        {paged.map((u) => (
+                        {pageItems.map((u) => (
                             <Table.Tr key={u.id}>
                                 <Table.Td>
                                     <TextBody fw={500} sizeOverride="sm">
@@ -224,7 +219,7 @@ const AdminUsersPage = () => {
                         ))}
                     </Table.Tbody>
                 </Table>
-                <PaginationBar align="right" page={page} size="sm" totalPages={totalPages} onChange={(p) => setPage(p)} />
+                <PaginationBar align="right" page={page} size="sm" totalPages={pageCount} onChange={(p) => setPage(p)} />
             </Stack>
             <Modal centered opened={!!editUserId} radius="md" title={t('admin.users.modal.changeRoleTitle')} onClose={() => setEditUserId(null)}>
                 <Stack gap="sm" mt="xs">

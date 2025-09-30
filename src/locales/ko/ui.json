@@ -79,6 +79,15 @@
             }
         }
     },
+    "faq": {
+        "title": "자주 묻는 질문",
+        "subtitle": "학습이나 결제 전에 자주 묻는 질문을 확인해 주세요.",
+        "more": "추가 질문은 1:1 문의를 이용해 주세요.",
+        "empty": "등록된 FAQ 항목이 없습니다",
+        "items": {
+            "payments": { "question": "결제 관련 자주 묻는 질문" }
+        }
+    },
     "auth": {
         "email": "이메일",
         "passwordLabel": "비밀번호",
@@ -203,9 +212,13 @@
         "adminUsers": "사용자 관리",
         "adminCoupons": "쿠폰 관리",
         "adminInstructorApps": "강사 신청 관리",
+        "adminSupport": "지원 관리",
         "cta": "바로가기",
         "applyInstructor": "강사 신청",
-        "legal": "정책"
+        "legal": "정책",
+        "support": "고객지원",
+        "faq": "FAQ",
+        "supportNew": "1:1 문의 작성"
     },
     "course": {
         "examCriteria": "응시 기준 {{percent}}% · {{price}}",
