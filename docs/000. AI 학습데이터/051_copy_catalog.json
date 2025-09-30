@@ -15,7 +15,10 @@
         "login": "로그인",
         "logout": "로그아웃",
         "my": "마이 강의실",
-        "admin": "관리자"
+        "admin": "관리자",
+        "support": "고객지원",
+        "faq": "FAQ",
+        "supportNew": "1:1 문의 작성"
     },
     "auth": {
         "email": "이메일",

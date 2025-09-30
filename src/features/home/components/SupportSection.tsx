@@ -13,7 +13,7 @@ interface SupportSectionProps {
     bare?: boolean;
 }
 
-function SupportSectionBase({ title, email = 'help@example.com', phone = '02-0000-0000', hours, faqHref = '#faq', contactHref = '#contact', bare }: SupportSectionProps) {
+function SupportSectionBase({ title, email = 'help@example.com', phone = '02-0000-0000', hours, faqHref = '/faq', contactHref = '/support/new', bare }: SupportSectionProps) {
     const { t } = useI18n();
     const finalTitle = title || t('home.support.title');
     const finalHours = hours || t('home.support.hours');

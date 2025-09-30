@@ -113,6 +113,16 @@ export const navGroups: NavGroup[] = [
             { id: 'terms', label: '', labelKey: 'nav.terms', href: '/terms' },
             { id: 'privacy', label: '', labelKey: 'nav.privacy', href: '/privacy' }
         ]
+    },
+    {
+        id: 'support',
+        label: '',
+        labelKey: 'nav.support',
+        order: 95,
+        items: [
+            { id: 'faq', label: '', labelKey: 'nav.faq', href: '/faq' },
+            { id: 'support-new', label: '', labelKey: 'nav.supportNew', href: '/support/new', auth: 'auth' }
+        ]
     }
 ];
 
