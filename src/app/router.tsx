@@ -30,6 +30,8 @@ import NoticesPage from '@main/pages/NoticesPage';
 import NoticeDetailPage from '@main/pages/NoticeDetailPage';
 import SupportTicketsPage from '@main/pages/SupportTicketsPage';
 import SupportNewPage from '@main/pages/SupportNewPage';
+import SupportTicketDetailPage from '@main/pages/SupportTicketDetailPage';
+import AdminSupportPage from '@main/pages/AdminSupportPage';
 import FAQPage from '@main/pages/FAQPage';
 import InstructorApplyPage from '@main/pages/InstructorApplyPage';
 import AdminInstructorAppsPage from '@main/pages/AdminInstructorAppsPage';
@@ -165,6 +167,14 @@ export default function AppRouter() {
                 <Route
                     element={
                         <RequireRole requiredRole="admin">
+                            <AdminSupportPage />
+                        </RequireRole>
+                    }
+                    path="/admin/support"
+                />
+                <Route
+                    element={
+                        <RequireRole requiredRole="admin">
                             <AdminInstructorAppsPage />
                         </RequireRole>
                     }
@@ -191,6 +201,14 @@ export default function AppRouter() {
                         </AuthAny>
                     }
                     path="/support"
+                />
+                <Route
+                    element={
+                        <AuthAny>
+                            <SupportTicketDetailPage />
+                        </AuthAny>
+                    }
+                    path="/support/:id"
                 />
                 <Route
                     element={

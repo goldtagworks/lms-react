@@ -83,7 +83,8 @@ export const navGroups: NavGroup[] = [
             { id: 'admin-users', label: '', labelKey: 'nav.adminUsers', href: '/admin/users', roles: ['admin'], auth: 'auth' },
             { id: 'admin-categories', label: '', labelKey: 'nav.adminCategories', href: '/admin/categories', roles: ['admin'], auth: 'auth' },
             { id: 'admin-coupons', label: '', labelKey: 'nav.adminCoupons', href: '/admin/coupons', roles: ['admin'], auth: 'auth' },
-            { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' }
+            { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
+            { id: 'admin-support', label: '', labelKey: 'nav.adminSupport', href: '/admin/support', roles: ['admin'], auth: 'auth' }
             // { id: 'admin-instructor-apps', label: '', labelKey: 'nav.adminInstructorApps', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
         ]
     },

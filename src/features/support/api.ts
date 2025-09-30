@@ -44,3 +44,38 @@ export function createSupportTicket(data: { title: string; body: string; categor
 
     return Promise.resolve(ticket);
 }
+
+export function createSupportMessage(ticketId: string, data: { body: string; is_private?: boolean; authorId?: string }): Promise<SupportTicketMessage> {
+    const now = new Date().toISOString();
+    const msg: SupportTicketMessage = {
+        id: crypto.randomUUID(),
+        ticket_id: ticketId,
+        author_id: data.authorId ?? 'me',
+        body: data.body,
+        is_private: !!data.is_private,
+        created_at: now,
+        updated_at: now
+    };
+
+    _messages.push(msg);
+
+    const t = _tickets.find((t) => t.id === ticketId);
+
+    if (t) {
+        t.last_message_at = now;
+        t.updated_at = now;
+    }
+
+    return Promise.resolve(msg);
+}
+
+export function updateTicketStatus(ticketId: string, status: SupportTicket['status']): Promise<SupportTicket | undefined> {
+    const t = _tickets.find((t) => t.id === ticketId);
+
+    if (t) {
+        t.status = status;
+        t.updated_at = new Date().toISOString();
+    }
+
+    return Promise.resolve(t);
+}

@@ -205,6 +205,7 @@
         "remove": "위시리스트 제거",
         "empty": "위시리스트에 담긴 코스가 없습니다"
     },
+
     "_terms_meta": {
         "standardizedAt": "2025-09-29",
         "notes": "커리큘럼=>강의 목차; 위시(리스트)=>찜; 강사진=>강사 소개; 상세 보기=>자세히 보기; 프로필 수정=>프로필 편집"
@@ -257,6 +258,15 @@
             "OPEN": "접수됨",
             "ANSWERED": "답변 완료",
             "CLOSED": "종결됨"
+        },
+        "detail": {
+            "status": "현재 상태: {{status}}",
+            "private": "내부 메모",
+            "reply": "답글 작성"
+        },
+        "admin": {
+            "title": "지원 티켓 관리",
+            "col": { "title": "제목", "status": "상태", "actions": "작업" }
         }
     },
     "faq": {

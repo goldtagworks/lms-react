@@ -14,7 +14,7 @@ export default function SupportTicketsPage() {
             <ul>
                 {(data ?? []).map((tkt) => (
                     <li key={tkt.id}>
-                        {tkt.title} - {tkt.status}
+                        <a href={`/support/${tkt.id}`}>{tkt.title}</a> - {tkt.status}
                     </li>
                 ))}
             </ul>
