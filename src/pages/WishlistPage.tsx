@@ -39,7 +39,7 @@ export default function WishlistPage() {
     return (
         <PageContainer roleMain>
             <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('common.favorite.add', {}, '찜')} />
-            <Card withBorder p="lg" radius="md" shadow="sm">
+            <Card withBorder p="lg" radius="lg" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
@@ -74,7 +74,7 @@ export default function WishlistPage() {
                                 const wish = userId ? isWishlisted(userId, course.id) : false;
 
                                 return (
-                                    <Card key={course.id} withBorder p="lg" radius="md" shadow="sm">
+                                    <Card key={course.id} withBorder p="lg" radius="lg" shadow="sm">
                                         <AppImage alt={course.title} height={120} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                         <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                             <Text fw={700} size="md">

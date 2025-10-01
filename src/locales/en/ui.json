@@ -1,0 +1,16 @@
+{
+    "__meta": "English partial translations – fill incrementally. Missing keys fallback to ko.",
+    "home": {
+        "featured": "Featured Courses",
+        "noFeatured": "Featured courses coming soon"
+    },
+    "notFound": {
+        "title": "Page Not Found",
+        "browseCourses": "Browse Courses",
+        "goSupport": "Support",
+        "home": "Go Home"
+    },
+    "common": {
+        "viewAll": "View All"
+    }
+}

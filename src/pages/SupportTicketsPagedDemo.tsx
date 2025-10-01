@@ -20,7 +20,7 @@ export default function SupportTicketsPagedDemo() {
                 {data && data.items.length === 0 && <Text c="dimmed">{t('support.empty')}</Text>}
                 {data &&
                     data.items.map((tkt) => (
-                        <Card key={tkt.id} withBorder p="md" radius="md">
+                        <Card key={tkt.id} withBorder p="md" radius="lg">
                             <Group justify="space-between" mb={4}>
                                 <Text fw={600}>{tkt.title}</Text>
                                 <Badge color={tkt.status === 'CLOSED' ? 'gray' : tkt.status === 'ANSWERED' ? 'teal' : 'indigo'} size="sm" variant="light">

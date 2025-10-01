@@ -5,6 +5,8 @@ import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { AuthProvider } from '@main/lib/auth';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@main/lib/queryClient';
 
 import App from './App';
 import '@main/styles/app.css';
@@ -20,9 +22,11 @@ ReactDOM.createRoot(rootElement).render(
             <Notifications position="top-right" />
             <ModalsProvider>
                 <BrowserRouter>
-                    <AuthProvider>
-                        <App />
-                    </AuthProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <AuthProvider>
+                            <App />
+                        </AuthProvider>
+                    </QueryClientProvider>
                 </BrowserRouter>
             </ModalsProvider>
         </MantineProvider>

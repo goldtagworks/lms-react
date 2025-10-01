@@ -95,7 +95,7 @@ const CourseListPage = () => {
                         const wish = userId ? isWishlisted(userId, course.id) : false;
 
                         return (
-                            <Card key={course.id} withBorder p="lg" radius="md" shadow="sm">
+                            <Card key={course.id} withBorder p="lg" radius="lg" shadow="sm">
                                 <AppImage alt={course.title} height={140} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <TextTitle>{course.title}</TextTitle>

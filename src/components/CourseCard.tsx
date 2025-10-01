@@ -17,7 +17,7 @@ const CourseCardComponent = ({ title, level, percent, price, weeks, lessons, ...
     const { t } = useI18n();
 
     return (
-        <Card withBorder radius="md" shadow="md" {...cardProps}>
+        <Card withBorder radius="lg" shadow="md" {...cardProps}>
             <Title mb="sm" order={4} size="lg">
                 {title}
             </Title>

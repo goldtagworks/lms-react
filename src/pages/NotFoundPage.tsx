@@ -29,29 +29,30 @@ const NotFoundPage = () => {
                         {t('notFound.message')}
                     </Text>
                 </Stack>
-                <Paper withBorder maw={640} p="lg" radius="md" w="100%">
+                <Paper withBorder maw={640} p="lg" radius="lg" w="100%">
                     <form onSubmit={onSearch}>
                         <TextInput
                             aria-label={t('notFound.searchPlaceholder')}
                             leftSection={<Search size={16} />}
                             placeholder={t('notFound.searchPlaceholder')}
+                            radius="md"
                             value={query}
                             onChange={(e) => setQuery(e.currentTarget.value)}
                         />
                     </form>
                     <Group gap="sm" justify="center" mt="md">
-                        <Button color="blue" component={Link} leftSection={<Home size={16} />} to="/" variant="light">
+                        <Button color="blue" component={Link} leftSection={<Home size={16} />} radius="md" to="/" variant="light">
                             {t('notFound.home')}
                         </Button>
-                        <Button color="blue" component={Link} leftSection={<Compass size={16} />} to="/courses" variant="subtle">
+                        <Button color="blue" component={Link} leftSection={<Compass size={16} />} radius="md" to="/courses" variant="subtle">
                             {t('notFound.browseCourses')}
                         </Button>
-                        <Button color="gray" component={Link} leftSection={<LifeBuoy size={16} />} to="/support" variant="subtle">
+                        <Button color="gray" component={Link} leftSection={<LifeBuoy size={16} />} radius="md" to="/support" variant="subtle">
                             {t('notFound.goSupport')}
                         </Button>
                     </Group>
                 </Paper>
-                <Divider label={t('common.viewAll')} labelPosition="center" maw={640} w="100%" />
+                <Divider label={t('common.all')} labelPosition="center" maw={640} w="100%" />
                 <Group c="dimmed" fz="sm" gap="md" justify="center" maw={640} ta="center" wrap="wrap">
                     <Anchor component={Link} to="/courses" underline="always">
                         {t('home.featured')}

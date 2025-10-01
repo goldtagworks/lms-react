@@ -1,13 +1,11 @@
+import type { Tables, Inserts, Updates } from '@main/types/database';
+
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@main/lib/supabase';
 import { qk } from '@main/lib/queryKeys';
 
-export interface CategoryRow {
-    id: string;
-    slug: string;
-    name: string;
-}
+export type CategoryRow = Tables<'categories'>;
 
 export interface UseAdminCategoriesOptions {
     pageSize?: number;
@@ -27,7 +25,7 @@ async function fetchCategories(): Promise<CategoryRow[]> {
 
     if (error) throw error;
 
-    return (data as CategoryRow[]) || [];
+    return (data as CategoryRow[] | null) || [];
 }
 
 export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions = {}) {
@@ -81,7 +79,8 @@ export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions 
                 if (!exists || exists.length === 0) break;
                 candidate = `${base}-${i++}`;
             }
-            const { error } = await supabase.from('categories').insert({ name, slug: candidate });
+            const payload: Inserts<'categories'> = { name, slug: candidate };
+            const { error } = await supabase.from('categories').insert(payload as any);
 
             if (error) throw error;
         },
@@ -104,7 +103,11 @@ export function useAdminCategories({ pageSize = 15 }: UseAdminCategoriesOptions 
 
     const renameMut = useMutation({
         mutationFn: async ({ id, name }: { id: string; name: string }) => {
-            const { error } = await supabase.from('categories').update({ name }).eq('id', id);
+            const patch: Updates<'categories'> = { name };
+            const { error } = await supabase
+                .from('categories')
+                .update(patch as any)
+                .eq('id', id);
 
             if (error) throw error;
         },

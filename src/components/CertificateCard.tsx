@@ -20,7 +20,7 @@ export function CertificateCard({ id, courseTitle, issuedAt, serialNo, compact }
     const { t } = useI18n();
 
     return (
-        <Card withBorder p="lg" radius="md" shadow="sm">
+        <Card withBorder p="lg" radius="lg" shadow="sm">
             <Stack gap={8}>
                 <Group gap={8} justify="space-between" wrap="nowrap">
                     <Text fw={700} lineClamp={1} size="md" title={courseTitle}>

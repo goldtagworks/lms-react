@@ -51,7 +51,7 @@ export default function MyPage() {
                 )}
                 title={t('nav.myPage', {}, '마이페이지')}
             />
-            <Card withBorder p="lg" radius="md" shadow="sm">
+            <Card withBorder p="lg" radius="lg" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
@@ -86,7 +86,7 @@ export default function MyPage() {
                                 const enrolled = isEnrolled(userId!, course.id);
 
                                 return (
-                                    <Card key={course.id} withBorder p="lg" radius="md" shadow="sm">
+                                    <Card key={course.id} withBorder p="lg" radius="lg" shadow="sm">
                                         <AppImage alt={course.title} height={140} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                         <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                             <Text fw={700} size="md">

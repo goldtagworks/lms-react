@@ -6,6 +6,51 @@
 --  * v1.4: Added notices, instructor_applications tables (migrating from in-memory repository)
 -- =============================
 
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'course_pricing_mode') THEN
+    CREATE TYPE course_pricing_mode AS ENUM ('free', 'fixed', 'subscription');
+  END IF;
+END $$;
+
+-- 누락된 enum 타입 정의 (FK/컬럼에서 참조되므로 선행 필요)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enrollment_source') THEN
+    CREATE TYPE enrollment_source AS ENUM ('free','purchase','manual');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'coupon_discount_type') THEN
+    CREATE TYPE coupon_discount_type AS ENUM ('percent','amount');
+  END IF;
+END $$;
+
+-- ============================================================
+-- (ORDERING NOTE)
+-- categories 테이블은 courses.category_id FK 의존성 해소를 위해
+-- courses 생성보다 앞서 정의되어야 한다. (기존 위치: 쿠폰/레딤션 뒤)
+-- ============================================================
+DROP TABLE IF EXISTS categories CASCADE; -- (moved up) 카테고리 선행 생성
+CREATE TABLE IF NOT EXISTS categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 카테고리 고유 ID
+  slug text NOT NULL UNIQUE, -- 슬러그(영문)
+  name text NOT NULL -- 카테고리명
+);
+
+
+-- [프로필] 사용자 기본 공개/역할 정보 (auth.users 1:1 확장)
+DROP TABLE IF EXISTS profiles CASCADE;
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, -- 사용자 ID (auth.users FK)
+  display_name text, -- 표시 이름 (강사/수강생 공통)
+  role text NOT NULL DEFAULT 'student' CHECK (role IN ('student','instructor','admin')), -- 역할
+  bio_md text, -- 소개 (Markdown)
+  avatar_url text, -- 아바타 이미지
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
+-- (NOTE) instructor 관련 통계/대표 강의 뷰는 후속 v1.x에서 추가 예정
+
 -- [코스] 강의/클래스의 기본 정보 테이블
 DROP TABLE IF EXISTS courses CASCADE;
 CREATE TABLE IF NOT EXISTS courses (
@@ -36,43 +81,7 @@ CREATE INDEX IF NOT EXISTS idx_courses_category_id ON courses(category_id);
 CREATE INDEX IF NOT EXISTS idx_courses_featured ON courses(is_featured);
 CREATE INDEX IF NOT EXISTS idx_courses_featured_rank ON courses(featured_rank) WHERE featured_rank IS NOT NULL;
 
--- [레슨] 강의 내 개별 학습 단위(구버전)
-DROP TABLE IF EXISTS lessons CASCADE;
-CREATE TABLE IF NOT EXISTS lessons (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 레슨 고유 ID
-  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
-  section_id uuid REFERENCES sections(id), -- 섹션 ID
-  title text NOT NULL, -- 레슨명
-  content text, -- 레슨 본문
-  order_no integer NOT NULL DEFAULT 1, -- 순서
-  is_preview boolean NOT NULL DEFAULT false, -- 미리보기 여부
-  video_url text, -- 동영상 URL
-  duration_seconds integer, -- 영상 길이(초)
-  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
-  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
-);
-CREATE INDEX IF NOT EXISTS idx_lessons_course_id ON lessons(course_id);
-CREATE INDEX IF NOT EXISTS idx_lessons_section_id ON lessons(section_id);
-
--- [수강신청] 사용자의 강의 등록/수강 상태(구버전)
-DROP TABLE IF EXISTS enrollments CASCADE;
-CREATE TABLE IF NOT EXISTS enrollments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 수강신청 고유 ID
-  user_id uuid NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE, -- 사용자 ID
-  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
-  status text NOT NULL DEFAULT 'PENDING', -- 상태(PENDING|ENROLLED|CANCELLED)
-  source enrollment_source NOT NULL DEFAULT 'purchase', -- 신청 경로
-  payment_id uuid REFERENCES payments(id), -- 결제 ID
-  started_at timestamptz, -- 수강 시작일
-  completed_at timestamptz, -- 수강 완료일
-  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
-  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
-);
-CREATE INDEX IF NOT EXISTS idx_enrollments_user_id ON enrollments(user_id);
-CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
-
--- [Deprecated] course_sections 테이블 제거 (v1.1 이전 버전에서 존재)
--- IF NEEDED FOR DOWNGRADE, recreate using previous definition.
+-- (Removed deprecated legacy lessons/enrollments blocks – canonical definitions below)
 
 -- [레슨] 강의 내 개별 학습 단위(신버전)
 DROP TABLE IF EXISTS lessons CASCADE;
@@ -109,6 +118,21 @@ CREATE TABLE IF NOT EXISTS enrollments (
 CREATE INDEX IF NOT EXISTS idx_enroll_user ON enrollments(user_id);
 CREATE INDEX IF NOT EXISTS idx_enroll_course ON enrollments(course_id);
 CREATE INDEX IF NOT EXISTS idx_enroll_active ON enrollments(status) WHERE status = 'ENROLLED';
+
+-- [시험] 코스 내 시험 메타 (attempts가 참조)
+DROP TABLE IF EXISTS exams CASCADE;
+CREATE TABLE IF NOT EXISTS exams (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 시험 고유 ID
+  course_id uuid NOT NULL REFERENCES courses(id) ON DELETE CASCADE, -- 코스 ID
+  title text NOT NULL, -- 시험 제목
+  description_md text, -- 시험 설명(Markdown)
+  pass_score int NOT NULL CHECK (pass_score BETWEEN 0 AND 100), -- 합격 점수
+  time_limit_minutes int CHECK (time_limit_minutes > 0), -- 제한 시간(분) @optional
+  question_count int CHECK (question_count >= 0), -- 총 문항수 (파생 금지: 실제 문항 테이블 도입 시 재검토)
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_exams_course ON exams(course_id);
 
 -- [결제] 수강신청 결제 내역
 DROP TABLE IF EXISTS payments CASCADE;
@@ -242,14 +266,6 @@ CREATE TABLE IF NOT EXISTS coupon_redemptions (
 );
 CREATE INDEX IF NOT EXISTS idx_redemptions_coupon ON coupon_redemptions(coupon_id);
 CREATE INDEX IF NOT EXISTS idx_redemptions_user ON coupon_redemptions(user_id);
-
--- [카테고리] 강의 분류 정보
-DROP TABLE IF EXISTS categories CASCADE;
-CREATE TABLE IF NOT EXISTS categories (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 카테고리 고유 ID
-  slug text NOT NULL UNIQUE, -- 슬러그(영문)
-  name text NOT NULL -- 카테고리명
-);
 
 -- [코스-카테고리 매핑] N:M 관계
 DROP TABLE IF EXISTS course_categories CASCADE;

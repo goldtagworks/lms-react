@@ -1,5 +1,8 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { togglePin, deleteNotice, useNotice } from '@main/lib/noticeRepo';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@main/lib/supabase';
+import { mapSupabaseError } from '@main/lib/errors';
+import { useNoticeMutations } from '@main/hooks/useNoticeMutations';
 import PageContainer from '@main/components/layout/PageContainer';
 import EmptyState from '@main/components/EmptyState';
 import { Badge, Group, Stack, Anchor, Paper, Divider, ActionIcon, Tooltip, Title } from '@mantine/core';
@@ -17,7 +20,20 @@ import { useI18n } from '@main/lib/i18n';
 export default function NoticeDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const notice = useNotice(id);
+    const { togglePin, remove } = useNoticeMutations();
+    const qc = useQueryClient();
+    const noticeQuery = useQuery({
+        queryKey: ['notice', id],
+        enabled: !!id,
+        queryFn: async () => {
+            const { data, error } = await supabase.from('notices').select('*').eq('id', id).single();
+
+            if (error) throw mapSupabaseError(error);
+
+            return data as any;
+        }
+    });
+    const notice: any = noticeQuery.data;
     const { copied, copy } = useCopyLink();
     const { t } = useI18n();
     const { user } = useAuth();
@@ -37,8 +53,13 @@ export default function NoticeDetailPage() {
 
     function handleTogglePin() {
         if (!isAdmin || !notice) return;
-        togglePin(notice.id);
-        notifications.show({ message: notice.pinned ? t('notice.unpinned') : t('notice.pinned'), color: 'teal' });
+        togglePin.mutate(notice.id, {
+            onSuccess: (n: any) => {
+                notifications.show({ message: n.pinned ? t('notice.pinned') : t('notice.unpinned'), color: 'teal' });
+                qc.invalidateQueries({ queryKey: ['notice', notice.id] });
+            },
+            onError: () => notifications.show({ message: t('notice.pinToggleFail'), color: 'red' })
+        });
     }
 
     function handleEdit() {
@@ -57,6 +78,7 @@ export default function NoticeDetailPage() {
                     onCancel={() => modals.close('notice-editor-modal')}
                     onSaved={() => {
                         modals.close('notice-editor-modal');
+                        qc.invalidateQueries({ queryKey: ['notice', notice.id] });
                     }}
                 />
             )
@@ -73,14 +95,13 @@ export default function NoticeDetailPage() {
             labels: { confirm: t('common.delete'), cancel: t('common.cancel') },
             confirmProps: { color: 'red' },
             onConfirm: () => {
-                const ok = deleteNotice(notice.id);
-
-                if (ok) {
-                    notifications.show({ message: t('notice.deleteDone'), color: 'teal' });
-                    navigate('/notices');
-                } else {
-                    notifications.show({ message: t('notice.deleteFail'), color: 'red' });
-                }
+                remove.mutate(notice.id, {
+                    onSuccess: () => {
+                        notifications.show({ message: t('notice.deleteDone'), color: 'teal' });
+                        navigate('/notices');
+                    },
+                    onError: () => notifications.show({ message: t('notice.deleteFail'), color: 'red' })
+                });
             }
         });
     }

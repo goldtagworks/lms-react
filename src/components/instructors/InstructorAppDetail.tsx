@@ -92,7 +92,7 @@ export function InstructorAppDetail({ appId, onClose }: InstructorAppDetailProps
                                 {t('instructor.bio', undefined, '소개')}
                             </TextMeta>
                         </Group>
-                        <Card withBorder w="100%">
+                        <Card withBorder radius="md" w="100%">
                             <TextBody style={{ whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{app.bio_md || t('instructor.noBio', undefined, '소개가 없습니다.')}</TextBody>
                         </Card>
                     </Box>

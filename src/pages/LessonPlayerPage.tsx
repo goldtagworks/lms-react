@@ -16,7 +16,7 @@ export default function LessonPlayerPage() {
             <Title order={2}>{t('player.title')}</Title>
             <Text>{t('player.enrollmentId', { id: enrollmentId || '' })}</Text>
             <Text mb="sm">{t('player.mockVideo')}</Text>
-            <Card withBorder p="lg" radius="md" shadow="sm">
+            <Card withBorder p="lg" radius="lg" shadow="sm">
                 <MarkdownView source={first?.content_md || `# ${t('lesson.sampleTitle')}` + `\n${t('lesson.emptyContent')}`} />
             </Card>
         </PageContainer>

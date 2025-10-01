@@ -69,7 +69,7 @@ const CertificatePage = () => {
     return (
         <PageContainer roleMain>
             <PageHeader description={t('certificate.pageDescDemo')} title={t('certificate.pageTitle')} />
-            <Card withBorder padding="xl" radius="md" shadow="sm">
+            <Card withBorder padding="xl" radius="lg" shadow="sm">
                 <Stack gap="lg">
                     <Group align="flex-start" justify="space-between">
                         <div>

@@ -53,7 +53,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled, data,
     return (
         <Stack gap="lg">
             <Group align="flex-start" gap="xl" wrap="wrap">
-                <Card withBorder p="md" radius="md" style={{ flex: '0 0 240px' }}>
+                <Card withBorder p="md" radius="lg" style={{ flex: '0 0 240px' }}>
                     <TextTitle fw={700} mb={4} sizeOverride="lg">
                         {t('review.ratingLabel', undefined, '평점')}
                     </TextTitle>
@@ -100,7 +100,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled, data,
                     <Stack gap="sm">
                         {(!data || data.items.length === 0) && <TextBody c="dimmed">{t('review.none', undefined, '아직 후기가 없습니다')}</TextBody>}
                         {data?.items.map((r) => (
-                            <Card key={r.id} withBorder p="sm" radius="md">
+                            <Card key={r.id} withBorder p="sm" radius="lg">
                                 <Group align="center" gap={6} mb={4}>
                                     <Stars value={r.rating} />
                                     <TextMeta>{new Date(r.created_at).toLocaleDateString()}</TextMeta>
@@ -118,7 +118,7 @@ export default function CourseReviewsSection({ courseId, userId, enrolled, data,
                 </TextTitle>
                 {!canWrite && <TextBody c="dimmed">{t('review.onlyEnrolled', undefined, '수강 중인 사용자만 후기를 작성할 수 있습니다')}</TextBody>}
                 {canWrite && (
-                    <Card withBorder p="md" radius="md">
+                    <Card withBorder p="md" radius="lg">
                         <Group align="center" gap="sm" mb="xs">
                             <Select
                                 data={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: t('review.form.ratingValue', { rating: n }, `${n}점`) }))}

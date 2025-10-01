@@ -16,7 +16,7 @@ function PromoBannerSectionBase({ banner }: PromoBannerSectionProps) {
 
     return (
         <Container py="xl" size="lg">
-            <Card withBorder aria-labelledby={`promo-${banner.id}-title`} p="xl" radius="md" shadow="md" style={{ background: promoBg }}>
+            <Card withBorder aria-labelledby={`promo-${banner.id}-title`} p="xl" radius="lg" shadow="md" style={{ background: promoBg }}>
                 <Group align="center" justify="space-between">
                     <div>
                         <Title id={`promo-${banner.id}-title`} mb={8} order={3}>

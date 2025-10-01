@@ -47,7 +47,7 @@ export default function EnrollPage() {
             <Grid gutter="xl">
                 {/* Action / Price Panel (모바일 우선 상단) */}
                 <Grid.Col order={{ base: 0, md: 2 }} span={{ base: 12, md: 4 }}>
-                    <Card withBorder aria-label={t('a11y.enrollActions', {}, '수강 액션')} component="aside" p="lg" radius="md" shadow="sm">
+                    <Card withBorder aria-label={t('a11y.enrollActions', {}, '수강 액션')} component="aside" p="lg" radius="lg" shadow="sm">
                         <Stack gap="sm">
                             <Box>
                                 <TextBody fw={700} sizeOverride="lg">

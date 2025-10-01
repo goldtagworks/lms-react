@@ -5,7 +5,7 @@ function PromoBannerSkeletonBase() {
     const promoBg = 'var(--gradient-promo, linear-gradient(90deg, #e0e7ff 60%, #f5f7fa 100%))';
 
     return (
-        <Card withBorder p="xl" radius="md" shadow="md" style={{ background: promoBg }}>
+        <Card withBorder p="xl" radius="lg" shadow="md" style={{ background: promoBg }}>
             <Group align="center" justify="space-between">
                 <Stack gap={12} style={{ flex: 1 }}>
                     <Skeleton h={32} w="60%" />

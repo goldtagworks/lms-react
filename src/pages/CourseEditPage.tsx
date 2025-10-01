@@ -230,7 +230,7 @@ const CourseEditPage = () => {
                     value={desc}
                     onChange={(e) => setDesc(e.currentTarget.value)}
                 />
-                <Card withBorder p="md" radius="md" shadow="sm">
+                <Card withBorder p="md" radius="lg" shadow="sm">
                     <Stack gap="sm">
                         <Group justify="space-between">
                             <Text fw={600} size="sm">

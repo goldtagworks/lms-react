@@ -22,7 +22,7 @@ export function InstructorApplyPage() {
 
     if (!user) {
         return (
-            <Card>
+            <Card withBorder mx="auto" p="lg" radius="lg" shadow="sm">
                 <Text>{t('instructor.apply.loginRequired')}</Text>
             </Card>
         );
@@ -30,7 +30,7 @@ export function InstructorApplyPage() {
 
     if (app?.status === 'APPROVED') {
         return (
-            <Card withBorder shadow="sm">
+            <Card withBorder radius="lg" shadow="sm">
                 <Stack>
                     <Text fw={600}>{t('instructor.apply.alreadyApproved')}</Text>
                     <Badge color="green">{t('common.status.approved')}</Badge>
@@ -68,7 +68,7 @@ export function InstructorApplyPage() {
                     {t('instructor.apply.pendingNotice')}
                 </Alert>
             )}
-            <Card withBorder radius="md" shadow="sm">
+            <Card withBorder radius="lg" shadow="sm">
                 <Stack>
                     <TextInput
                         required

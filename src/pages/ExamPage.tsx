@@ -11,7 +11,7 @@ const ExamPage = () => {
     // 실제로는 id로 데이터 fetch, 여기선 mock만 사용
     return (
         <PageContainer roleMain py={48} size="sm">
-            <Card withBorder padding="xl" radius="md" shadow="sm">
+            <Card withBorder padding="xl" radius="lg" shadow="sm">
                 <Stack>
                     <Title order={2}>{t('exam.pageTitle')}</Title>
                     <Text fw={700}>{mockExam.courseTitle}</Text>

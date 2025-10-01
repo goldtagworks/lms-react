@@ -71,7 +71,7 @@ const CertificatesListPage = () => {
                 description={t('empty.certificatesIntro')}
                 title={t('nav.myCertificates')}
             />
-            <Card withBorder p="lg" radius="md" shadow="sm">
+            <Card withBorder p="lg" radius="lg" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">

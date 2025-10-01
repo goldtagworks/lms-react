@@ -32,15 +32,15 @@ const InstructorCoursesPage = () => {
             <Text c="dimmed" mb="md" size="sm">
                 {t('instructor.courses.subtitle')}
             </Text>
-            {data.total === 0 && (
+            {data && data.total === 0 && (
                 <Text c="dimmed" size="sm">
                     {t('instructor.courses.empty')}
                 </Text>
             )}
-            {data.total > 0 && (
+            {data && data.total > 0 && (
                 <CourseGrid mt="md">
                     {data.items.map((c: any) => (
-                        <Card key={c.id} withBorder p="lg" radius="md" shadow="sm">
+                        <Card key={c.id} withBorder p="lg" radius="lg" shadow="sm">
                             <AppImage alt={c.title} height={120} mb={12} radius="lg" src={c.thumbnail_url || ''} />
                             <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                 <Text fw={600} lineClamp={1} size="sm">
@@ -75,7 +75,7 @@ const InstructorCoursesPage = () => {
                     ))}
                 </CourseGrid>
             )}
-            <PaginationBar align="right" page={page} totalPages={data.pageCount} onChange={setPage} />
+            <PaginationBar align="right" page={page} totalPages={data?.pageCount || 1} onChange={setPage} />
         </PageContainer>
     );
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TextInput, Textarea, Switch, Group, Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { addNotice, updateNotice } from '@main/lib/noticeRepo';
+import { useNoticeMutations } from '@main/hooks/useNoticeMutations';
 import { Save, X } from 'lucide-react';
 import { useI18n } from '@main/lib/i18n';
 
@@ -31,25 +31,36 @@ export default function NoticeEditor({ noticeId, initialTitle = '', initialBody 
         setPinned(initialPinned);
     }, [initialTitle, initialBody, initialPinned]);
 
+    const { create, update } = useNoticeMutations();
+
     function handleSubmit() {
         if (!title.trim()) {
             notifications.show({ color: 'red', title: t('notify.error.validation'), message: t('errors.noticeTitleRequired') });
 
             return;
         }
-        try {
-            if (isEdit && noticeId) {
-                updateNotice(noticeId, { title: title.trim(), body: body.trim(), pinned });
-                notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeUpdate') });
-                onSaved?.(noticeId);
-            } else {
-                const n = addNotice({ title: title.trim(), body: body.trim(), pinned });
-
-                notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeCreate') });
-                onSaved?.(n.id);
-            }
-        } catch {
-            notifications.show({ color: 'red', title: t('notify.error.generic'), message: t('notify.error.saveFailed') });
+        if (isEdit && noticeId) {
+            update.mutate(
+                { id: noticeId, title: title.trim(), body: body.trim(), pinned },
+                {
+                    onSuccess: (n: any) => {
+                        notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeUpdate') });
+                        onSaved?.(n.id);
+                    },
+                    onError: () => notifications.show({ color: 'red', title: t('notify.error.generic'), message: t('notify.error.saveFailed') })
+                }
+            );
+        } else {
+            create.mutate(
+                { title: title.trim(), body: body.trim(), pinned },
+                {
+                    onSuccess: (n: any) => {
+                        notifications.show({ color: 'teal', title: t('notify.success.generic'), message: t('notify.success.noticeCreate') });
+                        onSaved?.(n.id);
+                    },
+                    onError: () => notifications.show({ color: 'red', title: t('notify.error.generic'), message: t('notify.error.saveFailed') })
+                }
+            );
         }
     }
 

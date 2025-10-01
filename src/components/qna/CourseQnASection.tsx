@@ -30,16 +30,14 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
     const canAsk = enrolled && !!userId;
     const canResolve = userRole === 'instructor' || userRole === 'admin';
 
-    const handleAsk = () => {
+    const handleAsk = async () => {
         if (!canAsk) return;
-        const q = ask(title.trim(), body.trim(), isPrivate);
+        const q = await ask(title.trim(), body.trim()); // privacy currently not supported in schema
 
         if (q) {
             setTitle('');
             setBody('');
             setIsPrivate(false);
-
-            // 상위에서 page 상태 관리 예정: 새 질문 추가 시 상위에서 1페이지 리셋
         }
     };
 
@@ -57,7 +55,7 @@ export default function CourseQnASection({ courseId, userId, userRole, enrolled,
                 </TextTitle>
                 {!canAsk && <TextBody c="dimmed">{t('qna.onlyEnrolled', undefined, '수강 중인 사용자만 질문을 작성할 수 있습니다')}</TextBody>}
                 {canAsk && (
-                    <Card withBorder p="md" radius="md">
+                    <Card withBorder p="md" radius="lg">
                         <TextInput mb="xs" placeholder={t('qna.titlePlaceholder', undefined, '제목')} size="sm" value={title} onChange={(e) => setTitle(e.currentTarget.value)} />
                         <Textarea autosize minRows={3} placeholder={t('qna.bodyPlaceholder', undefined, '본문을 입력하세요')} value={body} onChange={(e) => setBody(e.currentTarget.value)} />
                         <Group justify="space-between" mt="xs">
@@ -123,7 +121,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
     const { answers } = useQuestionAnswers(expanded ? questionId : undefined);
     const { mutate: answer, error } = useAnswerQuestion(questionId, userId, isInstructor);
     const { mutate: updateQ, error: updateError } = useUpdateQuestion(userId);
-    const { mutate: togglePrivacy, error: privacyError } = useQuestionPrivacy(userId);
+    const { error: privacyError } = useQuestionPrivacy(); // no-op
     const [answerBody, setAnswerBody] = useState('');
     const [editMode, setEditMode] = useState(false);
     const [editTitle, setEditTitle] = useState(title);
@@ -144,26 +142,25 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
         setEditMode(false);
     };
 
-    const saveEdit = () => {
+    const saveEdit = async () => {
         if (!userId) return;
-        const updated = updateQ(questionId, editTitle.trim(), editBody.trim());
+        const updated = await updateQ(questionId, editTitle.trim(), editBody.trim());
 
         if (updated) {
-            if (localPrivate !== !!isPrivate) togglePrivacy(questionId, localPrivate);
-
+            // privacy not supported: ignore localPrivate change
             setEditMode(false);
         }
     };
 
-    const submitAnswer = () => {
+    const submitAnswer = async () => {
         if (!canAnswer || !answerBody.trim()) return;
-        const a = answer(answerBody.trim());
+        const a = await answer(answerBody.trim());
 
         if (a) setAnswerBody('');
     };
 
     return (
-        <Card withBorder p="sm" radius="md">
+        <Card withBorder p="sm" radius="lg">
             <Group align="flex-start" justify="space-between" mb={4} wrap="nowrap">
                 <Box style={{ flex: 1 }}>
                     <Group align="center" gap={6} mb={4} wrap="nowrap">
@@ -228,7 +225,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                 <Divider my={8} />
                 <Stack gap="xs">
                     {answers.map((a) => (
-                        <Card key={a.id} withBorder p="xs" radius="sm">
+                        <Card key={a.id} withBorder p="xs" radius="lg">
                             <Group align="center" gap={6} mb={4} wrap="nowrap">
                                 {a.is_instructor_answer && (
                                     <Badge color="blue" size="xs" variant="light">
@@ -241,7 +238,7 @@ function QuestionItem({ questionId, title, body, createdAt, isResolved, canResol
                         </Card>
                     ))}
                     {canAnswer && (
-                        <Card withBorder p="xs" radius="sm">
+                        <Card withBorder p="xs" radius="lg">
                             <Textarea
                                 autosize
                                 minRows={2}

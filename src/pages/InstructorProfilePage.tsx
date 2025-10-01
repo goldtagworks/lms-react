@@ -101,7 +101,7 @@ const InstructorProfilePage = () => {
                 {hero()}
                 <Divider label={t('instructor.profile.coursesDivider')} labelPosition="center" my="md" />
                 {curation.allCount === 0 && (
-                    <Card withBorder padding="lg" radius="md">
+                    <Card withBorder padding="lg" radius="lg">
                         <Text c="dimmed" size="sm">
                             {t('instructor.profile.emptyCourses')}
                         </Text>
@@ -111,7 +111,7 @@ const InstructorProfilePage = () => {
                     <CourseGrid mt="md">
                         {/* featured 먼저, 이후 others */}
                         {curation.featured && (
-                            <Card key={curation.featured.id} withBorder p="lg" radius="md" shadow="sm">
+                            <Card key={curation.featured.id} withBorder p="lg" radius="lg" shadow="sm">
                                 <AppImage alt={curation.featured.title} height={140} mb={12} radius="lg" src={curation.featured.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <Text fw={700} size="md">
@@ -142,7 +142,7 @@ const InstructorProfilePage = () => {
                             </Card>
                         )}
                         {curation.others.map((c) => (
-                            <Card key={c.id} withBorder p="lg" radius="md" shadow="sm">
+                            <Card key={c.id} withBorder p="lg" radius="lg" shadow="sm">
                                 <AppImage alt={c.title} height={140} mb={12} radius="lg" src={c.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <Text fw={600} size="md">
