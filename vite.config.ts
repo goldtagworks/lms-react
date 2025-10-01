@@ -10,7 +10,19 @@ export default defineConfig(({}) => {
         base: '/',
         plugins: [mdx({ remarkPlugins: [remarkGfm] }), react(), tsconfigPaths()] as (Plugin | PluginOption)[],
         build: {
-            emptyOutDir: true
+            emptyOutDir: true,
+            rollupOptions: {
+                output: {
+                    manualChunks: {
+                        'chunk-react': ['react', 'react-dom', 'react-router-dom'],
+                        'chunk-mantine': ['@mantine/core', '@mantine/hooks', '@mantine/form', '@mantine/dates', '@mantine/notifications', '@mantine/modals'],
+                        'chunk-i18n': ['i18next', 'react-i18next'],
+                        'chunk-supabase': ['@supabase/supabase-js'],
+                        'chunk-dayjs': ['dayjs'],
+                        'chunk-icons': ['lucide-react']
+                    }
+                }
+            }
         }
     };
 });

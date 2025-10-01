@@ -5,19 +5,20 @@ import RequireRole from '@main/components/RequireRole';
 import MainLayout from '@main/layouts/MainLayout';
 
 // Eager (초기 랜딩에 거의 항상 필요한 페이지)
+// Keep only absolutely critical above-the-fold pages eager; others lazy to shrink initial bundle
 import HomePage from '@main/pages/HomePage';
-import CourseListPage from '@main/pages/CourseListPage';
-import CourseDetailPage from '@main/pages/CourseDetailPage';
-import SignInPage from '@main/pages/SignInPage';
-import SignUpPage from '@main/pages/SignUpPage';
-import PasswordResetRequestPage from '@main/pages/PasswordResetRequestPage';
-import PasswordChangePage from '@main/pages/PasswordChangePage';
-import NoticesPage from '@main/pages/NoticesPage';
-import NoticeDetailPage from '@main/pages/NoticeDetailPage';
-import FAQPage from '@main/pages/FAQPage';
-import TermsPage from '@main/pages/TermsPage';
-import PrivacyPage from '@main/pages/PrivacyPage';
-import NotFoundPage from '@main/pages/NotFoundPage';
+const CourseListPage = lazy(() => import('@main/pages/CourseListPage'));
+const CourseDetailPage = lazy(() => import('@main/pages/CourseDetailPage'));
+const SignInPage = lazy(() => import('@main/pages/SignInPage'));
+const SignUpPage = lazy(() => import('@main/pages/SignUpPage'));
+const PasswordResetRequestPage = lazy(() => import('@main/pages/PasswordResetRequestPage'));
+const PasswordChangePage = lazy(() => import('@main/pages/PasswordChangePage'));
+const NoticesPage = lazy(() => import('@main/pages/NoticesPage'));
+const NoticeDetailPage = lazy(() => import('@main/pages/NoticeDetailPage'));
+const FAQPage = lazy(() => import('@main/pages/FAQPage'));
+const TermsPage = lazy(() => import('@main/pages/TermsPage'));
+const PrivacyPage = lazy(() => import('@main/pages/PrivacyPage'));
+const NotFoundPage = lazy(() => import('@main/pages/NotFoundPage'));
 
 // Lazy (무거운/역할 기반 또는 진입 빈도 낮은 페이지)
 const InstructorProfilePage = lazy(() => import('@main/pages/InstructorProfilePage'));
