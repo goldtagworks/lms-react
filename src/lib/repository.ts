@@ -22,8 +22,8 @@ const K_LESSONS = 'lms_lessons_v1'; // legacy (flat array)
 const K_LESSON_COURSE_PREFIX = 'lms_lessons_v2:'; // per-course key prefix
 const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
 const K_INSTRUCTOR_PROFILES = 'lms_instructor_profiles_v1';
-const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (mock)
-const K_USER_PASSWORDS = 'lms_user_passwords_v1'; // userId -> password (mock)
+const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (local demo)
+const K_USER_PASSWORDS = 'lms_user_passwords_v1'; // userId -> password (local demo; 평문 저장 금지)
 const K_MARKETING_COPY = 'lms_marketing_copy_v1'; // courseId -> MarketingCopy
 // NOTE: 강사 프로필 페이지 큐레이션/메트릭 계산 관련 새 유틸은
 // schema v1.1의 공개(published) + 활성(is_active) 코스를 기준으로 한다.
@@ -37,10 +37,10 @@ interface StoredUser {
 }
 
 interface PasswordMap {
-    [userId: string]: string; // 해시 아님 (mock). 실제 구현 시 절대 평문 저장 금지.
+    [userId: string]: string; // 해시 아님 (데모). 실제 구현 시 해시로 교체.
 }
 
-// ---------------- Users (admin mock) ----------------
+// ---------------- Users (admin demo storage) ----------------
 export function listUsers(): StoredUser[] {
     return loadUsers();
 }
@@ -132,7 +132,7 @@ export function resetUserPassword(userId: string): { temp: string } {
     const map = loadPasswordMap();
     const temp = 'tmp-' + Math.random().toString(36).slice(2, 10);
 
-    map[userId] = temp; // mock: plain text
+    map[userId] = temp; // 데모 plain text (실서비스 전 교체)
     savePasswordMap(map);
 
     return { temp };

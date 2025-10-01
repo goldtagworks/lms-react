@@ -52,7 +52,7 @@ hr { border:none; border-top:1px solid #ddd; margin:32px 0; }
   <hr />
   <p style="line-height:1.5; font-size:14px;">${t('certificate.demoDisclaimer', undefined, '본 수료증은 데모 환경에서 생성된 것으로 법적 효력이 없으며, 실제 서비스 도입 시 서버에서 서명된 PDF와 검증 API가 제공될 예정입니다.')}</p>
 </div>
-<div class="footer">© Demo LMS • This mock certificate is for presentation only.</div>
+<div class="footer">© Demo LMS • This demo certificate is for presentation only.</div>
 <script>window.focus()</script>
 </body></html>`);
 

@@ -644,7 +644,7 @@
         "certificatesNone": "합격한 시험이 아직 없어 수료증이 없습니다.",
         "certificatesEmpty": "수료증 없음",
         "certificateIssueNote": "발급 버튼은 첫 번째 수강중 강의를 기준으로 멱등 발급됩니다. 이미 동일 수강신청에 수료증이 있으면 재사용합니다.",
-        "adminUsersIntro": "플랫폼 사용자 목록을 조회하고 역할을 변경하거나 비활성화합니다. (mock 페이징)",
+        "adminUsersIntro": "플랫폼 사용자 목록을 조회하고 역할을 변경하거나 비활성화합니다.",
         "userRoleChange": "역할 변경",
         "selfDeactivateBlock": "자기 자신은 비활성화 불가",
         "deactivate": "비활성화",
@@ -652,7 +652,7 @@
         "roleAll": "역할 전체",
         "roleLabel": "역할",
         "deactivateUserTitle": "사용자 비활성화",
-        "deactivateUserConfirm": "이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)",
+        "deactivateUserConfirm": "이 사용자를 비활성화하시겠습니까?",
         "passwordResetDone": "초기화 완료",
         "passwordResetConfirm": "해당 사용자의 비밀번호를 초기화하고 재설정 안내 메일을 발송합니다. 진행하시겠습니까?",
         "passwordResetAndSend": "초기화 및 발송",
@@ -743,7 +743,7 @@
     "admin": {
         "categories": {
             "title": "카테고리 관리",
-            "description": "코스 분류용 카테고리를 생성/재정렬/비활성화합니다. (mock)",
+            "description": "코스 분류용 카테고리를 생성/재정렬/비활성화합니다.",
             "search": "이름/슬러그",
             "filter": { "all": "전체", "active": "활성", "inactive": "비활성", "current": { "active": "활성 필터 중", "inactive": "비활성 필터 중" } },
             "table": { "order": "순서", "name": "이름", "slug": "슬러그", "status": "상태", "actions": "액션", "empty": "카테고리가 없습니다." },
@@ -753,7 +753,7 @@
         },
         "coupons": {
             "title": "쿠폰 관리",
-            "description": "플랫폼 내 발행된 쿠폰을 생성/수정/비활성화합니다. (mock)",
+            "description": "플랫폼 내 발행된 쿠폰을 생성/수정/비활성화합니다.",
             "search": "코드 검색",
             "filter": { "all": "전체", "active": "활성", "inactive": "비활성" },
             "table": { "code": "코드", "type": "종류", "value": "값", "period": "기간", "usage": "사용/한도", "status": "상태", "actions": "액션", "empty": "쿠폰이 없습니다." },
@@ -802,7 +802,7 @@
         },
         "users": {
             "title": "사용자 관리",
-            "description": "플랫폼 사용자 목록을 조회하고 역할을 변경하거나 비활성화합니다. (mock 페이징)",
+            "description": "플랫폼 사용자 목록을 조회하고 역할을 변경하거나 비활성화합니다.",
             "searchPlaceholder": "이름/이메일/ID",
             "filter": { "roleAll": "역할 전체" },
             "table": { "id": "ID", "name": "이름", "email": "이메일", "role": "역할", "actions": "액션" },
@@ -812,7 +812,7 @@
                 "changeRoleTitle": "역할 변경",
                 "roleLabel": "역할",
                 "deactivateTitle": "사용자 비활성화",
-                "deactivateConfirm": "이 사용자를 비활성화하시겠습니까? (mock 데이터 제거)",
+                "deactivateConfirm": "이 사용자를 비활성화하시겠습니까?",
                 "passwordResetTitle": "비밀번호 초기화",
                 "passwordResetDone": "초기화 완료",
                 "passwordResetConfirm": "해당 사용자의 비밀번호를 초기화하고 재설정 안내 메일을 발송합니다. 진행하시겠습니까?",
