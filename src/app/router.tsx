@@ -12,6 +12,7 @@ const CourseDetailPage = lazy(() => import('@main/pages/CourseDetailPage'));
 const SignInPage = lazy(() => import('@main/pages/SignInPage'));
 const SignUpPage = lazy(() => import('@main/pages/SignUpPage'));
 const PasswordResetRequestPage = lazy(() => import('@main/pages/PasswordResetRequestPage'));
+const PasswordResetConfirmPage = lazy(() => import('@main/pages/PasswordResetConfirmPage'));
 const PasswordChangePage = lazy(() => import('@main/pages/PasswordChangePage'));
 const NoticesPage = lazy(() => import('@main/pages/NoticesPage'));
 const NoticeDetailPage = lazy(() => import('@main/pages/NoticeDetailPage'));
@@ -80,6 +81,7 @@ export default function AppRouter() {
                     <Route element={<SignInPage />} path="/signin" />
                     <Route element={<SignUpPage />} path="/signup" />
                     <Route element={<PasswordResetRequestPage />} path="/password/reset" />
+                    <Route element={<PasswordResetConfirmPage />} path="/password/reset/confirm" />
                     <Route
                         element={
                             <AuthAny>

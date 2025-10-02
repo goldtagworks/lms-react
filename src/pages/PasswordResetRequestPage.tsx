@@ -3,22 +3,50 @@ import { Alert, Button, Card, Stack, Text, TextInput } from '@mantine/core';
 import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useI18n } from '@main/lib/i18n';
+import { supabase } from '@main/lib/supabase';
 
-// NOTE: 서버 연동 전까지 임시 처리
 export default function PasswordResetRequestPage() {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t } = useI18n();
 
-    function submit() {
+    async function submit() {
+        if (loading) return;
         setError(null);
-        if (!email.trim()) {
+        setSent(false);
+
+        const trimmedEmail = email.trim();
+
+        if (!trimmedEmail) {
             setError(t('auth.reset.emailPrompt'));
 
             return;
         }
-        setSent(true);
+
+        // 간단한 이메일 형식 검증
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(trimmedEmail)) {
+            setError(t('auth.reset.emailPrompt')); // 기존 키 재사용
+
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+                redirectTo: `${window.location.origin}/password/reset/confirm`
+            });
+
+            if (error) throw error;
+            setSent(true);
+        } catch (e: any) {
+            setError(e.message || t('errors.unknown'));
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -52,7 +80,7 @@ export default function PasswordResetRequestPage() {
                                     {error}
                                 </Text>
                             )}
-                            <Button size="sm" onClick={submit}>
+                            <Button disabled={loading} loading={loading} size="sm" onClick={submit}>
                                 {t('auth.reset.submit')}
                             </Button>
                         </>

@@ -1,191 +1,200 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { supabase } from './supabase';
 import { UserRole } from './nav';
 
-type User = { id: string; name: string; email: string; role: UserRole } | null;
+// Public shape consumed by UI
+export type AuthUser = { id: string; name: string; email: string; role: UserRole } | null;
 
 interface AuthContextValue {
-    user: User;
-    login: (email: string, password: string) => Promise<void>;
-    logout: () => void;
-    register: (name: string, email: string, password: string) => Promise<void>;
+    user: AuthUser;
     loading: boolean;
     error: string | null;
+    login: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
+    refresh: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const TOKEN_KEY = 'lms_auth_token';
-const USER_KEY = 'lms_user_profile';
+// ---------- Internal helpers ----------
+async function fetchProfile(userId: string): Promise<{ display_name: string | null; role: UserRole } | null> {
+    const { data, error } = await supabase.from('profiles').select('display_name,role').eq('user_id', userId).maybeSingle();
 
-// API 엔드포인트 (Supabase 연결 전까지 로컬 스토리지 기반)
-const AUTH_API = {
-    login: async (email: string, password: string) => {
-        // TODO: 실제 API 호출로 교체
-        await new Promise((resolve) => setTimeout(resolve, 500));
+    if (error) {
+        // eslint-disable-next-line no-console
+        console.warn('[auth] fetchProfile error', error);
 
-        // 임시 검증 로직 (실제 서비스에서는 서버에서 처리)
-        if (!email || !password) {
-            throw new Error('이메일과 비밀번호를 입력해주세요.');
-        }
-
-        if (password.length < 6) {
-            throw new Error('비밀번호는 6자 이상이어야 합니다.');
-        }
-
-        // 임시 역할 할당 (실제로는 서버에서 반환)
-        let role: UserRole = 'student';
-
-        if (email.includes('admin')) role = 'admin';
-        else if (email.includes('instructor') || email.includes('teacher')) role = 'instructor';
-
-        const token = `jwt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const user = {
-            id: `user_${Date.now()}`,
-            name: email.split('@')[0],
-            email,
-            role
-        };
-
-        return { token, user };
-    },
-
-    register: async (name: string, email: string, password: string) => {
-        // TODO: 실제 API 호출로 교체
-        await new Promise((resolve) => setTimeout(resolve, 700));
-
-        if (!name || !email || !password) {
-            throw new Error('모든 필드를 입력해주세요.');
-        }
-
-        if (password.length < 6) {
-            throw new Error('비밀번호는 6자 이상이어야 합니다.');
-        }
-
-        // 이메일 중복 체크 (임시)
-        const existingUser = localStorage.getItem(`user_${email}`);
-
-        if (existingUser) {
-            throw new Error('이미 가입된 이메일입니다.');
-        }
-
-        const token = `jwt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const user = {
-            id: `user_${Date.now()}`,
-            name,
-            email,
-            role: 'student' as UserRole
-        };
-
-        // 임시 저장 (실제로는 서버 DB에 저장)
-        localStorage.setItem(`user_${email}`, JSON.stringify(user));
-
-        return { token, user };
-    },
-
-    verifyToken: async (token: string) => {
-        // TODO: 실제 JWT 검증으로 교체
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        if (!token || !token.startsWith('jwt_')) {
-            throw new Error('Invalid token');
-        }
-
-        // 임시: localStorage에서 사용자 정보 복원
-        const userString = localStorage.getItem(USER_KEY);
-
-        if (!userString) {
-            throw new Error('User not found');
-        }
-
-        return JSON.parse(userString);
+        return null;
     }
-};
+    if (!data) return null;
+    const role = (data.role as UserRole) || 'student';
+
+    return { display_name: data.display_name, role };
+}
+
+async function ensureProfile(userId: string, email: string, name?: string): Promise<{ display_name: string | null; role: UserRole }> {
+    const existing = await fetchProfile(userId);
+
+    if (existing) return existing;
+    // 기본 student로 생성
+    const display_name = name || email.split('@')[0];
+    const insert = { user_id: userId, display_name, role: 'student' as UserRole } as any;
+    const { error } = await supabase.from('profiles').insert(insert);
+
+    if (error) {
+        // eslint-disable-next-line no-console
+        console.error('[auth] ensureProfile insert failed', error);
+
+        return { display_name, role: 'student' };
+    }
+
+    return { display_name, role: 'student' };
+}
+
+function mapToAuthUser(sessionUser: any, profile: { display_name: string | null; role: UserRole } | null): AuthUser {
+    if (!sessionUser) return null;
+
+    return {
+        id: sessionUser.id,
+        email: sessionUser.email,
+        name: profile?.display_name || sessionUser.email?.split('@')[0] || 'User',
+        role: profile?.role || 'student'
+    };
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User>(null);
+    const [user, setUser] = useState<AuthUser>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const initAuth = async () => {
-            try {
-                const token = localStorage.getItem(TOKEN_KEY);
+    const resolveSession = useCallback(async () => {
+        setLoading(true);
+        try {
+            const { data: sessionRes } = await supabase.auth.getSession();
+            const sessionUser = sessionRes.session?.user || null;
 
-                if (token) {
-                    const userData = await AUTH_API.verifyToken(token);
-
-                    setUser(userData);
-                }
-            } catch {
-                // 토큰이 유효하지 않으면 로그아웃 처리
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_KEY);
+            if (!sessionUser) {
                 setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        initAuth();
+                return;
+            }
+            const profile = await fetchProfile(sessionUser.id);
+
+            setUser(mapToAuthUser(sessionUser, profile));
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('[auth] resolveSession error', e);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
+    useEffect(() => {
+        // 초기 세션 로드
+        resolveSession();
+        // 세션 변경 구독
+        const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            const sessionUser = session?.user || null;
+
+            if (!sessionUser) {
+                setUser(null);
+
+                return;
+            }
+            const profile = await fetchProfile(sessionUser.id);
+
+            setUser(mapToAuthUser(sessionUser, profile));
+        });
+
+        return () => {
+            sub.subscription.unsubscribe();
+        };
+    }, [resolveSession]);
+
     const login = useCallback(async (email: string, password: string) => {
+        setError(null);
+        setLoading(true);
         try {
-            setError(null);
-            setLoading(true);
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-            const { token, user } = await AUTH_API.login(email, password);
+            if (error) throw error;
+            if (!data.session?.user) throw new Error('로그인 실패: 사용자 정보를 찾을 수 없습니다.');
+            const profile = await fetchProfile(data.session.user.id);
 
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(user));
-            setUser(user);
-        } catch (err) {
-            const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
-
-            setError(message);
-            throw err;
+            setUser(mapToAuthUser(data.session.user, profile));
+        } catch (e: any) {
+            setError(e.message || '로그인에 실패했습니다.');
+            throw e;
         } finally {
             setLoading(false);
         }
     }, []);
 
     const register = useCallback(async (name: string, email: string, password: string) => {
+        setError(null);
+        setLoading(true);
         try {
-            setError(null);
-            setLoading(true);
+            const { data, error } = await supabase.auth.signUp({ email, password });
 
-            const { token, user } = await AUTH_API.register(name, email, password);
+            if (error) throw error;
+            const sessionUser = data.user; // 이메일 확인 요구 설정일 경우 session 없을 수 있음
 
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(user));
-            setUser(user);
-        } catch (err) {
-            const message = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
+            if (!sessionUser) {
+                // 이메일 확인 대기 상태
+                setUser(null);
 
-            setError(message);
-            throw err;
+                return;
+            }
+            const profile = await ensureProfile(sessionUser.id, email, name);
+
+            setUser(mapToAuthUser(sessionUser, profile));
+        } catch (e: any) {
+            setError(e.message || '회원가입에 실패했습니다.');
+            throw e;
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const logout = useCallback(() => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
-        setUser(null);
+    const logout = useCallback(async () => {
         setError(null);
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signOut();
+
+            if (error) throw error;
+            setUser(null);
+        } catch (e: any) {
+            setError(e.message || '로그아웃 실패');
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    return <AuthContext.Provider value={{ user, login, logout, register, loading, error }}>{children}</AuthContext.Provider>;
+    const refresh = useCallback(async () => {
+        await resolveSession();
+    }, [resolveSession]);
+
+    const value: AuthContextValue = {
+        user,
+        loading,
+        error,
+        login,
+        logout,
+        register,
+        refresh
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export function useAuth() {
+export function useAuth(): AuthContextValue {
     const ctx = useContext(AuthContext);
 
-    if (!ctx) {
-        throw new Error('useAuth must be used within AuthProvider');
-    }
+    if (!ctx) throw new Error('useAuth must be used within AuthProvider');
 
     return ctx;
 }

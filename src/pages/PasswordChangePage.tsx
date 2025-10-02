@@ -4,6 +4,7 @@ import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useAuth } from '@main/lib/auth';
 import { useI18n } from '@main/lib/i18n';
+import { supabase } from '@main/lib/supabase';
 
 export default function PasswordChangePage() {
     const { user } = useAuth();
@@ -16,37 +17,56 @@ export default function PasswordChangePage() {
     const { t } = useI18n();
 
     async function handleSubmit() {
+        if (loading) return;
         setError(null);
+        setDone(false);
 
+        if (!user) {
+            setError(t('auth.loginRequired.message.generic'));
+
+            return;
+        }
         if (!currentPw || !newPw) {
             setError(t('auth.password.required'));
 
             return;
         }
-
         if (newPw.length < 8) {
             setError(t('auth.password.min'));
 
             return;
         }
-
         if (newPw !== confirmPw) {
             setError(t('auth.password.mismatch'));
 
             return;
         }
+        if (currentPw === newPw) {
+            setError(t('auth.password.same'));
+
+            return;
+        }
 
         setLoading(true);
-
         try {
-            // TODO: 실제 비밀번호 변경 API 호출로 교체
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            // 1) 현재 비밀번호 검증을 위해 재로그인 시도 (Supabase는 updateUser에 현재 PW 요구 X 이지만 사용자 검증 UX용)
+            const email = user.email;
+            const reAuth = await supabase.auth.signInWithPassword({ email, password: currentPw });
+
+            if (reAuth.error) throw reAuth.error;
+            // 2) 비밀번호 변경
+            const { error: updErr } = await supabase.auth.updateUser({ password: newPw });
+
+            if (updErr) throw updErr;
             setDone(true);
             setCurrentPw('');
             setNewPw('');
             setConfirmPw('');
-        } catch {
-            setError(t('auth.password.updateError'));
+        } catch (e: any) {
+            const msg = e?.message?.toLowerCase() || '';
+
+            if (msg.includes('invalid login credentials')) setError(t('auth.password.required'));
+            else setError(e.message || t('errors.unknown'));
         } finally {
             setLoading(false);
         }
@@ -70,8 +90,8 @@ export default function PasswordChangePage() {
                         </Alert>
                     )}
                     {done && (
-                        <Alert color="teal" title={t('auth.password.changed.title')}>
-                            {t('auth.password.changed.desc')}
+                        <Alert color="teal" title={t('auth.password.change')}>
+                            {t('auth.password.changed')}
                         </Alert>
                     )}
                     <PasswordInput
@@ -97,7 +117,7 @@ export default function PasswordChangePage() {
                         </Text>
                     )}
                     <Button disabled={!user} loading={loading} size="sm" onClick={handleSubmit}>
-                        {t('auth.password.update')}
+                        {t('auth.password.change')}
                     </Button>
                 </Stack>
             </Card>
