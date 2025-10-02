@@ -1,6 +1,6 @@
 import { Notice } from '@main/types/notice';
 import { useState, useEffect } from 'react';
-// In-memory demo seed (sessionStorage persistence optional later)
+// In-memory seed (sessionStorage persistence optional later)
 const seed: Notice[] = [
     {
         id: 'n1',

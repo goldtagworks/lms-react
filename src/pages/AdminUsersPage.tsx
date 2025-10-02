@@ -18,15 +18,25 @@ interface RoleOption {
 
 const ROLE_OPTIONS: RoleOption[] = [];
 
-// 간단 seed: Auth Provider 에 저장된 사용자 외 추가 목록 비어 있을 수 있음
-function seedFromAuthIfNeeded() {
+// 사용자 초기화 (시스템에 등록된 사용자들을 확인)
+function initializeUsers() {
     try {
-        const raw = localStorage.getItem('demo-auth-user');
+        const users = JSON.parse(localStorage.getItem('lms_users_v1') || '[]');
 
-        if (raw) {
-            const u = JSON.parse(raw) as { id: string; name: string; email: string; role: UserRole };
+        if (users.length === 0) {
+            // 기본 관리자 계정이 없으면 현재 로그인한 사용자 추가
+            const currentUserStr = localStorage.getItem('lms_user_profile');
 
-            if (u && u.id) ensureUser({ id: u.id, name: u.name, email: u.email, role: u.role });
+            if (currentUserStr) {
+                const currentUser = JSON.parse(currentUserStr);
+
+                ensureUser({
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    role: currentUser.role
+                });
+            }
         }
     } catch {
         // ignore
@@ -45,7 +55,7 @@ const AdminUsersPage = () => {
     const [resetDone, setResetDone] = useState(false);
 
     useEffect(() => {
-        seedFromAuthIfNeeded();
+        initializeUsers();
     }, []);
 
     // useAdminUsersPaged 훅: role filter와 query는 훅 외부에서 필터링 필요 → 간단히 훅 호출 후 클라이언트 필터 추가

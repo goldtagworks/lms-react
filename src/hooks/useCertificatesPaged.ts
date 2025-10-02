@@ -16,7 +16,7 @@ interface CertificateRow {
 
 async function fetchCertificates(userId: string | undefined): Promise<CertificateRow[]> {
     if (!userId) return [];
-    // NOTE: 실제 스키마에 user_id 직접 없으면 서버 view 필요. 현재 mock 로직 대체로 enrollment_join 생략.
+    // NOTE: 실제 스키마에 user_id 직접 없으면 서버 view 필요. 현재 로직 대체로 enrollment_join 생략.
     // 임시: certificates 테이블(또는 view)에서 serial_no LIKE user prefix 등의 조건이 필요할 수 있음. 여기서는 전체 select 후 필터 없음 (추후 RLS로 user scope 제한 가정).
     const { data, error } = await supabase.from('certificates').select('*');
 

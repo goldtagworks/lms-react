@@ -17,16 +17,27 @@ export default function EnrollPage() {
     const navigate = useNavigate();
     const already = user && course ? isEnrolled(user.id, course.id) : false;
 
-    function handleEnrollAndGo() {
+    function handleEnrollment() {
         if (!user) {
             navigate('/signin');
 
             return;
         }
-        if (!course) return;
-        const { enrollment } = enrollCourse(user.id, course.id); // 즉시 ENROLLED (mock 결제)
 
-        navigate(`/learn/${enrollment.id}`);
+        if (!course) return;
+
+        // 무료 코스인 경우 즉시 등록
+        if (course.pricing_mode === 'free') {
+            const { enrollment } = enrollCourse(user.id, course.id);
+
+            navigate(`/learn/${enrollment.id}`);
+
+            return;
+        }
+
+        // 유료 코스인 경우 결제 페이지로 이동
+        // TODO: 실제 결제 시스템 연동 시 결제 페이지 구현 필요
+        navigate(`/payment/${course.id}`);
     }
 
     if (notFound || !course) {
@@ -72,7 +83,7 @@ export default function EnrollPage() {
                                 leftSection={<CreditCard size={16} />}
                                 size="xs"
                                 variant="filled"
-                                onClick={handleEnrollAndGo}
+                                onClick={handleEnrollment}
                             >
                                 {already ? t('empty.continueLearning', {}, '이어서 학습') : t('empty.startEnrollment', {}, '수강 시작')}
                             </Button>

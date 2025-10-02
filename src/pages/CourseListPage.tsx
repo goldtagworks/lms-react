@@ -19,7 +19,7 @@ import PaginationBar from '@main/components/PaginationBar';
 import { useAuth } from '@main/lib/auth';
 // Removed react-i18next usage in favor of internal i18n hook
 
-// 기존 mock 제거 → repository seed 사용
+// repository seed 사용
 
 const CourseListPage = () => {
     const [page, setPage] = useState(1);
@@ -86,7 +86,7 @@ const CourseListPage = () => {
                         onChange={(e) => setQuery(e.currentTarget.value)}
                     />
                     <Button disabled size="sm" variant="outline">
-                        {t('empty.sortStub', {}, '정렬(스텁)')}
+                        {t('empty.sortNoResults', {}, '정렬 결과 없음')}
                     </Button>
                 </Group>
                 <CourseGrid listMode>

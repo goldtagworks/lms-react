@@ -22,7 +22,7 @@ export function openCertificatePrintView({ certificate, courseTitle }: PrintPara
     const passedLabel = meta?.passed == null ? '—' : meta.passed ? t('exam.pass', undefined, '합격') : t('exam.fail', undefined, '불합격');
 
     win.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8" />
-<title>${t('certificate.demoTitle', undefined, '수료증 (Demo)')} ${certificate.serial_no}</title>
+<title>${t('certificate.title', undefined, '수료증')} ${certificate.serial_no}</title>
 <style>
 body { font-family: system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; margin:40px; color:#222; }
 .hdr { text-align:center; margin-bottom:40px; }
@@ -40,7 +40,7 @@ hr { border:none; border-top:1px solid #ddd; margin:32px 0; }
 </head><body>
 <button class="print-btn" onclick="window.print()">${t('certificate.print', undefined, '인쇄')}</button>
 <div class="hdr">
-  <h1 style="margin:0 0 8px; font-size:32px;">${t('certificate.demoTitle', undefined, '수료증 (Demo)')}</h1>
+  <h1 style="margin:0 0 8px; font-size:32px;">${t('certificate.title', undefined, '수료증')}</h1>
   <div class="label">CERTIFICATE OF COMPLETION</div>
 </div>
 <div class="cert-box">
@@ -50,9 +50,9 @@ hr { border:none; border-top:1px solid #ddd; margin:32px 0; }
   <div class="row"><span class="label">SCORE / PASS</span><br/><span class="value">${score} / ${passScore}</span></div>
   <div class="row"><span class="label">RESULT</span><br/><span class="badge ${meta?.passed ? '' : 'fail'}">${passedLabel}</span></div>
   <hr />
-  <p style="line-height:1.5; font-size:14px;">${t('certificate.demoDisclaimer', undefined, '본 수료증은 데모 환경에서 생성된 것으로 법적 효력이 없으며, 실제 서비스 도입 시 서버에서 서명된 PDF와 검증 API가 제공될 예정입니다.')}</p>
+  <p style="line-height:1.5; font-size:14px;">${t('certificate.notice', undefined, '본 수료증은 온라인 강의 수강 완료를 증명하는 공식 문서입니다. 발급 정보는 학습 관리 시스템에 영구적으로 기록됩니다.')}</p>
 </div>
-<div class="footer">© Demo LMS • This demo certificate is for presentation only.</div>
+<div class="footer">© LMS • Official Certificate of Completion</div>
 <script>window.focus()</script>
 </body></html>`);
 

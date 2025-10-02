@@ -22,7 +22,7 @@ const InstructorProfilePage = () => {
     const profile = useInstructorProfile(instructorId);
     const [editOpen, setEditOpen] = useState(false);
 
-    // 초기 프로필 보장 (승인된 강사 시나리오는 mock, 여기서는 단순 보장)
+    // 초기 프로필 보장 (승인된 강사 시나리오)
     const { t } = useI18n();
 
     useEffect(() => {

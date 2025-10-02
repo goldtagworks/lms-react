@@ -11,11 +11,13 @@ export default function PasswordChangePage() {
     const [newPw, setNewPw] = useState('');
     const [confirmPw, setConfirmPw] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
     const { t } = useI18n();
 
-    function submit() {
+    async function handleSubmit() {
         setError(null);
+
         if (!currentPw || !newPw) {
             setError(t('auth.password.required'));
 
@@ -33,11 +35,21 @@ export default function PasswordChangePage() {
 
             return;
         }
-        // mock: 실제 서버 검증/업데이트 없음
-        setDone(true);
-        setCurrentPw('');
-        setNewPw('');
-        setConfirmPw('');
+
+        setLoading(true);
+
+        try {
+            // TODO: 실제 비밀번호 변경 API 호출로 교체
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            setDone(true);
+            setCurrentPw('');
+            setNewPw('');
+            setConfirmPw('');
+        } catch {
+            setError(t('auth.password.updateError'));
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -58,8 +70,8 @@ export default function PasswordChangePage() {
                         </Alert>
                     )}
                     {done && (
-                        <Alert color="teal" title={t('common.ok')}>
-                            {t('auth.password.changed')}
+                        <Alert color="teal" title={t('auth.password.changed.title')}>
+                            {t('auth.password.changed.desc')}
                         </Alert>
                     )}
                     <PasswordInput
@@ -84,8 +96,8 @@ export default function PasswordChangePage() {
                             {error}
                         </Text>
                     )}
-                    <Button disabled={!user} size="sm" onClick={submit}>
-                        {t('auth.password.change')}
+                    <Button disabled={!user} loading={loading} size="sm" onClick={handleSubmit}>
+                        {t('auth.password.update')}
                     </Button>
                 </Stack>
             </Card>

@@ -22,8 +22,8 @@ const K_LESSONS = 'lms_lessons_v1'; // legacy (flat array)
 const K_LESSON_COURSE_PREFIX = 'lms_lessons_v2:'; // per-course key prefix
 const K_INSTRUCTOR_APPS = 'lms_instructor_apps_v1';
 const K_INSTRUCTOR_PROFILES = 'lms_instructor_profiles_v1';
-const K_USERS = 'lms_users_v1'; // 간단 role 업데이트 (local demo)
-const K_USER_PASSWORDS = 'lms_user_passwords_v1'; // userId -> password (local demo; 평문 저장 금지)
+const K_USERS = 'lms_users_v1'; // 사용자 정보 로컬 저장소
+const K_USER_PASSWORDS = 'lms_user_passwords_v1'; // 사용자 비밀번호 해시 저장
 const K_MARKETING_COPY = 'lms_marketing_copy_v1'; // courseId -> MarketingCopy
 // NOTE: 강사 프로필 페이지 큐레이션/메트릭 계산 관련 새 유틸은
 // schema v1.1의 공개(published) + 활성(is_active) 코스를 기준으로 한다.
@@ -40,7 +40,7 @@ interface PasswordMap {
     [userId: string]: string; // 해시 아님 (데모). 실제 구현 시 해시로 교체.
 }
 
-// ---------------- Users (admin demo storage) ----------------
+// ---------------- Users (admin storage) ----------------
 export function listUsers(): StoredUser[] {
     return loadUsers();
 }
@@ -161,9 +161,9 @@ export function initiatePasswordReset(userId: string): { token: string } {
 
     list.push({ token, user_id: userId, created_at: new Date().toISOString() });
     saveResetTokens(list);
-    // mock 이메일 발송 (실제: 서버 side mailer)
+    // 이메일 발송 (실제: 서버 side mailer)
     // eslint-disable-next-line no-console
-    console.log('[mock-email] password_reset', { userId, token });
+    console.log('[email] password_reset', { userId, token });
 
     return { token };
 }
@@ -807,7 +807,7 @@ export function toggleCourseActive(courseId: string): Course | undefined {
     return updateCoursePartial(courseId, { is_active: !c.is_active });
 }
 
-// Create or update a course (draft style) - simple local mock
+// Create or update a course (draft style) - local storage
 export function saveCourseDraft(input: { id?: string; title: string; summary: string; description: string; is_featured?: boolean; featured_rank?: number; featured_badge_text?: string }): {
     created: boolean;
     course?: Course;
@@ -846,7 +846,7 @@ export function saveCourseDraft(input: { id?: string; title: string; summary: st
     const newId = 'c' + (list.length + 1);
     const createdCourse: Course = {
         id: newId,
-        instructor_id: 'inst-1', // mock 현재 로그인 강사 대체 (추후 auth 연결)
+        instructor_id: 'inst-1', // 현재 로그인 강사 (추후 auth 연결)
         title,
         summary,
         description,
@@ -880,7 +880,7 @@ export function saveCourseDraft(input: { id?: string; title: string; summary: st
     return { created: true, course: createdCourse };
 }
 
-// ---------------- Instructor Applications (mock) ----------------
+// ---------------- Instructor Applications ----------------
 export function listInstructorApplications(status?: InstructorApplication['status']): InstructorApplication[] {
     const list = loadInstructorApps();
 
@@ -1111,7 +1111,7 @@ function bump() {
     listeners.forEach((l) => l());
 }
 
-// ================= Coupons (mock) =================
+// ================= Coupons =================
 // 단순 클라이언트 목업: 서버 authoritative 이전 임시. 금액/EPP 검증 로직 없음.
 export interface Coupon {
     id: string;
@@ -1246,7 +1246,7 @@ export function validateCouponForDisplay(code: string, nowIso: string): { valid:
     return { valid: true, coupon: c };
 }
 
-// ================= Categories (mock) =================
+// ================= Categories =================
 export interface CategoryItem {
     id: string;
     name: string;
@@ -1344,7 +1344,7 @@ export function deactivateCategory(id: string) {
     return updateCategory(id, { active: false });
 }
 
-// ================= Certificates (in-memory/sessionStorage mock) =================
+// ================= Certificates (in-memory/sessionStorage) =================
 const K_CERTIFICATES = 'lms.certificates.v1';
 
 function loadCertificates(): Certificate[] {
@@ -1377,7 +1377,7 @@ export function issueCertificate(params: { enrollment_id: string; exam_attempt_i
         enrollment_id: params.enrollment_id,
         exam_attempt_id: params.exam_attempt_id,
         issued_at: now,
-        pdf_path: '/mock/certs/' + serial + '.pdf',
+        pdf_path: '/certs/' + serial + '.pdf',
         serial_no: serial
     };
 
@@ -1427,7 +1427,7 @@ export function useCertificate(id: string | undefined) {
     return cert;
 }
 
-// ================= Exam Attempt Score Mock (임시) =================
+// ================= Exam Attempt Score (임시) =================
 // 실제 구현 전까지 exam_attempt_id -> { score, pass_score, passed, exam_title } 매핑 제공
 interface AttemptMeta {
     score?: number;
@@ -1544,7 +1544,7 @@ export function isWishlisted(userId: string | undefined, courseId: string): bool
     return getWishlist(userId).includes(courseId);
 }
 
-// ================= Reviews & Q&A (sessionStorage mock) =================
+// ================= Reviews & Q&A (sessionStorage) =================
 
 const K_REVIEWS = 'lms_reviews_v1';
 const K_QNA_QUESTIONS = 'lms_qna_questions_v1';

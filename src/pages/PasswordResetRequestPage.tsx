@@ -4,7 +4,7 @@ import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useI18n } from '@main/lib/i18n';
 
-// NOTE: 서버 연동 전까지 mock 처리
+// NOTE: 서버 연동 전까지 임시 처리
 export default function PasswordResetRequestPage() {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);

@@ -11,12 +11,11 @@ import { PromoBannerSection } from '../features/home/components/PromoBannerSecti
 import { GuideSection } from '../features/home/components/GuideSection';
 import { SupportSection } from '../features/home/components/SupportSection';
 import { RecentNoticesSection } from '../features/notices/components/RecentNoticesSection';
-// Removed mock homeData & useHomeDataMock – awaiting real API hooks.
 import PageContainer from '../components/layout/PageContainer';
 import PageSection from '../components/layout/PageSection';
 
 const HomePage = () => {
-    // Placeholder: real hooks (useHomeCategories, usePopularCourses, etc.) to be implemented.
+    // TODO: 실제 API 훅으로 교체 (useHomeCategories, usePopularCourses, etc.)
     const categories: any[] = [];
     const popular: any[] = [];
     const newCourses: any[] = [];
@@ -35,10 +34,10 @@ const HomePage = () => {
                     <CategoryChips categories={categories} />
                 </PageSection>
 
-                {/* 최근 공지 (핀 우선) */}
+                {/* 최근 공지 */}
                 <RecentNoticesSection />
 
-                {/* Sections temporarily hidden until real data hooks are implemented */}
+                {/* 주요 섹션들 - 실제 데이터 연결 필요 */}
                 <PageSection title={t('home.popular')}>
                     <CoursesSection courses={popular} title={t('home.popular')} />
                 </PageSection>

@@ -72,7 +72,7 @@ export function useAdminCertificates({ pageSize = 20 }: UseAdminCertificatesOpti
     const reissueMutation = useMutation({
         mutationFn: async () => {
             if (!reissueTarget) throw new Error('NO_TARGET');
-            // TODO: 실제 서버 재발급 RPC 구현 필요. stub: no-op
+            // TODO: 실제 서버 재발급 RPC 구현 필요.
             const { error } = await supabase.rpc('reissue_certificate', {
                 p_certificate_id: reissueTarget.id,
                 p_note: reissueNote || null

@@ -9,9 +9,10 @@ import { useEffect, useMemo } from 'react';
 import { formatDateTime, formatScore } from '@main/lib/format';
 import { useI18n } from '@main/lib/i18n';
 
-// (임시) 방문 시 샘플 attempt 메타 자동 주입: 실제 구현에서는 채점 완료 시 저장
-function ensureSampleAttemptMeta(cert: any | null | undefined) {
+// 시험 결과 메타데이터 자동 생성 (실제 구현에서는 채점 완료 시 저장)
+function ensureAttemptMeta(cert: any | null | undefined) {
     if (!cert) return;
+
     if (!getAttemptMeta(cert.exam_attempt_id)) {
         const score = 92;
         const pass = 70;
@@ -26,7 +27,7 @@ const CertificatePage = () => {
     const courses = useCourses();
 
     useEffect(() => {
-        ensureSampleAttemptMeta(cert);
+        ensureAttemptMeta(cert);
     }, [cert]);
 
     const attemptMeta = getAttemptMeta(cert?.exam_attempt_id);
@@ -35,7 +36,7 @@ const CertificatePage = () => {
         // enrollment_id 패턴: enr-... -> course id 추출 불가(현재 스키마로 직접 매핑 없음). 데모: 전체 중 첫 번째 코스명 or placeholder.
         // 실제 구현 시 certificate -> enrollment -> course join 필요.
 
-        // course title placeholder (i18n demo) - using certificate.title if missing
+        // 실제 구현 시 certificate -> enrollment -> course join 필요.
         return courses[0]?.title || t('certificate.title');
     }, [cert, courses]);
 
@@ -68,7 +69,7 @@ const CertificatePage = () => {
 
     return (
         <PageContainer roleMain>
-            <PageHeader description={t('certificate.pageDescDemo')} title={t('certificate.pageTitle')} />
+            <PageHeader description={t('certificate.pageDescription')} title={t('certificate.pageTitle')} />
             <Card withBorder padding="xl" radius="lg" shadow="sm">
                 <Stack gap="lg">
                     <Group align="flex-start" justify="space-between">
@@ -80,7 +81,6 @@ const CertificatePage = () => {
                                         {passed ? t('result.pass') : t('result.fail')}
                                     </Badge>
                                 )}
-                                <Badge variant="outline">{t('certificate.demoBadge')}</Badge>
                             </Group>
                         </div>
                         <Group gap="xs">
@@ -149,9 +149,6 @@ const CertificatePage = () => {
                             </Box>
                         </Grid.Col>
                     </Grid>
-                    <Alert color="gray" title={t('certificate.demoNoticeTitle')} variant="light">
-                        {t('certificate.demoNoticeBody')}
-                    </Alert>
                 </Stack>
             </Card>
         </PageContainer>

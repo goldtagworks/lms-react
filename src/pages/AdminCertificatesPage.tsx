@@ -117,7 +117,7 @@ export default function AdminCertificatesPage() {
                                     </Table.Td>
                                     <Table.Td ta="center">
                                         <Group gap={4} justify="center">
-                                            <Tooltip label={t('certificate.reissueMock')}>
+                                            <Tooltip label={t('certificate.reissue')}>
                                                 <ActionIcon aria-label={t('certificate.reissue')} size="sm" variant="subtle" onClick={() => openReissue(c)}>
                                                     <RotateCcw size={14} />
                                                 </ActionIcon>
@@ -137,7 +137,7 @@ export default function AdminCertificatesPage() {
                 <PaginationBar page={pageSafe} totalPages={totalPages} onChange={(p) => setPage(p)} />
             </Stack>
 
-            <Modal centered opened={!!reissueTarget} radius="md" size="sm" title={t('certificate.reissueTitleMock')} onClose={() => setReissueErr(null)}>
+            <Modal centered opened={!!reissueTarget} radius="md" size="sm" title={t('certificate.reissueTitle')} onClose={() => setReissueErr(null)}>
                 {reissueTarget && (
                     <Stack gap="sm">
                         {reissueErr && (
