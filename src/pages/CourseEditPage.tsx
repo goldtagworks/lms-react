@@ -2,6 +2,9 @@ import type { Lesson } from '@main/types/lesson';
 
 import { Title, TextInput, Textarea, Stack, Button, Group, Text, Card, Divider, Badge } from '@mantine/core';
 import { Save, X, Plus, Split } from 'lucide-react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
 // Modal for lesson editing extracted
 import LessonEditModal from '@main/features/lessons/LessonEditModal';
 import SectionHeaderAddModal from '@main/features/lessons/SectionHeaderAddModal';
@@ -24,7 +27,7 @@ const CourseEditPage = () => {
     const [title, setTitle] = useState(course?.title || '');
     const [summary, setSummary] = useState(course?.summary || '');
     const [desc, setDesc] = useState(course?.description || '');
-    const { lessons, orderedLessons, addLesson, addSection, removeLesson, move, togglePreview, patch } = useLessonsState(course?.id);
+    const { lessons, orderedLessons, addLesson, addSection, removeLesson, move, reorder, togglePreview, patch } = useLessonsState(course?.id);
     // newLessonTitle: 입력값만 페이지에서 관리
     const [newLessonTitle, setNewLessonTitle] = useState('');
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
@@ -79,6 +82,28 @@ const CourseEditPage = () => {
     navigateRef.current = navigate; // 최신 참조
 
     const { t } = useI18n();
+
+    // 드래그앤드롭 센서 설정
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    );
+
+    // 드래그 종료 핸들러
+    const handleDragEnd = (event: any) => {
+        const { active, over } = event;
+
+        if (active.id !== over?.id) {
+            const oldIndex = orderedLessons.findIndex((lesson) => lesson.id === active.id);
+            const newIndex = orderedLessons.findIndex((lesson) => lesson.id === over?.id);
+
+            const newOrder = arrayMove(orderedLessons, oldIndex, newIndex);
+
+            reorder(newOrder.map((lesson) => lesson.id));
+        }
+    };
 
     function guardedNavigate(to: any) {
         if (dirty && !window.confirm(t('course.editPage.save.navigateAwayConfirm'))) return;
@@ -267,70 +292,74 @@ const CourseEditPage = () => {
                                     </Button>
                                 </Group>
                                 <Divider my={6} />
-                                <Stack gap={10}>
-                                    {(() => {
-                                        let sectionCounter = 0;
-                                        let lessonCounterWithinSection = 0;
+                                <DndContext collisionDetection={closestCenter} sensors={sensors} onDragEnd={handleDragEnd}>
+                                    <SortableContext items={orderedLessons.map((lesson) => lesson.id)} strategy={verticalListSortingStrategy}>
+                                        <Stack gap={10}>
+                                            {(() => {
+                                                let sectionCounter = 0;
+                                                let lessonCounterWithinSection = 0;
 
-                                        return orderedLessons.map((row, idx) => {
-                                            if (row.is_section) {
-                                                sectionCounter += 1;
-                                                lessonCounterWithinSection = 0; // reset for new section
+                                                return orderedLessons.map((row, idx) => {
+                                                    if (row.is_section) {
+                                                        sectionCounter += 1;
+                                                        lessonCounterWithinSection = 0; // reset for new section
 
-                                                return (
-                                                    <SectionRow
-                                                        key={row.id}
-                                                        displayIndex={sectionCounter}
-                                                        index={idx}
-                                                        lesson={row}
-                                                        renameDraft={renameDraft}
-                                                        renamingId={renamingId}
-                                                        total={orderedLessons.length}
-                                                        onDelete={removeRow}
-                                                        onEdit={openLessonEdit}
-                                                        onMove={moveRow}
-                                                        onRenameCancel={cancelRename}
-                                                        onRenameChange={setRenameDraft}
-                                                        onRenameCommit={commitRename}
-                                                        onStartRename={startRename}
-                                                    />
-                                                );
-                                            }
-                                            lessonCounterWithinSection += 1;
-                                            const composite = sectionCounter > 0 ? `${sectionCounter}-${lessonCounterWithinSection}` : String(lessonCounterWithinSection);
+                                                        return (
+                                                            <SectionRow
+                                                                key={row.id}
+                                                                displayIndex={sectionCounter}
+                                                                index={idx}
+                                                                lesson={row}
+                                                                renameDraft={renameDraft}
+                                                                renamingId={renamingId}
+                                                                total={orderedLessons.length}
+                                                                onDelete={removeRow}
+                                                                onEdit={openLessonEdit}
+                                                                onMove={moveRow}
+                                                                onRenameCancel={cancelRename}
+                                                                onRenameChange={setRenameDraft}
+                                                                onRenameCommit={commitRename}
+                                                                onStartRename={startRename}
+                                                            />
+                                                        );
+                                                    }
+                                                    lessonCounterWithinSection += 1;
+                                                    const composite = sectionCounter > 0 ? `${sectionCounter}-${lessonCounterWithinSection}` : String(lessonCounterWithinSection);
 
-                                            return (
-                                                <LessonRow
-                                                    key={row.id}
-                                                    displayIndex={composite}
-                                                    index={idx}
-                                                    lesson={row}
-                                                    renameDraft={renameDraft}
-                                                    renamingId={renamingId}
-                                                    total={orderedLessons.length}
-                                                    onDelete={handleRemoveLesson}
-                                                    onEdit={openLessonEdit}
-                                                    onMove={moveRow}
-                                                    onRenameCancel={cancelRename}
-                                                    onRenameChange={setRenameDraft}
-                                                    onRenameCommit={commitRename}
-                                                    onStartRename={startRename}
-                                                    onTogglePreview={togglePreview}
-                                                />
-                                            );
-                                        });
-                                    })()}
-                                    {lessons.some((l) => l.is_preview) === false && lessons.length > 0 && (
-                                        <Text c="dimmed" size="xs">
-                                            {t('course.editPage.lessons.noPreview')}
-                                        </Text>
-                                    )}
-                                    {lessons.length === 0 && course && (
-                                        <Text c="dimmed" size="xs">
-                                            {t('course.editPage.lessons.noLessons')}
-                                        </Text>
-                                    )}
-                                </Stack>
+                                                    return (
+                                                        <LessonRow
+                                                            key={row.id}
+                                                            displayIndex={composite}
+                                                            index={idx}
+                                                            lesson={row}
+                                                            renameDraft={renameDraft}
+                                                            renamingId={renamingId}
+                                                            total={orderedLessons.length}
+                                                            onDelete={handleRemoveLesson}
+                                                            onEdit={openLessonEdit}
+                                                            onMove={moveRow}
+                                                            onRenameCancel={cancelRename}
+                                                            onRenameChange={setRenameDraft}
+                                                            onRenameCommit={commitRename}
+                                                            onStartRename={startRename}
+                                                            onTogglePreview={togglePreview}
+                                                        />
+                                                    );
+                                                });
+                                            })()}
+                                            {lessons.some((l) => l.is_preview) === false && lessons.length > 0 && (
+                                                <Text c="dimmed" size="xs">
+                                                    {t('course.editPage.lessons.noPreview')}
+                                                </Text>
+                                            )}
+                                            {lessons.length === 0 && course && (
+                                                <Text c="dimmed" size="xs">
+                                                    {t('course.editPage.lessons.noLessons')}
+                                                </Text>
+                                            )}
+                                        </Stack>
+                                    </SortableContext>
+                                </DndContext>
                             </>
                         )}
                     </Stack>

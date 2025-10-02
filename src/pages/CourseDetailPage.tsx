@@ -4,7 +4,7 @@ import MarkdownView from '@main/components/markdown/MarkdownView';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { TagChip } from '@main/components/TagChip';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageSection from '@main/components/layout/PageSection';
 import PageHeader from '@main/components/layout/PageHeader';
@@ -35,6 +35,7 @@ import { useState } from 'react';
 import useCourseReviewsPaged, { ReviewSort as ReviewSortPaged } from '@main/hooks/course/useCourseReviewsPaged';
 import CourseQnASection from '@main/components/qna/CourseQnASection';
 import useCourseQnAPaged from '@main/hooks/course/useCourseQnAPaged';
+import { useUserEnrollments, useFirstLessonId } from '@main/hooks/course/useEnrollment';
 
 export default function CourseDetailPage() {
     const { courseId: rawId } = useParams();
@@ -47,12 +48,20 @@ export default function CourseDetailPage() {
     const [qnaPage, setQnaPage] = useState(1);
     const { user } = useAuth();
     const userId = user?.id;
+    const navigate = useNavigate();
     const { data: qnaPaged } = useCourseQnAPaged(course?.id, qnaPage, { pageSize: 5, viewerId: userId });
     const enrolled = userId && course?.id ? isEnrolled(userId, course.id) : false;
     const wish = userId && course?.id ? isWishlisted(userId, course.id) : false;
     const { t } = useI18n();
     const lessons = useLessons(course?.id);
     const marketingCopy = useMarketingCopy(course?.id);
+
+    // 사용자의 수강신청 정보 조회
+    const { data: userEnrollments } = useUserEnrollments(userId || '');
+    const { data: firstLessonId } = useFirstLessonId(course?.id || '');
+
+    // 현재 코스의 수강신청 찾기
+    const currentEnrollment = userEnrollments?.find((e) => e.course_id === course?.id && e.status === 'ENROLLED');
 
     // 커리큘럼: 단일 lessons 배열 내에서 is_section=true 를 헤더로 사용
     // 기존 section_id 그룹핑 제거됨. 렌더 단계에서 순차 스캔하며 헤더 블록 생성.
@@ -120,13 +129,34 @@ export default function CourseDetailPage() {
     const handleEnroll = () => {
         if (!userId || !course?.id) return; // 로그인 안됨
         if (!enrolled) {
-            enrollAndNotify(userId, course.id);
+            // 유료 코스인 경우 결제 페이지로 이동
+            if (course.pricing_mode === 'paid') {
+                navigate(`/payment/${course.id}`);
+            } else {
+                // 무료 코스인 경우 직접 등록
+                enrollAndNotify(userId, course.id);
+            }
         }
     };
 
     const handleWishlist = () => {
         if (!userId || !course?.id) return;
         toggleWishlistAndNotify(userId, course.id);
+    };
+
+    const handleStartLearning = () => {
+        if (!currentEnrollment || !firstLessonId) {
+            notifications.show({
+                title: t('player.error'),
+                message: t('player.enrollmentOrLessonNotFound'),
+                color: 'red'
+            });
+
+            return;
+        }
+
+        // 첫 번째 레슨으로 이동
+        navigate(`/enrollments/${currentEnrollment.id}/lessons/${firstLessonId}`);
     };
 
     const openFeaturedModal = () => {
@@ -444,6 +474,7 @@ export default function CourseDetailPage() {
                             userId={userId}
                             wish={wish}
                             onEnroll={handleEnroll}
+                            onStartLearning={handleStartLearning}
                             onToggleWish={handleWishlist}
                         />
                         <Button fullWidth component={Link} mt="sm" radius="md" size="sm" to="/courses" variant="default">

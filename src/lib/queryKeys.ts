@@ -28,6 +28,9 @@ export const qk = {
     // Certificates
     certificate: (id: string) => ['certificate', id] as const,
     certificates: (userId?: string) => ['certificates', userId ?? 'me'] as const,
+    // Exams
+    exam: (id: string) => ['exam', id] as const,
+    examQuestions: (examId: string) => ['examQuestions', examId] as const,
     // Exam Attempts
     examAttempts: (filter: { examId?: string; enrollmentId?: string }) => ['examAttempts', filter] as const,
     // Categories (관리자)
@@ -47,7 +50,18 @@ export const qk = {
     // Course Reviews (페이지네이션)
     reviews: (filters: { courseId: string; page: number; pageSize: number; sort?: string }) => ['reviews', stableFilters(filters)] as const,
     // Course QnA (페이지네이션)
-    qna: (filters: { courseId: string; page: number; pageSize: number; viewerId?: string }) => ['qna', stableFilters(filters)] as const
+    qna: (filters: { courseId: string; page: number; pageSize: number; viewerId?: string }) => ['qna', stableFilters(filters)] as const,
+    // Dashboard
+    dashboardStats: () => ['dashboardStats'] as const,
+    topCourses: (limit: number) => ['topCourses', limit] as const,
+    activeStudents: (limit: number) => ['activeStudents', limit] as const,
+    revenueChart: (months: number) => ['revenueChart', months] as const,
+    examStats: () => ['examStats'] as const,
+    // Admin Exam Management
+    adminExams: () => ['adminExams'] as const,
+    examWithQuestions: (examId: string) => ['examWithQuestions', examId] as const,
+    // Courses for exam creation
+    coursesForExam: () => ['coursesForExam'] as const
 };
 
 export type QueryKey = ReturnType<(typeof qk)[keyof typeof qk]>;

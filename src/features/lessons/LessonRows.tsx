@@ -1,8 +1,10 @@
 import type { Lesson } from '@main/types/lesson';
 
 import { ActionIcon, Badge, Group, Text, TextInput } from '@mantine/core';
-import { ArrowDown, ArrowUp, Check, Pencil, PenSquare, Star, StarOff, Trash2, X } from 'lucide-react';
+import { Check, Pencil, PenSquare, Star, StarOff, Trash2, X, GripVertical } from 'lucide-react';
 import { memo, useCallback, useRef, useEffect } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useI18n } from '@main/lib/i18n';
 import { useEnterSpace } from '@main/hooks/useEnterSpace';
 
@@ -43,12 +45,12 @@ interface LessonRowProps extends LessonRowHandlers, RenameSharedProps {
 
 export const SectionRow = memo(function SectionRow({
     lesson,
-    index,
-    total,
+    index: _index,
+    total: _total,
     displayIndex,
     onEdit,
     onDelete,
-    onMove,
+    onMove: _onMove,
     renamingId,
     renameDraft,
     onStartRename,
@@ -56,6 +58,16 @@ export const SectionRow = memo(function SectionRow({
     onRenameCancel,
     onRenameCommit
 }: SectionRowProps) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: lesson.id
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1
+    };
+
     const handleEdit = useCallback(() => onEdit(lesson), [lesson, onEdit]);
     const keyHandler = useEnterSpace(handleEdit);
     const isRenaming = renamingId === lesson.id;
@@ -71,15 +83,21 @@ export const SectionRow = memo(function SectionRow({
     const { t } = useI18n();
 
     return (
-        <Group key={lesson.id} gap={6} style={{ backgroundColor: 'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))' }} wrap="nowrap">
+        <Group
+            key={lesson.id}
+            ref={setNodeRef}
+            gap={6}
+            style={{
+                backgroundColor: 'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))',
+                ...style
+            }}
+            wrap="nowrap"
+        >
             <Badge color="gray" size="sm" variant="outline">
                 {t('a11y.lesson.section.label')}
             </Badge>
-            <ActionIcon aria-label={t('a11y.lesson.section.moveUp')} disabled={index === 0} variant="subtle" onClick={() => onMove(lesson.id, 'up')}>
-                <ArrowUp size={16} />
-            </ActionIcon>
-            <ActionIcon aria-label={t('a11y.lesson.section.moveDown')} disabled={index === total - 1} variant="subtle" onClick={() => onMove(lesson.id, 'down')}>
-                <ArrowDown size={16} />
+            <ActionIcon aria-label={t('a11y.lesson.section.dragHandle')} size="sm" style={{ cursor: 'grab' }} variant="subtle" {...attributes} {...listeners}>
+                <GripVertical size={16} />
             </ActionIcon>
             {isRenaming ? (
                 <Group flex={1} gap={4} wrap="nowrap">
@@ -136,12 +154,12 @@ export const SectionRow = memo(function SectionRow({
 
 export const LessonRow = memo(function LessonRow({
     lesson,
-    index,
-    total,
+    index: _index,
+    total: _total,
     displayIndex,
     onEdit,
     onDelete,
-    onMove,
+    onMove: _onMove,
     onTogglePreview,
     renamingId,
     renameDraft,
@@ -150,6 +168,16 @@ export const LessonRow = memo(function LessonRow({
     onRenameCancel,
     onRenameCommit
 }: LessonRowProps) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: lesson.id
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1
+    };
+
     const handleEdit = useCallback(() => onEdit(lesson), [lesson, onEdit]);
     const keyHandler = useEnterSpace(handleEdit);
     const videoLabel = lesson.content_url ? (YOUTUBE_REGEX.test(lesson.content_url) ? 'YouTube' : 'Video') : '—';
@@ -166,7 +194,7 @@ export const LessonRow = memo(function LessonRow({
     const { t } = useI18n();
 
     return (
-        <Group key={lesson.id} gap={4} wrap="nowrap">
+        <Group key={lesson.id} ref={setNodeRef} gap={4} style={style} wrap="nowrap">
             <ActionIcon
                 aria-label={lesson.is_preview ? t('a11y.lesson.preview.unset') : t('a11y.lesson.preview.set')}
                 color={lesson.is_preview ? 'yellow' : 'gray'}
@@ -175,11 +203,8 @@ export const LessonRow = memo(function LessonRow({
             >
                 {lesson.is_preview ? <Star size={16} /> : <StarOff size={16} />}
             </ActionIcon>
-            <ActionIcon aria-label={t('a11y.lesson.lesson.moveUp')} disabled={index === 0} variant="subtle" onClick={() => onMove(lesson.id, 'up')}>
-                <ArrowUp size={16} />
-            </ActionIcon>
-            <ActionIcon aria-label={t('a11y.lesson.lesson.moveDown')} disabled={index === total - 1} variant="subtle" onClick={() => onMove(lesson.id, 'down')}>
-                <ArrowDown size={16} />
+            <ActionIcon aria-label={t('a11y.lesson.lesson.dragHandle')} size="sm" style={{ cursor: 'grab' }} variant="subtle" {...attributes} {...listeners}>
+                <GripVertical size={16} />
             </ActionIcon>
             {isRenaming ? (
                 <Group flex={1} gap={4} wrap="nowrap">

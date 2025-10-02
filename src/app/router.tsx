@@ -27,22 +27,33 @@ const MyPage = lazy(() => import('@main/pages/MyPage'));
 const WishlistPage = lazy(() => import('@main/pages/WishlistPage'));
 const LessonPlayerPage = lazy(() => import('@main/pages/LessonPlayerPage'));
 const ExamAttemptPage = lazy(() => import('@main/pages/ExamAttemptPage'));
+const ExamResultPage = lazy(() => import('@main/pages/ExamResultPage'));
+const CertificatesPage = lazy(() => import('@main/pages/CertificatesPage'));
 const InstructorCoursesPage = lazy(() => import('@main/pages/InstructorCoursesPage'));
 const CourseEditPage = lazy(() => import('@main/pages/CourseEditPage'));
 const AdminUsersPage = lazy(() => import('@main/pages/AdminUsersPage'));
+const AdminDashboardPage = lazy(() => import('@main/pages/AdminDashboardPage'));
+const AdminExamsPage = lazy(() => import('@main/pages/AdminExamsPage'));
+const AdminExamCreatePage = lazy(() => import('@main/pages/AdminExamCreatePage'));
+const AdminExamEditPage = lazy(() => import('@main/pages/AdminExamEditPage'));
+const AdminExamQuestionsPage = lazy(() => import('@main/pages/AdminExamQuestionsPage'));
 const AdminCertificatesPage = lazy(() => import('@main/pages/AdminCertificatesPage'));
 const AdminCouponsPage = lazy(() => import('@main/pages/AdminCouponsPage'));
 const AdminCategoriesPage = lazy(() => import('@main/pages/AdminCategoriesPage'));
 const EnrollPage = lazy(() => import('@main/pages/EnrollPage'));
 const ExamPage = lazy(() => import('@main/pages/ExamPage'));
 const CertificatePage = lazy(() => import('@main/pages/CertificatePage'));
-const CertificatesListPage = lazy(() => import('@main/pages/CertificatesListPage'));
 const SupportTicketsPage = lazy(() => import('@main/pages/SupportTicketsPage'));
 const SupportNewPage = lazy(() => import('@main/pages/SupportNewPage'));
 const SupportTicketDetailPage = lazy(() => import('@main/pages/SupportTicketDetailPage'));
 const AdminSupportPage = lazy(() => import('@main/pages/AdminSupportPage'));
 const InstructorApplyPage = lazy(() => import('@main/pages/InstructorApplyPage'));
 const AdminInstructorAppsPage = lazy(() => import('@main/pages/AdminInstructorAppsPage'));
+
+// Payment pages
+const PaymentPage = lazy(() => import('@main/pages/PaymentPage'));
+const PaymentSuccessPage = lazy(() => import('@main/pages/PaymentSuccessPage'));
+const PaymentFailPage = lazy(() => import('@main/pages/PaymentFailPage'));
 
 function AuthAny({ children }: { children: ReactNode }) {
     const { user, loading } = useAuth();
@@ -97,15 +108,29 @@ export default function AppRouter() {
                     {/* Authenticated (generic) */}
                     <Route element={<MyPage />} path="/my" />
                     <Route element={<WishlistPage />} path="/my/wishlist" />
-                    <Route element={<CertificatesListPage />} path="/my/certificates" />
+                    <Route element={<CertificatesPage />} path="/my/certificates" />
 
                     {/* Certificate 단일 정의 (중복 제거) */}
                     <Route element={<CertificatePage />} path="/certificate/:id" />
 
                     {/* Learning / Exam */}
-                    <Route element={<LessonPlayerPage />} path="/learn/:enrollmentId" />
+                    <Route element={<LessonPlayerPage />} path="/enrollments/:enrollmentId/lessons/:lessonId" />
                     <Route element={<ExamAttemptPage />} path="/exam/:examId/attempt" />
+                    <Route element={<ExamResultPage />} path="/exam/:examId/result" />
                     <Route element={<ExamPage />} path="/exam/:id" />
+
+                    {/* Payment */}
+                    <Route
+                        element={
+                            <AuthAny>
+                                <PaymentPage />
+                            </AuthAny>
+                        }
+                        path="/payment/:courseId"
+                    />
+                    {/* Toss Payments 콜백: Toss는 paymentKey/orderId/amount 또는 errorCode/errorMessage를 query string으로 전달 */}
+                    <Route element={<PaymentSuccessPage />} path="/payment/success" />
+                    <Route element={<PaymentFailPage />} path="/payment/fail" />
 
                     {/* Instructor */}
                     <Route element={<InstructorApplyPage />} path="/instructor/apply" />
@@ -146,6 +171,22 @@ export default function AppRouter() {
                     <Route
                         element={
                             <RequireRole requiredRole="admin">
+                                <AdminDashboardPage />
+                            </RequireRole>
+                        }
+                        path="/admin"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
+                                <AdminDashboardPage />
+                            </RequireRole>
+                        }
+                        path="/admin/dashboard"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
                                 <CourseEditPage />
                             </RequireRole>
                         }
@@ -166,6 +207,38 @@ export default function AppRouter() {
                             </RequireRole>
                         }
                         path="/admin/certificates"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
+                                <AdminExamsPage />
+                            </RequireRole>
+                        }
+                        path="/admin/exams"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
+                                <AdminExamCreatePage />
+                            </RequireRole>
+                        }
+                        path="/admin/exams/create"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
+                                <AdminExamEditPage />
+                            </RequireRole>
+                        }
+                        path="/admin/exams/:examId/edit"
+                    />
+                    <Route
+                        element={
+                            <RequireRole requiredRole="admin">
+                                <AdminExamQuestionsPage />
+                            </RequireRole>
+                        }
+                        path="/admin/exams/:examId/questions"
                     />
                     <Route
                         element={

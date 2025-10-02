@@ -12,5 +12,70 @@
     },
     "common": {
         "viewAll": "View All"
+    },
+    "enroll": {
+        "startLearning": "Start Learning"
+    },
+    "player": {
+        "loading": "Loading lesson...",
+        "lessonNotFound": "Lesson not found",
+        "sectionHeader": "This is a section header",
+        "duration": "Duration: {{minutes}} minutes",
+        "progress": "Progress: {{current}} / {{total}}",
+        "completed": "Completed",
+        "externalContent": "External Content",
+        "openContent": "Open Content",
+        "markComplete": "Mark Complete",
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "payment": {
+        "title": "Payment",
+        "subtitle": "Proceed to complete your enrollment.",
+        "button": "Pay Now",
+        "confirming": "Confirming Payment",
+        "confirmingMessage": "Processing payment confirmation. Please wait.",
+        "originalPrice": "Original Price",
+        "salePrice": "Sale Price",
+        "discount": "Discount",
+        "tax": "Tax",
+        "finalAmount": "Final Payment Amount",
+        "totalAmount": "Total Amount",
+        "courseInfo": "Course Information",
+        "priceBreakdown": "Price Details",
+        "pay": "Pay",
+        "secureNote": "Your payment is processed securely.",
+        "success": {
+            "title": "Payment Completed!",
+            "message": "Congratulations! Your enrollment has started.",
+            "enrolledCourse": "Enrollment Complete",
+            "startLearning": "Start Learning",
+            "goToMyCourses": "View My Courses",
+            "additionalInfo": "You can check your payment history in My Page."
+        },
+        "fail": {
+            "title": "Payment Failed",
+            "message": "An error occurred during payment processing.",
+            "retry": "Try Again",
+            "additionalInfo": "If the problem persists, please contact customer support."
+        },
+        "error": {
+            "title": "Payment Error",
+            "details": "Error Details",
+            "code": "Error Code",
+            "reason": "Failure Reason",
+            "missingPaymentKey": "Payment key is missing",
+            "missingParameters": "Required payment information is missing",
+            "orderNotFound": "Order information not found",
+            "confirmationFailed": "Payment confirmation failed",
+            "request": "A problem occurred while requesting the payment",
+            "userCanceled": "Payment was canceled by user",
+            "processAborted": "Payment process was aborted",
+            "cardRejected": "Payment was rejected by card company",
+            "invalidCardExpiration": "Card expiration date is invalid",
+            "insufficientFunds": "Insufficient card balance",
+            "installmentNotSupported": "Installment is not supported for this card",
+            "unknown": "An unknown error occurred"
+        }
     }
 }

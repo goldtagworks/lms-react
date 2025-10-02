@@ -38,3 +38,107 @@ export interface Payment {
     /** 생성일 */
     created_at: string;
 }
+
+// ============================================================
+// Toss Payments API 타입 정의
+// ============================================================
+
+// 결제 요청 시 필요한 정보
+export interface TossPaymentRequest {
+    amount: number;
+    orderId: string;
+    orderName: string;
+    customerName?: string;
+    customerEmail?: string;
+    customerMobilePhone?: string;
+    successUrl: string;
+    failUrl: string;
+    flowMode?: 'DEFAULT' | 'DIRECT';
+    easyPay?: {
+        discountCode?: string;
+    };
+    card?: {
+        useEscrow?: boolean;
+        flowMode?: 'DEFAULT' | 'DIRECT';
+        useCardPoint?: boolean;
+        useAppCardOnly?: boolean;
+    };
+}
+
+// 토스 결제 승인 응답
+export interface TossPaymentResponse {
+    paymentKey: string;
+    type: 'NORMAL' | 'BILLING' | 'BRANDPAY';
+    orderId: string;
+    orderName: string;
+    mId: string;
+    currency: string;
+    method: 'card' | 'virtualAccount' | 'transfer' | 'mobilePhone' | 'giftCertificate' | 'easyPay';
+    totalAmount: number;
+    balanceAmount: number;
+    status: 'READY' | 'IN_PROGRESS' | 'WAITING_FOR_DEPOSIT' | 'DONE' | 'CANCELED' | 'PARTIAL_CANCELED' | 'ABORTED' | 'EXPIRED';
+    requestedAt: string;
+    approvedAt?: string;
+    useEscrow: boolean;
+    lastTransactionKey?: string;
+    suppliedAmount: number;
+    vat: number;
+    isPartialCancelable: boolean;
+    card?: {
+        amount: number;
+        issuerCode: string;
+        acquirerCode?: string;
+        number: string;
+        installmentPlanMonths: number;
+        approveNo: string;
+        useCardPoint: boolean;
+        cardType: 'credit' | 'debit' | 'gift';
+        ownerType: 'personal' | 'company';
+        acquireStatus: 'READY' | 'REQUESTED' | 'COMPLETED' | 'CANCEL_REQUESTED' | 'CANCELED';
+        isInterestFree: boolean;
+        interestPayer?: 'BUYER' | 'CARD_COMPANY' | 'MERCHANT';
+    };
+    failure?: {
+        code: string;
+        message: string;
+    };
+}
+
+// 결제 승인 요청
+export interface TossConfirmRequest {
+    paymentKey: string;
+    orderId: string;
+    amount: number;
+}
+
+// Toss Payments 에러 응답
+export interface TossErrorResponse {
+    code: string;
+    message: string;
+}
+
+// 결제 프로세스 상태
+export interface PaymentFlow {
+    step: 'INIT' | 'REQUESTED' | 'CONFIRMING' | 'COMPLETED' | 'FAILED';
+    orderId: string;
+    paymentKey?: string;
+    amount: number;
+    course: {
+        id: string;
+        title: string;
+    };
+    user: {
+        id: string;
+        name?: string;
+        email?: string;
+    };
+    epp?: {
+        original_price_cents: number;
+        final_amount_cents: number;
+        discount_amount_cents: number;
+        applied_coupon?: string;
+    };
+    error?: TossErrorResponse;
+    createdAt: string;
+    updatedAt: string;
+}

@@ -134,6 +134,23 @@ CREATE TABLE IF NOT EXISTS exams (
 );
 CREATE INDEX IF NOT EXISTS idx_exams_course ON exams(course_id);
 
+-- [시험 문제] 시험별 문제 및 선택지
+DROP TABLE IF EXISTS exam_questions CASCADE;
+CREATE TABLE IF NOT EXISTS exam_questions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- 문제 고유 ID
+  exam_id uuid NOT NULL REFERENCES exams(id) ON DELETE CASCADE, -- 시험 ID
+  question_text text NOT NULL, -- 문제 내용
+  question_type text NOT NULL CHECK (question_type IN ('single', 'multiple', 'short')), -- 문제 유형
+  choices jsonb, -- 객관식 선택지 (단답형은 null)
+  correct_answer jsonb NOT NULL, -- 정답
+  points int NOT NULL DEFAULT 1 CHECK (points > 0), -- 배점
+  order_index int NOT NULL, -- 문제 순서
+  created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+);
+CREATE INDEX IF NOT EXISTS idx_exam_questions_exam ON exam_questions(exam_id);
+CREATE INDEX IF NOT EXISTS idx_exam_questions_order ON exam_questions(exam_id, order_index);
+
 -- [결제] 수강신청 결제 내역
 DROP TABLE IF EXISTS payments CASCADE;
 CREATE TABLE IF NOT EXISTS payments (
@@ -397,4 +414,29 @@ CREATE INDEX IF NOT EXISTS idx_support_msgs_ticket ON support_ticket_messages(ti
 CREATE INDEX IF NOT EXISTS idx_support_msgs_author ON support_ticket_messages(author_id);
 
 -- 뷰 예시(향후): v_support_ticket_counts (상태별 카운트) 필요 시 추가
+
+-- [RLS 정책] exam_questions 테이블
+ALTER TABLE exam_questions ENABLE ROW LEVEL SECURITY;
+
+-- 관리자만 모든 작업 가능
+CREATE POLICY "Admins can manage exam questions" ON exam_questions
+FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE profiles.user_id = auth.uid() 
+        AND profiles.role = 'admin'
+    )
+);
+
+-- 학생은 시험 응시 중에만 문제 조회 가능 (정답 제외)
+CREATE POLICY "Students can view questions during exam" ON exam_questions
+FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM enrollments e
+        JOIN exams ex ON ex.course_id = e.course_id
+        WHERE ex.id = exam_questions.exam_id
+        AND e.user_id = auth.uid()
+        AND e.status = 'ENROLLED'
+    )
+);
 

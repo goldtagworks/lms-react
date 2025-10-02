@@ -775,6 +775,25 @@ export function moveLesson(id: string, dir: 'up' | 'down'): Lesson[] {
     return [];
 }
 
+// 드래그앤드롭을 위한 레슨 순서 재정렬 함수
+export function reorderLessons(courseId: string, orderedIds: string[]): Lesson[] {
+    const list = loadLessonsForCourse(courseId);
+
+    // 새로운 순서대로 재정렬
+    const reorderedList = orderedIds.map((id, index) => {
+        const lesson = list.find((l) => l.id === id);
+
+        if (!lesson) throw new Error(`Lesson not found: ${id}`);
+
+        return { ...lesson, order_index: index + 1 };
+    });
+
+    saveLessonsForCourse(courseId, reorderedList);
+    bump();
+
+    return reorderedList;
+}
+
 export function getCourse(id: string): Course | undefined {
     return loadCourses().find((c) => c.id === id);
 }

@@ -2,7 +2,7 @@ import type { Lesson } from '@main/types/lesson';
 
 import { notifications } from '@mantine/notifications';
 import { useI18n } from '@main/lib/i18n';
-import { listLessonsByCourse, createLesson, deleteLesson, moveLesson, updateLesson } from '@main/lib/repository';
+import { listLessonsByCourse, createLesson, deleteLesson, moveLesson, updateLesson, reorderLessons } from '@main/lib/repository';
 import { useCallback, useRef, useState } from 'react';
 
 export interface LessonsStateApi {
@@ -12,6 +12,7 @@ export interface LessonsStateApi {
     addSection: (title: string, opts?: { silent?: boolean }) => boolean;
     removeLesson: (id: string, opts?: { silent?: boolean }) => void;
     move: (id: string, dir: 'up' | 'down') => void;
+    reorder: (orderedIds: string[]) => void;
     togglePreview: (id: string) => void;
     patch: (patch: Partial<Lesson> & { id: string }, opts?: { silent?: boolean }) => void;
 }
@@ -172,5 +173,26 @@ export function useLessonsState(courseId?: string): LessonsStateApi {
         [lessons]
     );
 
-    return { lessons, orderedLessons, addLesson, addSection, removeLesson, move, togglePreview, patch };
+    const reorder = useCallback(
+        (orderedIds: string[]) => {
+            if (!courseId) return;
+
+            try {
+                const reorderedList = reorderLessons(courseId, orderedIds);
+
+                setLessons(reorderedList);
+            } catch (error) {
+                notifications.show({
+                    color: 'red',
+                    title: t('notify.error.generic'),
+                    message: t('lesson.edit.reorderFailed')
+                });
+                // eslint-disable-next-line no-console
+                console.error('Lesson reorder failed:', error);
+            }
+        },
+        [courseId]
+    );
+
+    return { lessons, orderedLessons, addLesson, addSection, removeLesson, move, reorder, togglePreview, patch };
 }

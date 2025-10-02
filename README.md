@@ -6,8 +6,12 @@
 
 > AI용 전체 구현 워크플로우(Master Prompt)는 `docs/prompts/MASTER_PROMPT_LATEST.md` 를 참조하세요.
 
-## 주요 기능 (Features)
+## 📚 주요 기능 (Features)
 
+- ✅ **시험 관리 시스템**: 완전한 CRUD 인터페이스 (Phase A,B,C 완료)
+    - 시험 생성/수정/삭제
+    - 다양한 문제 유형 (객관식/단답형)
+    - 실시간 문제 관리 및 미리보기
 - 코스 카탈로그 & 섹션 구조
 - 가격(EPP 계산)
 - 결제 & 쿠폰 & 웹훅 검증
@@ -15,32 +19,64 @@
 - RLS 기반 접근 제어
 - 디자인 토큰 & 다국어(i18n) 카탈로그
 
-## Tech Stack (초안)
+## 🔧 Tech Stack
 
-- React (UI) / Mantine v8 (Design System)
-- Edge Functions (TypeScript 기반, 스펙: `040_edgespec.md`)
-- PostgreSQL + RLS (스키마: `031_schema.sql` / 정책: `032_rls.sql`)
-- (예정) 테스트: Vitest 또는 Jest, e2e: Playwright
+- **Frontend**: React 19 + Mantine v8 + TypeScript
+- **State Management**: React Query + Zustand
+- **Backend**: Supabase + Edge Functions
+- **Database**: PostgreSQL + Row Level Security
+- **Testing**: Playwright (E2E) + axe-core (접근성)
 
-## 디렉토리 개요 (현재 단계)
+## 📁 디렉토리 구조
 
 ```
 docs/
   000. AI 학습데이터/   # 세부 도메인 스펙
-  prompts/               # AI Master Prompt 및 버전
-openapi/ (예정)          # 자동 생성 OpenAPI 산출물
-src/ (예정)              # 애플리케이션 구현
+  002. 테이블 설계/     # 데이터베이스 스키마
+  004. 배포/           # 배포 관련 문서
+  prompts/             # AI Master Prompt 및 버전
+src/
+  components/          # 재사용 컴포넌트
+  pages/              # 페이지 컴포넌트
+    AdminExamCreatePage.tsx     # 시험 생성
+    AdminExamEditPage.tsx       # 시험 수정
+    AdminExamQuestionsPage.tsx  # 문제 관리
+  services/           # API 서비스 계층
+  hooks/              # React Query Hooks
+  types/              # TypeScript 타입 정의
 ```
 
-## 시작하기 (Getting Started)
+## 🚀 시작하기 (Getting Started)
 
-현재 저장소는 주로 스펙 문서 위주입니다. 구현이 진행되면 아래 절차가 추가될 예정입니다.
+### 개발 환경 설정
 
-1. Node & 패키지 매니저 버전 정의 (TODO)
-2. `.env.example` 작성 후 `cp .env.example .env`
-3. 의존성 설치: `pnpm install` (또는 npm/yarn 결정 필요)
-4. DB 마이그레이션 & 시드: `pnpm db:migrate && pnpm db:seed` (예정)
-5. 개발 서버 실행: `pnpm dev` (예정)
+1. **의존성 설치**
+
+    ```bash
+    yarn install
+    ```
+
+2. **환경 변수 설정**
+
+    ```bash
+    cp .env.example .env
+    # Supabase 설정 등 환경 변수 입력
+    ```
+
+3. **개발 서버 실행**
+    ```bash
+    yarn dev
+    # http://localhost:5173 에서 접근
+    ```
+
+### 시험 관리 시스템 사용법
+
+1. **관리자 로그인** → `/admin/exams` 접근
+2. **새 시험 만들기** → 시험 정보 입력
+3. **문제 추가** → 다양한 문제 유형 지원
+4. **미리보기 및 수정** → 실시간 편집 가능
+
+<!-- 테스트 스크립트는 초기 Phase C 검증 종료 후 정리됨. 필요 시 git 히스토리 참조 -->
 
 ## 문서 (Documentation)
 
