@@ -1,11 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SegmentedControl } from '@mantine/core';
+import { Select } from '@mantine/core';
 import { Locale, setLocale, useI18n, ensureNamespaces } from '@main/lib/i18n';
 
 const STORAGE_KEY = 'app.locale';
 const OPTIONS: { label: string; value: Locale }[] = [
-    { label: '한국어', value: 'ko' },
-    { label: 'EN', value: 'en' }
+    { label: '🇰🇷 한국어', value: 'ko' },
+    { label: '🇺🇸 English', value: 'en' },
+    { label: '🇯🇵 日本語', value: 'ja' },
+    { label: '🇰🇭 ខ្មែរ', value: 'km' },
+    { label: '🇱🇦 ລາວ', value: 'lo' },
+    { label: '🇲🇳 Монгол', value: 'mn' },
+    { label: '🇳🇵 नेपाली', value: 'ne' },
+    { label: '🇷🇺 Русский', value: 'ru' },
+    { label: '🇹🇭 ไทย', value: 'th' },
+    { label: '🇵🇭 Filipino', value: 'tl' },
+    { label: "🇺🇿 O'zbek", value: 'uz' },
+    { label: '🇻🇳 Tiếng Việt', value: 'vi' },
+    { label: '🇨🇳 中文(简)', value: 'zh-CN' },
+    { label: '🇹🇼 中文(繁)', value: 'zh-TW' }
 ];
 
 export function LanguageSwitch({ size = 'xs' }: { size?: 'xs' | 'sm' | 'md' }) {
@@ -38,7 +50,17 @@ export function LanguageSwitch({ size = 'xs' }: { size?: 'xs' | 'sm' | 'md' }) {
         [locale]
     );
 
-    return <SegmentedControl aria-label="Language switch" data={OPTIONS.map((o) => ({ label: o.label, value: o.value }))} size={size} value={value} onChange={onChange} />;
+    return (
+        <Select
+            aria-label="Language switch"
+            comboboxProps={{ withinPortal: true }}
+            data={OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
+            size={size}
+            value={value}
+            w={120}
+            onChange={(val) => val && onChange(val)}
+        />
+    );
 }
 
 export default LanguageSwitch;

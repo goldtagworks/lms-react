@@ -1,6 +1,6 @@
 import React from 'react';
 import { Divider } from '@mantine/core';
-import { t } from '@main/lib/i18n';
+import { useI18n } from '@main/lib/i18n';
 
 import { HeroSection } from '../features/home/components/HeroSection';
 import { CategoryChips } from '../features/home/components/CategoryChips';
@@ -15,6 +15,8 @@ import PageContainer from '../components/layout/PageContainer';
 import PageSection from '../components/layout/PageSection';
 
 const HomePage = () => {
+    const { t } = useI18n();
+
     // TODO: 실제 API 훅으로 교체 (useHomeCategories, usePopularCourses, etc.)
     const categories: any[] = [];
     const popular: any[] = [];

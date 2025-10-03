@@ -12,7 +12,7 @@ import { useEffect, useSyncExternalStore, useState } from 'react';
 
 import koUiStatic from '../locales/ko/ui.json';
 
-export type Locale = 'ko' | 'en';
+export type Locale = 'ko' | 'en' | 'ja' | 'km' | 'lo' | 'mn' | 'ne' | 'ru' | 'th' | 'tl' | 'uz' | 'vi' | 'zh-CN' | 'zh-TW';
 export const DEFAULT_LOCALE: Locale = 'ko';
 let currentLocale: Locale = DEFAULT_LOCALE;
 let version = 0; // increments on locale or namespace load to trigger subscribers
@@ -21,7 +21,19 @@ let ready = false; // 최초 필수 namespace 로드 여부
 // Loaded resources cache: locale -> namespace -> record
 const resources: Record<Locale, Record<string, Record<string, string>>> = {
     ko: {},
-    en: {}
+    en: {},
+    ja: {},
+    km: {},
+    lo: {},
+    mn: {},
+    ne: {},
+    ru: {},
+    th: {},
+    tl: {},
+    uz: {},
+    vi: {},
+    'zh-CN': {},
+    'zh-TW': {}
 };
 
 // Known namespaces (mirrors src/locales/*/*.json). Update when adding a new file.
