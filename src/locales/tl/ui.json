@@ -928,32 +928,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "Pag-enroll sa Kurso",
+            "subtitle": "Suriin ang mahahalagang impormasyon bago magsimula",
+            "li1": "Agad nagsisimula ang libreng mga kurso",
+            "li2": "Bayad na kurso pagkatapos ng secure na bayad",
+            "li3": "Pamahalaan ang progreso sa My Page at silid-aralan"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "Magpatuloy sa pagbabayad",
+            "subtitle": "Suriing muli ang huling halaga at mga diskwento",
+            "li1": "Naipakita na ang kupon / sale",
+            "li2": "Ligtas na kapaligiran ng pagproseso ng bayad",
+            "li3": "Agad na pag-enroll pagkatapos maaprubahan"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "Kumpleto ang pagbabayad",
+            "subtitle": "Matagumpay na na-proseso ang iyong pag-enroll",
+            "li1": "Simulan agad ang kurso",
+            "li2": "Tingnan ang kasaysayan ng bayad at pag-enroll sa My Page",
+            "li3": "Makukuha ang sertipiko pagkatapos makumpleto / pumasa"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "Nabigo ang pagbabayad",
+            "subtitle": "Hindi matagumpay na na-proseso ang bayad",
+            "li1": "Subukang muli o gumamit ng ibang paraan",
+            "li2": "Suriin ang limit / expiration ng card",
+            "li3": "Makipag-ugnayan sa suporta kung magpapatuloy"
         }
     },
     "notFound": {

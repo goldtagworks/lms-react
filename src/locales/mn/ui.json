@@ -928,32 +928,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "Курсэд бүртгүүлэх",
+            "subtitle": "Хичээлээ эхлэхээс өмнө гол мэдээллийг шалгана уу",
+            "li1": "Үнэгүй курс шууд эхэлнэ",
+            "li2": "Төлбөртэй курс аюулгүй төлбөрийн дараа бүртгэнэ",
+            "li3": "Ахиц дэвшлээ Миний хуудас болон сургалтын өрөөнд удирд"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "Төлбөр хийх",
+            "subtitle": "Эцсийн дүн ба хөнгөлөлтийг дахин шалгана уу",
+            "li1": "Купон / хямдрал тусгагдсан",
+            "li2": "Аюулгүй төлбөрийн орчин",
+            "li3": "Баталгаажсаны дараа шууд бүртгэнэ"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "Төлбөр амжилттай",
+            "subtitle": "Таны бүртгэл амжилттай боллоо",
+            "li1": "Одоо курсээ эхлүүл",
+            "li2": "Төлбөр ба бүртгэлийн түүхийг Миний хуудаснаас хар",
+            "li3": "Дууссаны / тэнцсэний дараа гэрчилгээ авах"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "Төлбөр амжилтгүй",
+            "subtitle": "Төлбөр амжилттай хийгдээгүй",
+            "li1": "Дахин оролдох эсвэл өөр арга хэрэглэх",
+            "li2": "Картын лимит / хугацааг шалгах",
+            "li3": "Асуудал үргэлжилбэл дэмжлэгтэй холбогдох"
         }
     },
     "notFound": {

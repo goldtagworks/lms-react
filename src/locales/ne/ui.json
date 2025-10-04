@@ -928,32 +928,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "कोर्स भर्ना",
+            "subtitle": "सुरु गर्नु अघि प्रमुख जानकारी जाँच्नुहोस्",
+            "li1": "निशुल्क कोर्स तुरुन्त सुरु हुन्छ",
+            "li2": "भुक्तान भएको कोर्स सुरक्षित भुक्तानीपछि भर्ना हुन्छ",
+            "li3": "प्रगति ‘माई पेज’ र अध्ययन क्षेत्रमा व्यवस्थापन गर्नुहोस्"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "भुक्तानीमा अगाडि बढ्नुहोस्",
+            "subtitle": "अन्तिम रकम र छुट पुन: जाँच गर्नुहोस्",
+            "li1": "कुपन / छुट परिलक्षित",
+            "li2": "सुरक्षित भुक्तानी वातावरण",
+            "li3": "स्वीकृतिपछि तुरुन्त भर्ना"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "भुक्तानी सम्पन्न",
+            "subtitle": "तपाईंको भर्ना सफलतापूर्वक प्रक्रिया भयो",
+            "li1": "अहिले नै कोर्स सुरु गर्नुहोस्",
+            "li2": "भुक्तानी / भर्ना इतिहास ‘माई पेज’ मा हेर्नुहोस्",
+            "li3": "पूरा / उत्तीर्णपछि प्रमाणपत्र उपलब्ध"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "भुक्तानी असफल",
+            "subtitle": "भुक्तानी सफल भएन",
+            "li1": "पुन: प्रयास वा अर्को विधि प्रयोग",
+            "li2": "कार्ड सीमा / म्याद जाँच",
+            "li3": "समस्या कायम रहे समर्थनमा सम्पर्क"
         }
     },
     "notFound": {

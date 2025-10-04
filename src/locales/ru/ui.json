@@ -959,32 +959,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "Запись на курс",
+            "subtitle": "Проверьте ключевую информацию перед началом обучения",
+            "li1": "Бесплатные курсы стартуют сразу",
+            "li2": "Платные — после безопасной оплаты",
+            "li3": "Управляйте прогрессом в Личном кабинете"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "Перейти к оплате",
+            "subtitle": "Проверьте итоговую сумму и применённые скидки",
+            "li1": "Купон / скидка учтены",
+            "li2": "Безопасная среда обработки платежей",
+            "li3": "Мгновенная запись после подтверждения"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "Оплата завершена",
+            "subtitle": "Ваша запись успешно оформлена",
+            "li1": "Начните курс прямо сейчас",
+            "li2": "Историю оплат и записей смотрите в Личном кабинете",
+            "li3": "Сертификат доступен после завершения / прохождения"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "Ошибка оплаты",
+            "subtitle": "Платёж не был успешно обработан",
+            "li1": "Повторите или выберите другой способ",
+            "li2": "Проверьте лимит / срок действия карты",
+            "li3": "Свяжитесь с поддержкой при повторных сбоях"
         }
     },
     "notFound": {

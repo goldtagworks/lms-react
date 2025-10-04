@@ -959,32 +959,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "ลงทะเบียนคอร์ส",
+            "subtitle": "ตรวจสอบข้อมูลสำคัญก่อนเริ่มเรียน",
+            "li1": "คอร์สฟรีเริ่มได้ทันที",
+            "li2": "คอร์สเสียค่าใช้จ่ายลงทะเบียนหลังชำระเงินปลอดภัย",
+            "li3": "จัดการความคืบหน้าที่หน้าของฉันและพื้นที่เรียน"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "ดำเนินการชำระเงิน",
+            "subtitle": "ตรวจสอบยอดสุดท้ายและส่วนลดอีกครั้ง",
+            "li1": "สะท้อนคูปอง / โปรโมชันแล้ว",
+            "li2": "สภาพแวดล้อมการชำระเงินที่ปลอดภัย",
+            "li3": "ลงทะเบียนทันทีหลังอนุมัติ"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "ชำระเงินสำเร็จ",
+            "subtitle": "การลงทะเบียนของคุณเสร็จสมบูรณ์",
+            "li1": "เริ่มเรียนได้เลย",
+            "li2": "ตรวจสอบประวัติการชำระ / ลงทะเบียนที่หน้าของฉัน",
+            "li3": "รับใบรับรองหลังเรียนจบ / ผ่าน"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "ชำระเงินล้มเหลว",
+            "subtitle": "การชำระเงินไม่สำเร็จ",
+            "li1": "ลองใหม่หรือใช้วิธีอื่น",
+            "li2": "ตรวจสอบวงเงิน / วันหมดอายุบัตร",
+            "li3": "ติดต่อฝ่ายสนับสนุนหากยังมีปัญหา"
         }
     },
     "notFound": {

@@ -968,32 +968,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "ចុះឈ្មោះវគ្គសិក្សា",
+            "subtitle": "ពិនិត្យព័ត៌មានសំខាន់មុនពេលចាប់ផ្តើមរៀន",
+            "li1": "វគ្គឥតគិតថ្លៃចាប់ផ្តើមភ្លាមៗ",
+            "li2": "វគ្គបង់ប្រាក់ចុះឈ្មោះបន្ទាប់ពីបង់ប្រាក់សុវត្ថិភាព",
+            "li3": "គ្រប់គ្រងវឌ្ឍនភាពនៅទំព័រ​របស់​ខ្ញុំ និងបន្ទប់រៀន"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "បន្តទៅការទូទាត់",
+            "subtitle": "ពិនិត្យច្រើនលើទឹកប្រាក់ចុងក្រោយ និងការបញ្ចុះតម្លៃ",
+            "li1": "បានអនុវត្ត កូដ/បញ្ចុះតម្លៃ",
+            "li2": "បរិយាកាសដំណើរការទូទាត់សុវត្ថិភាព",
+            "li3": "ចុះឈ្មោះភ្លាមៗក្រោយអនុម័ត"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "ទូទាត់បានជោគជ័យ",
+            "subtitle": "ការចុះឈ្មោះរបស់អ្នកបានបញ្ចប់ដោយជោគជ័យ",
+            "li1": "ចាប់ផ្តើមរៀនឥឡូវនេះ",
+            "li2": "ពិនិត្យប្រវត្តិទូទាត់ និងការចុះឈ្មោះនៅទំព័រ​របស់​ខ្ញុំ",
+            "li3": "បញ្ចប់ / ជាប់ប្រឡង ទើបអាចទទួលវិញ្ញាបនបត្រ"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "ការទូទាត់បរាជ័យ",
+            "subtitle": "ការទូទាត់មិនទទួលបានជោគជ័យ",
+            "li1": "ព្យាយាមម្ដងទៀត ឬប្រើវិធីផ្សេង",
+            "li2": "ពិនិត្យដែនកំណត់ / កាលបរិច្ឆេទបញ្ចប់កាត",
+            "li3": "ទាក់ទងជំនួយបើបន្តមានបញ្ហា"
         }
     },
     "notFound": {

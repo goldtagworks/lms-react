@@ -928,32 +928,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "Kursga ro'yxatdan o'tish",
+            "subtitle": "Boshlashdan oldin muhim ma'lumotlarni ko'rib chiqing",
+            "li1": "Bepul kurslar darhol boshlanadi",
+            "li2": "Pullik kurslar xavfsiz to'lovdan so'ng ro'yxatdan o'tadi",
+            "li3": "Jarayonni Mening sahifam va o'quv bo'limida boshqaring"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "To'lovni davom ettirish",
+            "subtitle": "Yakuniy summani va chegirmalarni qayta tekshiring",
+            "li1": "Kupon / chegirma hisobga olindi",
+            "li2": "Xavfsiz to'lov muhiti",
+            "li3": "Tasdiqlangandan so'ng darhol ro'yxatdan o'tish"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "To'lov muvaffaqiyatli",
+            "subtitle": "Sizning ro'yxatdan o'tishingiz amalga oshdi",
+            "li1": "Darhol o'qishni boshlang",
+            "li2": "To'lov va ro'yxat tarixi Mening sahifamda",
+            "li3": "Tugatgандан / o'tгандан keyin sertifikat olinadi"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "To'lov muvaffaqiyatsiz",
+            "subtitle": "To'lov muvaffaqиятли амалга ошмади",
+            "li1": "Qayta urinib ko'ring yoki boshqa usulni tanlang",
+            "li2": "Kartadagi limit / amal qilish muddatini tekshiring",
+            "li3": "Muammo davom etsa qo'llab-quvvatlashga murojaat qiling"
         }
     },
     "notFound": {

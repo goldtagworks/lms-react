@@ -928,32 +928,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "ລົງທະບຽນຄໍສ",
+            "subtitle": "ກວດເບິ່ງຂໍ້ມູນສໍາຄັນກ່ອນເລີ່ມຮຽນ",
+            "li1": "ຄໍສຟຣີເລີ່ມໄດ້ທັນທີ",
+            "li2": "ຄໍສມີຄ່າ ຈະລົງທະບຽນຫຼັງຈາກຈ່າຍເງິນປອດໄພ",
+            "li3": "ຄວບຄຸມຄວາມຄືບໜ້າໃນ ໜ້າຂອງຂ້ອຍ & ຫ້ອງຮຽນ"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "ດໍາເນີນການຈ່າຍເງິນ",
+            "subtitle": "ກວດທວນຈໍານວນສຸດທ້າຍ ແລະ ສ່ວນຫຼຸດ",
+            "li1": "ຄູປອງ / ສ່ວນຫຼຸດ ໄດ້ຖືກສະທ້ອນ",
+            "li2": "ສະພາບແວດລ້ອມການຈ່າຍເງິນປອດໄພ",
+            "li3": "ລົງທະບຽນທັນທີຫຼັງອະນຸມັດ"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "ຈ່າຍເງິນສໍາເລັດ",
+            "subtitle": "ການລົງທະບຽນຂອງທ່ານສໍາເລັດແລ້ວ",
+            "li1": "ເລີ່ມຮຽນດຽວນີ້",
+            "li2": "ກວດປະຫວັດຈ່າຍ / ລົງທະບຽນໃນ ໜ້າຂອງຂ້ອຍ",
+            "li3": "ໄດ້ຮັບໃບຢັ້ງຢືນຫຼັງຈົບ / ຜ່ານ"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "ຈ່າຍເງິນລົ້ມເຫຼວ",
+            "subtitle": "ການຈ່າຍເງິນບໍ່ສໍາເລັດ",
+            "li1": "ລອງໃໝ່ ຫຼື ໃຊ້ວິທີອື່ນ",
+            "li2": "ກວດວົງເງິນ / ໝົດອາຍຸບັດ",
+            "li3": "ຕິດຕໍ່ສະຫນັບສະຫນູນຖ້າຍັງບໍ່ສໍາເລັດ"
         }
     },
     "notFound": {

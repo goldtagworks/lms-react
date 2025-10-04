@@ -968,32 +968,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "Ghi danh khóa học",
+            "subtitle": "Xem lại thông tin quan trọng trước khi bắt đầu học",
+            "li1": "Khóa học miễn phí bắt đầu ngay",
+            "li2": "Khóa có phí ghi danh sau khi thanh toán an toàn",
+            "li3": "Quản lý tiến độ trong Trang cá nhân & khu học tập"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "Tiến hành thanh toán",
+            "subtitle": "Kiểm tra lại số tiền cuối cùng và giảm giá đã áp dụng",
+            "li1": "Đã áp dụng mã giảm giá / khuyến mãi",
+            "li2": "Môi trường xử lý thanh toán an toàn",
+            "li3": "Ghi danh ngay sau khi duyệt"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "Thanh toán thành công",
+            "subtitle": "Ghi danh của bạn đã được xử lý",
+            "li1": "Bắt đầu học ngay",
+            "li2": "Xem lịch sử thanh toán & ghi danh trong Trang cá nhân",
+            "li3": "Nhận chứng chỉ sau khi hoàn thành / đạt"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "Thanh toán thất bại",
+            "subtitle": "Thanh toán chưa được xử lý thành công",
+            "li1": "Thử lại hoặc chọn phương thức khác",
+            "li2": "Kiểm tra hạn mức / ngày hết hạn thẻ",
+            "li3": "Liên hệ hỗ trợ nếu vẫn lỗi"
         }
     },
     "notFound": {

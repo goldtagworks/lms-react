@@ -942,36 +942,6 @@
             "title": "お支払いエラー",
             "details": "エラーの詳細",
             "code": "エラーコード",
-            "paymentHero": {
-                "enroll": {
-                    "title": "Course enrollment",
-                    "subtitle": "Review key information before starting your learning",
-                    "li1": "Free courses start immediately",
-                    "li2": "Paid courses enroll after secure payment",
-                    "li3": "Manage progress in My Page & learning room"
-                },
-                "pay": {
-                    "title": "Proceed to payment",
-                    "subtitle": "Double‑check final amount and discounts applied",
-                    "li1": "Coupon / sale reflected",
-                    "li2": "Secure payment processing environment",
-                    "li3": "Instant enrollment after approval"
-                },
-                "success": {
-                    "title": "Payment completed",
-                    "subtitle": "Your enrollment has been processed successfully",
-                    "li1": "Start the course right away",
-                    "li2": "Check payment & enrollment history in My Page",
-                    "li3": "Certificates available after completion/pass"
-                },
-                "fail": {
-                    "title": "Payment failed",
-                    "subtitle": "The payment was not processed successfully",
-                    "li1": "Retry or use another method",
-                    "li2": "Verify card limit / expiration",
-                    "li3": "Contact support if it persists"
-                }
-            },
             "reason": "失敗理由",
             "missingPaymentKey": "支払いキーがありません",
             "missingParameters": "必要な支払い情報が不足しています",
@@ -985,6 +955,36 @@
             "insufficientFunds": "カードの残高不足",
             "installmentNotSupported": "このカードでは分割払いはサポートされていません",
             "unknown": "不明なエラーが発生しました"
+        }
+    },
+    "paymentHero": {
+        "enroll": {
+            "title": "受講登録",
+            "subtitle": "学習を始める前に重要な情報を確認してください",
+            "li1": "無料コースはすぐに開始",
+            "li2": "有料コースは安全な決済後に登録",
+            "li3": "進捗はマイページと学習画面で管理"
+        },
+        "pay": {
+            "title": "決済を進める",
+            "subtitle": "最終金額と割引適用をもう一度確認してください",
+            "li1": "クーポン / セール反映済み",
+            "li2": "安全な決済処理環境",
+            "li3": "承認後すぐに受講開始"
+        },
+        "success": {
+            "title": "決済が完了しました",
+            "subtitle": "受講登録が正常に処理されました",
+            "li1": "今すぐ学習を始める",
+            "li2": "決済 / 登録履歴はマイページで確認",
+            "li3": "修了 / 合格後に証明書を取得"
+        },
+        "fail": {
+            "title": "決済に失敗しました",
+            "subtitle": "決済が正常に処理されませんでした",
+            "li1": "再試行または他の方法を利用",
+            "li2": "カード限度額 / 有効期限を確認",
+            "li3": "継続する場合はサポートへ連絡"
         }
     },
     "notFound": {

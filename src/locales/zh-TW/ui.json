@@ -959,32 +959,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "Course enrollment",
-            "subtitle": "Review key information before starting your learning",
-            "li1": "Free courses start immediately",
-            "li2": "Paid courses enroll after secure payment",
-            "li3": "Manage progress in My Page & learning room"
+            "title": "課程報名",
+            "subtitle": "開始學習前請先檢視關鍵資訊",
+            "li1": "免費課程可立即開始",
+            "li2": "付費課程於安全付款後報名",
+            "li3": "在「我的」頁面與學習區管理進度"
         },
         "pay": {
-            "title": "Proceed to payment",
-            "subtitle": "Double‑check final amount and discounts applied",
-            "li1": "Coupon / sale reflected",
-            "li2": "Secure payment processing environment",
-            "li3": "Instant enrollment after approval"
+            "title": "前往付款",
+            "subtitle": "再次確認最終金額與折扣",
+            "li1": "已反映優惠券 / 特價",
+            "li2": "安全的付款處理環境",
+            "li3": "審核通過後立即開課"
         },
         "success": {
-            "title": "Payment completed",
-            "subtitle": "Your enrollment has been processed successfully",
-            "li1": "Start the course right away",
-            "li2": "Check payment & enrollment history in My Page",
-            "li3": "Certificates available after completion/pass"
+            "title": "付款完成",
+            "subtitle": "你的報名已成功處理",
+            "li1": "立即開始課程",
+            "li2": "在「我的」頁面查看付款與報名紀錄",
+            "li3": "完成 / 通過後可取得證書"
         },
         "fail": {
-            "title": "Payment failed",
-            "subtitle": "The payment was not processed successfully",
-            "li1": "Retry or use another method",
-            "li2": "Verify card limit / expiration",
-            "li3": "Contact support if it persists"
+            "title": "付款失敗",
+            "subtitle": "付款未成功處理",
+            "li1": "重試或使用其他方式",
+            "li2": "檢查卡片額度 / 有效期",
+            "li3": "仍失敗請聯繫客服"
         }
     },
     "notFound": {
