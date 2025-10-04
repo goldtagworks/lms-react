@@ -51,14 +51,6 @@ export default function WishlistPage() {
                             </Badge>
                         )}
                     </Group>
-                    {!userId && (
-                        <EmptyState
-                            actionLabel={t('common.login', {}, '로그인')}
-                            message={t('empty.wishlistLoginNeeded', {}, '로그인 후 찜 기능을 사용할 수 있습니다.')}
-                            title={t('empty.wishlistInfo', {}, '찜 기능 안내')}
-                            to="/signin"
-                        />
-                    )}
                     {userId && wishlist.length === 0 && (
                         <EmptyState
                             actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}

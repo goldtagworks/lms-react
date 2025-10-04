@@ -65,6 +65,8 @@ export function DevQuickNav() {
                         <SectionLabel label="가입/인증" />
                         <QuickLink label="회원가입" to="/signup" />
                         <QuickLink label="로그인" to="/signin" />
+                        <QuickLink label="비밀번호 재설정" to="/password/reset" />
+                        <QuickLink label="비밀번호 변경" to="/password/change" />
                         {!user && (
                             <Text c="dimmed" size="10px">
                                 (비로그인 상태)
@@ -80,12 +82,15 @@ export function DevQuickNav() {
                         <Divider my={4} />
                         <SectionLabel label="수강 & 결제" />
                         <QuickLink label="수강 신청 c1" to="/enroll/c1" />
-                        <QuickLink label="체크아웃 c1" to="/enroll/c1" />
+                        <QuickLink label="결제 c1" to="/payment/c1" />
+                        <QuickLink label="결제 성공" to="/payment/success" />
+                        <QuickLink label="결제 실패" to="/payment/fail" />
                         <Divider my={4} />
                         <SectionLabel label="학습" />
-                        <QuickLink label="레슨 플레이어 enr-1" to="/learn/enr-1" />
+                        <QuickLink label="레슨 플레이어 (enr-1/l-1)" to="/enrollments/enr-1/lessons/l-1" />
                         <QuickLink label="시험 e1" to="/exam/e1" />
                         <QuickLink label="시험 시도 e1" to="/exam/e1/attempt" />
+                        <QuickLink label="시험 결과 e1" to="/exam/e1/result" />
                         <Divider my={4} />
                         <SectionLabel label="수료" />
                         <QuickLink label="내 수료증 목록" to="/my/certificates" />
@@ -96,12 +101,28 @@ export function DevQuickNav() {
                         <QuickLink label="찜한 강의" to="/my/wishlist" />
                         <Divider my={4} />
                         <SectionLabel label="관리자" />
-                        <QuickLink label="강사 신청 관리" to="/admin/instructors/apps" />
+                        <QuickLink label="대시보드" to="/admin/dashboard" />
                         <QuickLink label="사용자 관리" to="/admin/users" />
+                        <QuickLink label="시험 관리" to="/admin/exams" />
+                        <QuickLink label="시험 생성" to="/admin/exams/create" />
+                        <QuickLink label="시험 e1 편집" to="/admin/exams/e1/edit" />
+                        <QuickLink label="시험 e1 문제" to="/admin/exams/e1/questions" />
+                        <QuickLink label="강사 신청 관리" to="/admin/instructors/apps" />
                         <QuickLink label="쿠폰 관리" to="/admin/coupons" />
                         <QuickLink label="카테고리 관리" to="/admin/categories" />
                         <QuickLink label="수료증 관리" to="/admin/certificates" />
+                        <QuickLink label="고객지원 관리" to="/admin/support" />
                         <QuickLink label="(Admin) 강좌 c1 편집" to="/admin/courses/c1/edit" />
+                        <Divider my={4} />
+                        <SectionLabel label="고객지원" />
+                        <QuickLink label="지원 티켓 목록" to="/support" />
+                        <QuickLink label="새 지원 요청" to="/support/new" />
+                        <QuickLink label="지원 티켓 s1" to="/support/s1" />
+                        <Divider my={4} />
+                        <SectionLabel label="기타" />
+                        <QuickLink label="FAQ" to="/faq" />
+                        <QuickLink label="이용약관" to="/terms" />
+                        <QuickLink label="개인정보처리방침" to="/privacy" />
                     </Stack>
                 )}
             </Stack>

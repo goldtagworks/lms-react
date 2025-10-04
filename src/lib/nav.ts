@@ -71,6 +71,23 @@ export const navGroups: NavGroup[] = [
             { id: 'instructor-profile', label: '', labelKey: 'nav.instructorProfile', href: '/instructor/__USER_ID__', auth: 'auth', roles: ['instructor'] }
         ]
     },
+     {
+        id: 'cta',
+        label: '',
+        labelKey: 'nav.cta',
+        order: 50,
+        items: [
+            {
+                id: 'apply-instructor',
+                label: '',
+                labelKey: 'nav.applyInstructor',
+                href: '/instructor/apply',
+                auth: 'auth',
+                roles: ['student'],
+                predicate: ({ role }) => role === 'student'
+            }
+        ]
+    },
     */
     {
         id: 'admin',
@@ -86,23 +103,6 @@ export const navGroups: NavGroup[] = [
             { id: 'admin-certificates', label: '', labelKey: 'nav.adminCertificates', href: '/admin/certificates', roles: ['admin'], auth: 'auth' },
             { id: 'admin-support', label: '', labelKey: 'nav.adminSupport', href: '/admin/support', roles: ['admin'], auth: 'auth' }
             // { id: 'admin-instructor-apps', label: '', labelKey: 'nav.adminInstructorApps', href: '/admin/instructors/apps', roles: ['admin'], auth: 'auth' }
-        ]
-    },
-    {
-        id: 'cta',
-        label: '',
-        labelKey: 'nav.cta',
-        order: 50,
-        items: [
-            {
-                id: 'apply-instructor',
-                label: '',
-                labelKey: 'nav.applyInstructor',
-                href: '/instructor/apply',
-                auth: 'auth',
-                roles: ['student'],
-                predicate: ({ role }) => role === 'student'
-            }
         ]
     },
     {

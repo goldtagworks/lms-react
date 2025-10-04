@@ -63,14 +63,6 @@ export default function MyPage() {
                             </Badge>
                         )}
                     </Group>
-                    {!userId && (
-                        <EmptyState
-                            actionLabel={t('common.login', {}, '로그인')}
-                            message={t('empty.enrollmentsLoginNeeded', {}, '로그인 후 수강 내역을 확인할 수 있습니다.')}
-                            title={t('empty.loginRequired', {}, '로그인 필요')}
-                            to="/signin"
-                        />
-                    )}
                     {userId && enrolledCourses.length === 0 && (
                         <EmptyState
                             actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}

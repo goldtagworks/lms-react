@@ -18,13 +18,8 @@ export default function EnrollPage() {
     const already = user && course ? isEnrolled(user.id, course.id) : false;
 
     function handleEnrollment() {
-        if (!user) {
-            navigate('/signin');
-
-            return;
-        }
-
-        if (!course) return;
+        // AuthAny 가드에 의해 로그인이 보장되지만 타입 안전성을 위해 체크
+        if (!user || !course) return;
 
         // 무료 코스인 경우 즉시 등록
         if (course.pricing_mode === 'free') {

@@ -106,18 +106,67 @@ export default function AppRouter() {
                     <Route element={<PrivacyPage />} path="/privacy" />
 
                     {/* Authenticated (generic) */}
-                    <Route element={<MyPage />} path="/my" />
-                    <Route element={<WishlistPage />} path="/my/wishlist" />
-                    <Route element={<CertificatesPage />} path="/my/certificates" />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <MyPage />
+                            </AuthAny>
+                        }
+                        path="/my"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <WishlistPage />
+                            </AuthAny>
+                        }
+                        path="/my/wishlist"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <CertificatesPage />
+                            </AuthAny>
+                        }
+                        path="/my/certificates"
+                    />
 
                     {/* Certificate 단일 정의 (중복 제거) */}
                     <Route element={<CertificatePage />} path="/certificate/:id" />
 
                     {/* Learning / Exam */}
-                    <Route element={<LessonPlayerPage />} path="/enrollments/:enrollmentId/lessons/:lessonId" />
-                    <Route element={<ExamAttemptPage />} path="/exam/:examId/attempt" />
-                    <Route element={<ExamResultPage />} path="/exam/:examId/result" />
-                    <Route element={<ExamPage />} path="/exam/:id" />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <LessonPlayerPage />
+                            </AuthAny>
+                        }
+                        path="/enrollments/:enrollmentId/lessons/:lessonId"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <ExamAttemptPage />
+                            </AuthAny>
+                        }
+                        path="/exam/:examId/attempt"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <ExamResultPage />
+                            </AuthAny>
+                        }
+                        path="/exam/:examId/result"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <ExamPage />
+                            </AuthAny>
+                        }
+                        path="/exam/:id"
+                    />
 
                     {/* Payment */}
                     <Route
@@ -129,11 +178,32 @@ export default function AppRouter() {
                         path="/payment/:courseId"
                     />
                     {/* Toss Payments 콜백: Toss는 paymentKey/orderId/amount 또는 errorCode/errorMessage를 query string으로 전달 */}
-                    <Route element={<PaymentSuccessPage />} path="/payment/success" />
-                    <Route element={<PaymentFailPage />} path="/payment/fail" />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <PaymentSuccessPage />
+                            </AuthAny>
+                        }
+                        path="/payment/success"
+                    />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <PaymentFailPage />
+                            </AuthAny>
+                        }
+                        path="/payment/fail"
+                    />
 
                     {/* Instructor */}
-                    <Route element={<InstructorApplyPage />} path="/instructor/apply" />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <InstructorApplyPage />
+                            </AuthAny>
+                        }
+                        path="/instructor/apply"
+                    />
                     <Route
                         element={
                             <RequireRole requiredRole="instructor">
@@ -304,7 +374,14 @@ export default function AppRouter() {
                     <Route element={<Navigate replace to="/signup" />} path="/register" />
 
                     {/* Enroll (kept near end to avoid collisions) */}
-                    <Route element={<EnrollPage />} path="/enroll/:id" />
+                    <Route
+                        element={
+                            <AuthAny>
+                                <EnrollPage />
+                            </AuthAny>
+                        }
+                        path="/enroll/:id"
+                    />
 
                     {/* 404 */}
                     <Route element={<NotFoundPage />} path="*" />

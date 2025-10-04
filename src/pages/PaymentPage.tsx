@@ -22,12 +22,7 @@ export default function PaymentPage() {
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        // 비로그인 사용자는 로그인 페이지로
-        if (!user) {
-            navigate('/signin', { state: { from: `/payment/${courseId}` } });
-
-            return;
-        }
+        // AuthAny 가드에 의해 로그인이 보장되므로 user는 항상 존재
 
         // 무료 강의는 즉시 수강신청
         if (course && course.price_cents === 0) {

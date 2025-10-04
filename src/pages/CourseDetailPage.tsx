@@ -573,14 +573,16 @@ export default function CourseDetailPage() {
                                                                 <TextMeta style={{ width: 42 }} ta="right">
                                                                     {block.sectionIndex ? `${block.sectionIndex}-${idx + 1}` : idx + 1}
                                                                 </TextMeta>
-                                                                <TextBody lineClamp={1} style={{ flex: 1, lineHeight: 1.35 }}>
-                                                                    {l.title}
+                                                                <Box style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                                    <TextBody lineClamp={1} style={{ flex: 1, lineHeight: 1.35 }}>
+                                                                        {l.title}
+                                                                    </TextBody>
                                                                     {l.is_preview && (
-                                                                        <Badge color="blue" ml={8} size="xs" variant="light">
+                                                                        <Badge color="blue" size="xs" variant="light">
                                                                             {t('course.detail.preview.title')}
                                                                         </Badge>
                                                                     )}
-                                                                </TextBody>
+                                                                </Box>
                                                                 <TextMeta style={{ width: 42 }} ta="right">
                                                                     {t('course.detail.curriculum.minutes', { mins })}
                                                                 </TextMeta>

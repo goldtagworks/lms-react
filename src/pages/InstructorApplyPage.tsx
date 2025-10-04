@@ -20,12 +20,10 @@ export function InstructorApplyPage() {
     const [linkUrl, setLinkUrl] = useState('');
     const [consent, setConsent] = useState<ConsentState | null>(null);
 
+    // AuthAny 가드에 의해 로그인된 사용자만 이 페이지에 접근 가능하지만
+    // 타입 안전성을 위해 null 체크 유지
     if (!user) {
-        return (
-            <Card withBorder mx="auto" p="lg" radius="lg" shadow="sm">
-                <Text>{t('instructor.apply.loginRequired')}</Text>
-            </Card>
-        );
+        return null; // AuthAny가 이미 리다이렉트 처리했으므로 렌더링하지 않음
     }
 
     if (app?.status === 'APPROVED') {

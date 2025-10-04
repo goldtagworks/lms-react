@@ -6,6 +6,20 @@
 --  * v1.4: Added notices, instructor_applications tables (migrating from in-memory repository)
 -- =============================
 
+-- =====================================================================
+-- FULL REBUILD HELPER (dev only)
+-- 필요 시 모든 핵심 테이블을 깨끗하게 재생성하기 위한 드롭 블록.
+-- prod 환경이나 마이그레이션 체인에서는 사용 금지. (명시적 버전 이동시 별도 migration 작성)
+-- 주의: 외래키 CASCADE 로 의존 데이터 전부 삭제됨.
+-- =====================================================================
+DO $$
+BEGIN
+  IF current_setting('server_version_num')::int >= 0 THEN  -- 형식적 가드
+    PERFORM 1;
+  END IF;
+END $$;
+
+
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'course_pricing_mode') THEN
@@ -346,6 +360,24 @@ CREATE TABLE IF NOT EXISTS notices (
 CREATE INDEX IF NOT EXISTS idx_notices_pinned ON notices(pinned) WHERE pinned = true;
 CREATE INDEX IF NOT EXISTS idx_notices_created ON notices(created_at DESC);
 
+-- RLS (notices): 공개 공지 목록/상세 조회는 익명 허용, 작성/수정/삭제는 관리자만 (admin role 은 profiles.role='admin')
+ALTER TABLE notices ENABLE ROW LEVEL SECURITY;
+
+-- (PostgreSQL은 CREATE POLICY 에 IF NOT EXISTS 미지원 → 사전 DROP 후 재생성)
+DROP POLICY IF EXISTS notices_read_public ON notices;
+CREATE POLICY notices_read_public ON notices
+  FOR SELECT USING (published = true);
+
+-- 관리자 전용 전체 액세스 (초안 포함)
+DROP POLICY IF EXISTS notices_admin_all ON notices;
+CREATE POLICY notices_admin_all ON notices
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+  ) WITH CHECK (
+    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+  );
+
+
 -- =============================================
 -- [강사 신청] instructor applications (mock -> DB 마이그레이션)
 -- 상태(status): PENDING | APPROVED | REJECTED | REVOKED
@@ -440,3 +472,26 @@ FOR SELECT USING (
     )
 );
 
+
+-- Idempotency keys table
+create table if not exists idempotency_keys (
+  scope text not null,
+  key_hash text not null,
+  first_result jsonb,
+  created_at timestamptz not null default now(),
+  primary key(scope, key_hash)
+);
+create index if not exists idx_idem_scope on idempotency_keys(scope);
+
+-- =============================
+-- 기본 관리자 계정 생성
+-- =============================
+-- 주의: 실제 사용자 가입 후 이 데이터를 업데이트해야 함
+-- auth.users 테이블에 해당 이메일로 가입된 사용자가 있어야 함
+INSERT INTO public.users (id, email, name, role, created_at, updated_at) 
+VALUES 
+  ('00000000-0000-0000-0000-000000000001', 'goldtagworks@gmail.com', 'GoldTag Admin', 'admin', now(), now()),
+  ('00000000-0000-0000-0000-000000000002', 'kr.lms.labs@gmail.com', 'LMS Labs Admin', 'admin', now(), now())
+ON CONFLICT (email) DO UPDATE SET 
+  role = 'admin',
+  updated_at = now();
