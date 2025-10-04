@@ -1,6 +1,5 @@
 import { Anchor, Avatar, Badge, Button, Card, Divider, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { useParams } from 'react-router-dom';
-import PageContainer from '@main/components/layout/PageContainer';
 import { useAuth } from '@main/lib/auth';
 import { ensureInstructorProfile, useInstructorProfile, upsertInstructorProfile, curateInstructorCourses } from '@main/lib/repository';
 import CourseGrid from '@main/components/layout/CourseGrid';
@@ -13,6 +12,8 @@ import { Link as LinkIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import InstructorProfileEditModal from '@main/features/instructor/InstructorProfileEditModal';
 import { Edit } from 'lucide-react';
+import AuthLayout from '@main/components/auth/AuthLayout';
+import InstructorHero from '@main/components/instructor/InstructorHero';
 
 const InstructorProfilePage = () => {
     const { id } = useParams();
@@ -36,69 +37,63 @@ const InstructorProfilePage = () => {
         upsertInstructorProfile(instructorId, patch);
     }
 
-    function hero() {
-        if (!profile) {
-            return (
-                <Group align="flex-start" gap="lg" wrap="nowrap">
-                    <Skeleton circle h={96} w={96} />
-                    <Stack flex={1} gap={8}>
-                        <Skeleton h={28} w="40%" />
-                        <Skeleton h={16} w="70%" />
-                        <Skeleton h={16} w="55%" />
-                    </Stack>
-                </Group>
-            );
-        }
-
-        const initials = profile.display_name.slice(0, 2).toUpperCase();
-
-        return (
-            <Group align="flex-start" gap="lg" wrap="nowrap">
-                <Avatar color="indigo" radius="md" size={96} variant="filled">
-                    {initials}
-                </Avatar>
-                <Stack flex={1} gap={6}>
-                    <Group gap={10}>
-                        <Title order={2} size="h3">
-                            {profile.display_name}
-                        </Title>
-                        <Badge color="grape" variant="light">
-                            Instructor
-                        </Badge>
-                        {canEdit && (
-                            <Button leftSection={<Edit size={14} />} size="sm" variant="subtle" onClick={() => setEditOpen(true)}>
-                                {t('instructor.edit.title')}
-                            </Button>
-                        )}
-                    </Group>
-                    {/* 향후 서버 사전 계산 메트릭 (코스/레슨/총 시간) 주입 예정 - 클라이언트 계산 금지 정책 */}
-                    <MarkdownViewer source={profile.bio_md} />
-                    {profile.links && profile.links.length > 0 && (
-                        <Group gap={10} mt={4} wrap="wrap">
-                            <Group gap={4}>
-                                <LinkIcon size={14} />
-                                <Text fw={500} size="sm">
-                                    Links
-                                </Text>
-                            </Group>
-                            {profile.links.map((l, i) => (
-                                <Anchor key={i} href={l.url} rel="noopener noreferrer" size="sm" target="_blank">
-                                    {l.label}
-                                </Anchor>
-                            ))}
-                        </Group>
-                    )}
-                </Stack>
-            </Group>
-        );
-    }
-
-    // t already from useI18n()
+    const initials = profile?.display_name?.slice(0, 2).toUpperCase();
 
     return (
-        <PageContainer roleMain py={48} size="lg">
+        <AuthLayout hero={<InstructorHero variant="profile" />}>
             <Stack gap="xl">
-                {hero()}
+                <Card withBorder p="lg" radius="lg" shadow="sm">
+                    {!profile && (
+                        <Group align="flex-start" gap="lg" wrap="nowrap">
+                            <Skeleton circle h={96} w={96} />
+                            <Stack flex={1} gap={8}>
+                                <Skeleton h={28} w="40%" />
+                                <Skeleton h={16} w="70%" />
+                                <Skeleton h={16} w="55%" />
+                            </Stack>
+                        </Group>
+                    )}
+                    {profile && (
+                        <Stack gap="sm">
+                            <Group align="flex-start" gap="lg" wrap="nowrap">
+                                <Avatar color="indigo" radius="md" size={96} variant="filled">
+                                    {initials}
+                                </Avatar>
+                                <Stack flex={1} gap={6}>
+                                    <Group gap={10}>
+                                        <Title order={2} size="h3">
+                                            {profile.display_name}
+                                        </Title>
+                                        <Badge color="grape" variant="light">
+                                            Instructor
+                                        </Badge>
+                                        {canEdit && (
+                                            <Button leftSection={<Edit size={14} />} size="sm" variant="subtle" onClick={() => setEditOpen(true)}>
+                                                {t('instructor.edit.title')}
+                                            </Button>
+                                        )}
+                                    </Group>
+                                    <MarkdownViewer source={profile.bio_md} />
+                                    {profile.links && profile.links.length > 0 && (
+                                        <Group gap={10} mt={4} wrap="wrap">
+                                            <Group gap={4}>
+                                                <LinkIcon size={14} />
+                                                <Text fw={500} size="sm">
+                                                    Links
+                                                </Text>
+                                            </Group>
+                                            {profile.links.map((l, i) => (
+                                                <Anchor key={i} href={l.url} rel="noopener noreferrer" size="sm" target="_blank">
+                                                    {l.label}
+                                                </Anchor>
+                                            ))}
+                                        </Group>
+                                    )}
+                                </Stack>
+                            </Group>
+                        </Stack>
+                    )}
+                </Card>
                 <Divider label={t('instructor.profile.coursesDivider')} labelPosition="center" my="md" />
                 {curation.allCount === 0 && (
                     <Card withBorder padding="lg" radius="lg">
@@ -109,7 +104,6 @@ const InstructorProfilePage = () => {
                 )}
                 {curation.allCount > 0 && (
                     <CourseGrid mt="md">
-                        {/* featured 먼저, 이후 others */}
                         {curation.featured && (
                             <Card key={curation.featured.id} withBorder p="lg" radius="lg" shadow="sm">
                                 <AppImage alt={curation.featured.title} height={140} mb={12} radius="lg" src={curation.featured.thumbnail_url || ''} />
@@ -181,9 +175,9 @@ const InstructorProfilePage = () => {
                         </Anchor>
                     </Group>
                 )}
+                <InstructorProfileEditModal opened={editOpen} profile={profile || null} onClose={() => setEditOpen(false)} onSave={(p) => handleSaveProfile(p)} />
             </Stack>
-            <InstructorProfileEditModal opened={editOpen} profile={profile || null} onClose={() => setEditOpen(false)} onSave={(p) => handleSaveProfile(p)} />
-        </PageContainer>
+        </AuthLayout>
     );
 };
 

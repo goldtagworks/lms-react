@@ -396,6 +396,37 @@
             "featuredBadge": "推薦",
             "allCoursesLink": "查看所有課程 ({{count}})"
         },
+        "hero": {
+            "apply": {
+                "title": "講師申請",
+                "subtitle": "將您的專業知識分享給學習者",
+                "li1": "填寫簡介 / 連結",
+                "li2": "管理員批准後可建立課程",
+                "li3": "可隨時更新個人資料"
+            },
+            "courses": {
+                "title": "課程管理",
+                "subtitle": "集中管理課程狀態與內容",
+                "li1": "課程列表 / 推薦設定",
+                "li2": "概要 · 標籤 · 預覽管理",
+                "li3": "推薦 / 定價 / 擴展中繼資料 路線圖"
+            },
+            "courseEdit": {
+                "newTitle": "建立新課程",
+                "editTitle": "編輯課程",
+                "subtitle": "配置章節、課時與中繼資訊",
+                "li1": "拖曳排序章節與課時",
+                "li2": "選擇 1 個預覽課時",
+                "li3": "儲存時快照結構與基本資訊"
+            },
+            "profile": {
+                "title": "講師資料",
+                "subtitle": "顯示給學習者的公開資料",
+                "li1": "從課程卡片與列表跳轉",
+                "li2": "輕量 Markdown 介紹",
+                "li3": "透過外部連結強調專業"
+            }
+        },
         "appApproved": "批准的申請",
         "appRejected": "被拒絕的申請",
         "appRevoked": "撤銷的許可",
@@ -680,6 +711,43 @@
         "certificatesNoneAdmin": "尚未發放證書。",
         "sortNoResults": "排序無結果",
         "certificateIssueBlocked": "由於沒有正在進行的課程，無法發放證書。"
+    },
+    "hero": {
+        "courses": {
+            "title": "數千門課程",
+            "subtitle": "透過專家打造的高品質課程學習新技能",
+            "item1": "以專案為導向的實戰學習",
+            "item2": "業界專家驗證的課程體系",
+            "item3": "從學習到就業的完整路線圖"
+        },
+        "wishlist": {
+            "title": "我的學習計畫",
+            "subtitle": "收藏感興趣的課程並系統化學習",
+            "item1": "隨時快速進入已收藏課程",
+            "item2": "獲取折扣與更新通知",
+            "item3": "獲得個人化學習推薦"
+        },
+        "certificates": {
+            "title": "成就證明",
+            "subtitle": "管理並分享已完成課程的證書",
+            "item1": "官方證書發行與下載",
+            "item2": "可直接新增至 LinkedIn 個人檔案",
+            "item3": "求職時的能力證明材料"
+        },
+        "enrollments": {
+            "title": "學習旅程的開始",
+            "subtitle": "透過結構化學習成為專業人士",
+            "item1": "分階段進度追蹤",
+            "item2": "專家講師 1:1 回饋",
+            "item3": "實戰專案打造作品集"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "專業線上學習平台",
+            "item1": "高品質線上課程",
+            "item2": "系統化學習管理",
+            "item3": "實務導向課程體系"
+        }
     },
     "notify": {
         "success": {

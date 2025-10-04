@@ -99,12 +99,12 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
     if (error) {
         return (
             <PageContainer>
-                <Card withBorder padding="xl" radius="md" style={{ maxWidth: 600, margin: '0 auto' }}>
+                <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
                     <Stack align="center" gap="md">
-                        <Alert color="red" title={t('payment.error.title')} w="100%">
+                        <Alert color="red" radius="md" title={t('payment.error.title')} w="100%">
                             {error}
                         </Alert>
-                        <Button variant="outline" onClick={() => navigate('/courses')}>
+                        <Button radius="md" size="sm" variant="outline" onClick={() => navigate('/courses')}>
                             {t('common.backToCourses')}
                         </Button>
                     </Stack>
@@ -116,7 +116,7 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
     if (isConfirmed) {
         return (
             <PageContainer>
-                <Card withBorder padding="xl" radius="md" style={{ maxWidth: 600, margin: '0 auto' }}>
+                <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
                     <Stack align="center" gap="lg">
                         {/* 성공 아이콘 */}
                         <div
@@ -162,11 +162,11 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                         {/* 액션 버튼 */}
                         <Stack gap="sm" w="100%">
                             {courseId && (
-                                <Button fullWidth size="md" onClick={handleGoToCourse}>
+                                <Button fullWidth radius="md" size="sm" onClick={handleGoToCourse}>
                                     {t('payment.success.startLearning')}
                                 </Button>
                             )}
-                            <Button fullWidth size="md" variant="outline" onClick={handleGoToMyCourses}>
+                            <Button fullWidth radius="md" size="sm" variant="outline" onClick={handleGoToMyCourses}>
                                 {t('payment.success.goToMyCourses')}
                             </Button>
                         </Stack>

@@ -54,7 +54,7 @@ const PaymentFailPage = (_: PaymentFailPageProps) => {
 
     return (
         <PageContainer>
-            <Card withBorder padding="xl" radius="md" style={{ maxWidth: 600, margin: '0 auto' }}>
+            <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
                 <Stack align="center" gap="lg">
                     {/* 실패 아이콘 */}
                     <div
@@ -71,17 +71,17 @@ const PaymentFailPage = (_: PaymentFailPageProps) => {
                     </div>
 
                     {/* 실패 메시지 */}
-                    <Stack align="center" gap="xs">
+                    <Stack align="center" gap="lg">
                         <Title c="red" order={2}>
                             {t('payment.fail.title')}
                         </Title>
-                        <Text c="dimmed" size="lg" ta="center">
+                        <Text c="dimmed" size="md" ta="center">
                             {t('payment.fail.message')}
                         </Text>
                     </Stack>
 
                     {/* 에러 세부 정보 */}
-                    <Alert color="red" title={t('payment.error.details')} w="100%">
+                    <Alert color="red" radius="md" title={t('payment.error.details')} w="100%">
                         <Stack gap="xs">
                             {code && (
                                 <Text size="sm">
@@ -96,10 +96,10 @@ const PaymentFailPage = (_: PaymentFailPageProps) => {
 
                     {/* 액션 버튼 */}
                     <Stack gap="sm" w="100%">
-                        <Button fullWidth size="md" onClick={handleRetryPayment}>
+                        <Button fullWidth radius="md" size="sm" onClick={handleRetryPayment}>
                             {t('payment.fail.retry')}
                         </Button>
-                        <Button fullWidth size="md" variant="outline" onClick={handleGoToCourses}>
+                        <Button fullWidth radius="md" size="sm" variant="outline" onClick={handleGoToCourses}>
                             {t('common.backToCourses')}
                         </Button>
                     </Stack>

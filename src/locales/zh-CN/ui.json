@@ -396,6 +396,37 @@
             "featuredBadge": "推荐",
             "allCoursesLink": "查看所有课程 ({{count}})"
         },
+        "hero": {
+            "apply": {
+                "title": "讲师申请",
+                "subtitle": "将您的专业知识分享给学习者",
+                "li1": "填写简介 / 链接",
+                "li2": "管理员批准后可创建课程",
+                "li3": "可随时更新个人资料"
+            },
+            "courses": {
+                "title": "课程管理",
+                "subtitle": "集中管理课程状态与内容",
+                "li1": "课程列表 / 推荐设置",
+                "li2": "概要 · 标签 · 预览管理",
+                "li3": "推荐 / 定价 / 扩展元数据 路线图"
+            },
+            "courseEdit": {
+                "newTitle": "创建新课程",
+                "editTitle": "编辑课程",
+                "subtitle": "配置章节、课时与元信息",
+                "li1": "拖拽排序章节与课时",
+                "li2": "选择 1 个预览课时",
+                "li3": "保存时快照结构与基础信息"
+            },
+            "profile": {
+                "title": "讲师资料",
+                "subtitle": "展示给学习者的公开资料",
+                "li1": "从课程卡片与列表跳转",
+                "li2": "轻量 Markdown 介绍",
+                "li3": "通过外部链接突出专业"
+            }
+        },
         "appApproved": "批准的申请",
         "appRejected": "拒绝的申请",
         "appRevoked": "撤销的权限",
@@ -680,6 +711,43 @@
         "certificatesNoneAdmin": "尚未签发证书。",
         "sortNoResults": "排序无结果",
         "certificateIssueBlocked": "由于没有进行中的课程，无法签发证书。"
+    },
+    "hero": {
+        "courses": {
+            "title": "数千门课程",
+            "subtitle": "通过专家打造的高质量课程学习新技能",
+            "item1": "以项目为导向的实战学习",
+            "item2": "行业专家验证的课程体系",
+            "item3": "从学习到就业的完整路线图"
+        },
+        "wishlist": {
+            "title": "我的学习计划",
+            "subtitle": "保存感兴趣的课程并系统化学习",
+            "item1": "随时快速访问已收藏课程",
+            "item2": "获取折扣与更新通知",
+            "item3": "获得个性化学习推荐"
+        },
+        "certificates": {
+            "title": "成就证明",
+            "subtitle": "管理并分享已完成课程的证书",
+            "item1": "官方证书签发与下载",
+            "item2": "可直接添加到 LinkedIn 个人资料",
+            "item3": "求职中的能力证明材料"
+        },
+        "enrollments": {
+            "title": "学习旅程的开始",
+            "subtitle": "通过结构化学习成为专业人士",
+            "item1": "分阶段进度跟踪",
+            "item2": "专家讲师 1:1 反馈",
+            "item3": "实战项目打造作品集"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "专业在线学习平台",
+            "item1": "高质量在线课程",
+            "item2": "系统化学习管理",
+            "item3": "实战导向课程体系"
+        }
     },
     "notify": {
         "success": {

@@ -681,6 +681,43 @@
         "sortNoResults": "Walang resulta para sa pag-uri-uri",
         "certificateIssueBlocked": "Hindi maaring i-isyu ang sertipiko dahil walang mga kasalukuyang kurso."
     },
+    "hero": {
+        "courses": {
+            "title": "Libu-libong kurso",
+            "subtitle": "Matuto ng bagong kasanayan sa de-kalidad na kursong ginawa ng mga eksperto",
+            "item1": "Project-based na praktikal na pagkatuto",
+            "item2": "Curriculum na napatunayan ng industriya",
+            "item3": "Kumpletong landas mula pagkatuto hanggang trabaho"
+        },
+        "wishlist": {
+            "title": "Plano ng pagkatuto",
+            "subtitle": "I-save ang mga kursong interes at mag-aral nang sistematiko",
+            "item1": "Mabilis na access sa naka-save na mga kurso",
+            "item2": "Mga abiso sa diskwento at update",
+            "item3": "Personalized na rekomendasyon sa pagkatuto"
+        },
+        "certificates": {
+            "title": "Patunay ng tagumpay",
+            "subtitle": "Pamahalaan at ibahagi ang mga sertipiko ng natapos na kurso",
+            "item1": "Opisyal na pag-isyu at pag-download",
+            "item2": "Direktang idagdag sa LinkedIn profile",
+            "item3": "Gamitin bilang patunay ng kasanayan sa pag-apply ng trabaho"
+        },
+        "enrollments": {
+            "title": "Simula ng paglalakbay sa pagkatuto",
+            "subtitle": "Maging propesyonal sa pamamagitan ng naka-istrukturang pagkatuto",
+            "item1": "Hakbang-hakbang na pagsubaybay ng progreso",
+            "item2": "1:1 feedback mula sa eksperto",
+            "item3": "Portfolio mula sa tunay na proyekto"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "Propesyonal na online learning platform",
+            "item1": "De-kalidad na online na kurso",
+            "item2": "Naka-istrukturang learning management",
+            "item3": "Praktikal na curriculum"
+        }
+    },
     "notify": {
         "success": {
             "generic": "Tagumpay",

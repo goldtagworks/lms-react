@@ -396,6 +396,37 @@
             "featuredBadge": "Nổi bật",
             "allCoursesLink": "Xem tất cả khóa học ({{count}})"
         },
+        "hero": {
+            "apply": {
+                "title": "Đăng ký giảng viên",
+                "subtitle": "Chia sẻ chuyên môn của bạn với học viên",
+                "li1": "Viết giới thiệu / liên kết ngắn",
+                "li2": "Tạo khóa học sau khi được duyệt",
+                "li3": "Cập nhật hồ sơ bất cứ lúc nào"
+            },
+            "courses": {
+                "title": "Quản lý khóa học",
+                "subtitle": "Quản lý trạng thái & nội dung khóa học tập trung",
+                "li1": "Danh sách khóa học / đánh dấu nổi bật",
+                "li2": "Tóm tắt · thẻ · bài học xem trước",
+                "li3": "Lộ trình: nổi bật / giá / meta thêm"
+            },
+            "courseEdit": {
+                "newTitle": "Tạo khóa học mới",
+                "editTitle": "Chỉnh sửa khóa học",
+                "subtitle": "Cấu hình phần, bài học và meta",
+                "li1": "Kéo để sắp xếp phần & bài học",
+                "li2": "Chọn 1 bài học xem trước",
+                "li3": "Snapshot thông tin & cấu trúc khi lưu"
+            },
+            "profile": {
+                "title": "Hồ sơ giảng viên",
+                "subtitle": "Hồ sơ công khai hiển thị cho học viên",
+                "li1": "Liên kết từ thẻ & danh sách khóa học",
+                "li2": "Giới thiệu Markdown gọn nhẹ",
+                "li3": "Làm nổi bật chuyên môn qua liên kết ngoài"
+            }
+        },
         "appApproved": "Đơn đăng ký đã được phê duyệt",
         "appRejected": "Đơn đăng ký đã bị từ chối",
         "appRevoked": "Quyền đã bị thu hồi",
@@ -680,6 +711,43 @@
         "certificatesNoneAdmin": "Chưa có chứng chỉ nào được cấp.",
         "sortNoResults": "Không có kết quả cho việc sắp xếp",
         "certificateIssueBlocked": "Không thể cấp chứng chỉ vì không có khóa học nào đang diễn ra."
+    },
+    "hero": {
+        "courses": {
+            "title": "Hàng nghìn khóa học",
+            "subtitle": "Học kỹ năng mới với các khóa chất lượng cao từ chuyên gia",
+            "item1": "Học thực hành qua dự án",
+            "item2": "Giáo trình được thẩm định bởi chuyên gia",
+            "item3": "Lộ trình hoàn chỉnh đến tuyển dụng"
+        },
+        "wishlist": {
+            "title": "Kế hoạch học tập cá nhân",
+            "subtitle": "Lưu khóa quan tâm và học có hệ thống",
+            "item1": "Truy cập nhanh khóa đã lưu mọi lúc",
+            "item2": "Nhận thông báo giảm giá & cập nhật",
+            "item3": "Nhận gợi ý học tập cá nhân hóa"
+        },
+        "certificates": {
+            "title": "Minh chứng thành tựu",
+            "subtitle": "Quản lý và chia sẻ chứng chỉ đã hoàn thành",
+            "item1": "Phát hành & tải chứng chỉ chính thức",
+            "item2": "Thêm trực tiếp vào hồ sơ LinkedIn",
+            "item3": "Chứng minh năng lực khi tuyển dụng"
+        },
+        "enrollments": {
+            "title": "Khởi đầu hành trình học",
+            "subtitle": "Trở thành chuyên gia qua học tập có cấu trúc",
+            "item1": "Theo dõi tiến độ từng bước",
+            "item2": "Phản hồi 1:1 từ giảng viên",
+            "item3": "Dự án thực tế xây portfolio"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "Nền tảng học trực tuyến chuyên nghiệp",
+            "item1": "Khóa học chất lượng cao",
+            "item2": "Quản lý học tập có hệ thống",
+            "item3": "Giáo trình định hướng thực hành"
+        }
     },
     "notify": {
         "success": {

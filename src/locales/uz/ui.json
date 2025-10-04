@@ -681,6 +681,43 @@
         "sortNoResults": "Saralash uchun natijalar yo'q",
         "certificateIssueBlocked": "Davom etayotgan kurslar yo'qligi sababli sertifikat berish mumkin emas."
     },
+    "hero": {
+        "courses": {
+            "title": "Minglab kurslar",
+            "subtitle": "Mutaxassislar yaratgan yuqori sifatli kurslar bilan yangi ko'nikmalar o'rganing",
+            "item1": "Loyiha asosli amaliy o'qish",
+            "item2": "Sohadagi ekspertlar tasdiqlagan o'quv dasturi",
+            "item3": "Ta'limdan ishga joylashuvgacha to'liq yo'l xaritasi"
+        },
+        "wishlist": {
+            "title": "Shaxsiy o'qish rejasi",
+            "subtitle": "Qiziqqan kurslarni saqlang va tizimli o'rganing",
+            "item1": "Istalgan vaqtda saqlangan kurslarga tezkor kirish",
+            "item2": "Chegirma va yangilanish bildirishnomalari",
+            "item3": "Shaxsiylashtirilgan o'qish tavsiyalari"
+        },
+        "certificates": {
+            "title": "Yutuq isboti",
+            "subtitle": "Tugallangan kurs sertifikatlarini boshqaring va ulashing",
+            "item1": "Rasmiy sertifikat berish va yuklab olish",
+            "item2": "Bevosita LinkedIn profiliga qo'shish",
+            "item3": "Ishga kirishda ko'nikma isboti sifatida foydalanish"
+        },
+        "enrollments": {
+            "title": "O'qish safarining boshlanishi",
+            "subtitle": "Tuzilmali ta'lim orqali professional bo'ling",
+            "item1": "Bosqichma-bosqich progress kuzatuvi",
+            "item2": "Ekspert o'qituvchidan 1:1 fikr-mulohaza",
+            "item3": "Haqiqiy loyihalar bilan portfel yaratish"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "Professional onlayn o'qish platformasi",
+            "item1": "Yuqori sifatli onlayn kurslar",
+            "item2": "Tuzilmali o'qish boshqaruvi",
+            "item3": "Amaliyotga yo'naltirilgan o'quv dasturi"
+        }
+    },
     "notify": {
         "success": {
             "generic": "Muvaffaqiyatli",

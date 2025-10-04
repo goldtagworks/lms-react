@@ -155,10 +155,10 @@ export default function PaymentPage() {
 
                     {/* 결제 버튼 */}
                     <Group grow>
-                        <Button disabled={isProcessing} variant="outline" onClick={() => navigate(-1)}>
+                        <Button disabled={isProcessing} radius="md" size="sm" variant="outline" onClick={() => navigate(-1)}>
                             {t('common.cancel')}
                         </Button>
-                        <Button loading={isProcessing} onClick={handlePayment}>
+                        <Button loading={isProcessing} radius="md" size="sm" onClick={handlePayment}>
                             {t('payment.pay')} {formatPrice(epp.final_amount_cents, epp.currency)}
                         </Button>
                     </Group>

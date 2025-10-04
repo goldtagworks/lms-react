@@ -22,10 +22,10 @@ const ExamPage = () => {
                     <Text c="dimmed">
                         {t('exam.status')}: {t('exam.status.before')}
                     </Text>
-                    <Button color="primary" component={Link} size="sm" to={`/certificate/1`} variant="filled">
+                    <Button component={Link} radius="md" size="sm" to={`/certificate/1`} variant="filled">
                         {t('exam.completeToCertificate')}
                     </Button>
-                    <Button component={Link} size="sm" to={`/my`} variant="outline">
+                    <Button component={Link} radius="md" size="sm" to={`/my`} variant="outline">
                         {t('exam.backMyPage')}
                     </Button>
                 </Stack>

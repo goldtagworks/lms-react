@@ -396,6 +396,37 @@
             "featuredBadge": "Featured",
             "allCoursesLink": "View all courses ({{count}})"
         },
+        "hero": {
+            "apply": {
+                "title": "Apply as Instructor",
+                "subtitle": "Share your expertise with learners",
+                "li1": "Write a brief intro / links",
+                "li2": "Create courses after admin approval",
+                "li3": "Update your profile anytime"
+            },
+            "courses": {
+                "title": "Manage Courses",
+                "subtitle": "Manage course status & content in one place",
+                "li1": "Course list / featured setting",
+                "li2": "Summary · tags · preview management",
+                "li3": "Featured / pricing / extra meta roadmap"
+            },
+            "courseEdit": {
+                "newTitle": "Create New Course",
+                "editTitle": "Edit Course",
+                "subtitle": "Configure sections, lessons and meta info",
+                "li1": "Drag to reorder sections & lessons",
+                "li2": "Select one preview lesson",
+                "li3": "Snapshot base info & structure on save"
+            },
+            "profile": {
+                "title": "Instructor Profile",
+                "subtitle": "Public profile visible to learners",
+                "li1": "Linked from course cards & lists",
+                "li2": "Lightweight Markdown introduction",
+                "li3": "Highlight expertise via external links"
+            }
+        },
         "appApproved": "Approved application",
         "appRejected": "Rejected application",
         "appRevoked": "Revoked permission",
@@ -680,6 +711,43 @@
         "certificatesNoneAdmin": "No certificates issued yet.",
         "sortNoResults": "No results for sorting",
         "certificateIssueBlocked": "Cannot issue certificate as there are no ongoing courses."
+    },
+    "hero": {
+        "courses": {
+            "title": "Thousands of courses",
+            "subtitle": "Learn new skills with high-quality courses built by experts",
+            "item1": "Project-based, practical learning",
+            "item2": "Curriculum verified by industry experts",
+            "item3": "Complete roadmap connecting to employment"
+        },
+        "wishlist": {
+            "title": "Your learning plan",
+            "subtitle": "Save courses of interest and study systematically",
+            "item1": "Quick access to saved courses anytime",
+            "item2": "Receive discount and update notifications",
+            "item3": "Get personalized learning recommendations"
+        },
+        "certificates": {
+            "title": "Proof of achievement",
+            "subtitle": "Manage and share certificates of completed courses",
+            "item1": "Official certificate issuance & download",
+            "item2": "Add directly to your LinkedIn profile",
+            "item3": "Use as competency proof in hiring"
+        },
+        "enrollments": {
+            "title": "Start of your learning journey",
+            "subtitle": "Become a professional through structured learning",
+            "item1": "Step-by-step progress tracking",
+            "item2": "1:1 feedback from expert instructors",
+            "item3": "Build a portfolio with real projects"
+        },
+        "default": {
+            "title": "KSI LMS",
+            "subtitle": "Professional online learning platform",
+            "item1": "High-quality online lectures",
+            "item2": "Structured learning management",
+            "item3": "Practice-oriented curriculum"
+        }
     },
     "notify": {
         "success": {
