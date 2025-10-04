@@ -42,7 +42,7 @@ const InstructorProfilePage = () => {
     return (
         <AuthLayout hero={<InstructorHero variant="profile" />}>
             <Stack gap="xl">
-                <Card withBorder p="lg" radius="lg" shadow="sm">
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                     {!profile && (
                         <Group align="flex-start" gap="lg" wrap="nowrap">
                             <Skeleton circle h={96} w={96} />
@@ -96,7 +96,7 @@ const InstructorProfilePage = () => {
                 </Card>
                 <Divider label={t('instructor.profile.coursesDivider')} labelPosition="center" my="md" />
                 {curation.allCount === 0 && (
-                    <Card withBorder padding="lg" radius="lg">
+                    <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                         <Text c="dimmed" size="sm">
                             {t('instructor.profile.emptyCourses')}
                         </Text>
@@ -105,7 +105,7 @@ const InstructorProfilePage = () => {
                 {curation.allCount > 0 && (
                     <CourseGrid mt="md">
                         {curation.featured && (
-                            <Card key={curation.featured.id} withBorder p="lg" radius="lg" shadow="sm">
+                            <Card key={curation.featured.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                                 <AppImage alt={curation.featured.title} height={140} mb={12} radius="lg" src={curation.featured.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <Text fw={700} size="md">
@@ -136,7 +136,7 @@ const InstructorProfilePage = () => {
                             </Card>
                         )}
                         {curation.others.map((c) => (
-                            <Card key={c.id} withBorder p="lg" radius="lg" shadow="sm">
+                            <Card key={c.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                                 <AppImage alt={c.title} height={140} mb={12} radius="lg" src={c.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <Text fw={600} size="md">

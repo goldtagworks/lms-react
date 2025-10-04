@@ -59,7 +59,7 @@ export default function AdminExamsPage() {
                         </Stack>
                     </Alert>
                 ) : (
-                    <Card withBorder padding="lg" radius="md">
+                    <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                         <Table>
                             <Table.Thead>
                                 <Table.Tr>

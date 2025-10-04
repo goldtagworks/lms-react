@@ -51,7 +51,7 @@ export default function PasswordResetRequestPage() {
 
     return (
         <AuthLayout hero={<AuthHero variant="reset" />}>
-            <Card withBorder component="section" p="xl" radius="lg" shadow="md">
+            <Card withBorder component="section" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                 <Stack gap="md">
                     <div>
                         <Text fw={600} size="lg">

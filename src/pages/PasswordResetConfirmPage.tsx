@@ -69,7 +69,7 @@ export default function PasswordResetConfirmPage() {
     if (!accessToken || !refreshToken) {
         return (
             <AuthLayout hero={<AuthHero variant="reset" />}>
-                <Card withBorder component="section" p="xl" radius="lg" shadow="md">
+                <Card withBorder component="section" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                     <Alert color="red" title={t('errors.error')}>
                         {t('auth.reset.invalidLink')}
                     </Alert>
@@ -80,7 +80,7 @@ export default function PasswordResetConfirmPage() {
 
     return (
         <AuthLayout hero={<AuthHero variant="reset" />}>
-            <Card withBorder component="section" p="xl" radius="lg" shadow="md">
+            <Card withBorder component="section" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                 <Stack gap="md">
                     <div>
                         <Text fw={600} size="lg">

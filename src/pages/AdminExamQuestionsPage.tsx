@@ -356,7 +356,7 @@ export default function AdminExamQuestionsPage() {
                 </Group>
 
                 {/* 시험 정보 */}
-                <Card withBorder padding="lg" radius="md">
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                     <Stack gap="md">
                         <Group justify="space-between">
                             <Text fw={500} size="lg">
@@ -398,7 +398,7 @@ export default function AdminExamQuestionsPage() {
                         </Stack>
                     </Alert>
                 ) : (
-                    <Card withBorder padding="lg" radius="md">
+                    <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                         <Stack gap="md">
                             <Group justify="space-between">
                                 <Text fw={500} size="lg">

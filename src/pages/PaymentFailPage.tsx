@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Title, Text, Button, Stack, Alert } from '@mantine/core';
-import PageContainer from '@main/components/layout/PageContainer';
+import AuthLayout from '@main/components/auth/AuthLayout';
+import PaymentHero from '@main/components/payment/PaymentHero';
 import { tossPaymentService } from '@main/services/tossPaymentService';
 import { t } from '@main/lib/i18n';
 
@@ -53,8 +54,8 @@ const PaymentFailPage = (_: PaymentFailPageProps) => {
     };
 
     return (
-        <PageContainer>
-            <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
+        <AuthLayout hero={<PaymentHero variant="fail" />}>
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md" style={{ maxWidth: 600, margin: '0 auto' }}>
                 <Stack align="center" gap="lg">
                     {/* 실패 아이콘 */}
                     <div
@@ -110,7 +111,7 @@ const PaymentFailPage = (_: PaymentFailPageProps) => {
                     </Text>
                 </Stack>
             </Card>
-        </PageContainer>
+        </AuthLayout>
     );
 };
 

@@ -104,7 +104,7 @@ export default function LessonPlayerPage() {
             )}
 
             {/* 레슨 콘텐츠 */}
-            <Card withBorder mb="lg" p="lg" radius="lg" shadow="sm">
+            <Card withBorder mb="lg" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 {lesson.content_url ? (
                     <Box mb="md">
                         <Text c="dimmed" mb="xs" size="sm">

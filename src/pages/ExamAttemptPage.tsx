@@ -112,7 +112,7 @@ export default function ExamAttemptPage() {
     return (
         <PageContainer roleMain py={24} size="md">
             {/* 헤더 */}
-            <Card withBorder mb="md" padding="lg">
+            <Card withBorder mb="md" p={{ base: 'lg', md: 'xl' }}>
                 <Group align="center" justify="space-between">
                     <div>
                         <Title order={2}>{exam.title}</Title>
@@ -127,7 +127,7 @@ export default function ExamAttemptPage() {
             </Card>
 
             {/* 진행 상황 */}
-            <Card withBorder mb="md" padding="lg">
+            <Card withBorder mb="md" p={{ base: 'lg', md: 'xl' }}>
                 <Group justify="space-between" mb="xs">
                     <Text fw={500}>진행 상황</Text>
                     <Text c="dimmed">
@@ -145,7 +145,7 @@ export default function ExamAttemptPage() {
             </Stack>
 
             {/* 제출 버튼 */}
-            <Card withBorder mt="lg" padding="lg">
+            <Card withBorder mt="lg" p={{ base: 'lg', md: 'xl' }}>
                 <Group justify="space-between">
                     <Text>
                         답변한 문제: <strong>{answeredCount}</strong> / {totalQuestions}
@@ -223,7 +223,7 @@ function QuestionCard({ question, questionNumber, answer, onAnswerChange }: Ques
     };
 
     return (
-        <Card withBorder padding="lg">
+        <Card withBorder p={{ base: 'lg', md: 'xl' }}>
             <Stack>
                 <Group>
                     <Badge variant="light">문제 {questionNumber}</Badge>

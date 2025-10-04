@@ -6,7 +6,7 @@ import { useDashboardStats, useTopCourses, useActiveStudents, useExamStats } fro
 // 통계 카드 컴포넌트
 function StatCard({ title, value, icon: Icon, color = 'blue' }: { title: string; value: string | number; icon: any; color?: string }) {
     return (
-        <Card withBorder padding="lg" radius="md">
+        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
             <Group justify="space-between">
                 <Stack gap="xs">
                     <Text c="dimmed" size="sm">
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
                 <Grid>
                     {/* 인기 코스 */}
                     <Grid.Col span={{ base: 12, lg: 6 }}>
-                        <Card withBorder padding="lg" radius="md">
+                        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                             <Stack gap="md">
                                 <Title order={3}>인기 코스 TOP 5</Title>
                                 {coursesLoading ? (
@@ -125,7 +125,7 @@ export default function AdminDashboardPage() {
 
                     {/* 활성 학생 */}
                     <Grid.Col span={{ base: 12, lg: 6 }}>
-                        <Card withBorder padding="lg" radius="md">
+                        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                             <Stack gap="md">
                                 <Title order={3}>활성 학생 TOP 5</Title>
                                 {studentsLoading ? (
@@ -173,7 +173,7 @@ export default function AdminDashboardPage() {
                 </Grid>
 
                 {/* 시험 통계 */}
-                <Card withBorder padding="lg" radius="md">
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                     <Stack gap="md">
                         <Title order={3}>시험 통계</Title>
                         {examStatsLoading ? (

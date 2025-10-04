@@ -78,7 +78,7 @@ export default function ExamResultPage() {
 
     return (
         <PageContainer roleMain py={48} size="sm">
-            <Card withBorder padding="xl" radius="lg" shadow="sm">
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 <Stack align="center" gap="xl">
                     {/* 결과 헤더 */}
                     <Group>

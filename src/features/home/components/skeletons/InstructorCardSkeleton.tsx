@@ -3,7 +3,7 @@ import { Card, Skeleton, Stack } from '@mantine/core';
 
 function InstructorCardSkeletonBase() {
     return (
-        <Card withBorder miw={220} p="lg" radius="lg" shadow="sm">
+        <Card withBorder miw={220} p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
             <Skeleton circle h={80} mb={12} w={80} />
             <Stack gap={6}>
                 <Skeleton h={18} w="70%" />

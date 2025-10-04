@@ -51,7 +51,7 @@ export default function CertificatesPage() {
     if (!certificates || certificates.length === 0) {
         return (
             <HeroLayout hero={<EmptyStateHero variant="certificates" />}>
-                <Card withBorder p="lg" radius="lg" shadow="sm">
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                     <Alert color="blue" title={t('cert.page.emptyTitle')}>
                         <Text>{t('cert.page.emptyBody')}</Text>
                     </Alert>
@@ -67,7 +67,7 @@ export default function CertificatesPage() {
 
                 <Stack gap="md">
                     {certificates.map((certificate) => (
-                        <Card key={certificate.id} withBorder padding="lg" radius="md">
+                        <Card key={certificate.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                             <Stack gap="md">
                                 {/* 헤더 */}
                                 <Group align="flex-start" justify="space-between">

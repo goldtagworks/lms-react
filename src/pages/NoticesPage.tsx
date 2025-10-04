@@ -89,7 +89,7 @@ export default function NoticesPage() {
             {paged.length === 0 && <EmptyState message={t('empty.notices')} />}
             <Stack gap="md">
                 {paged.map((n) => (
-                    <Card key={n.id} withBorder aria-label={n.title} component="article" radius="lg" shadow="sm" style={{ cursor: 'pointer' }}>
+                    <Card key={n.id} withBorder aria-label={n.title} component="article" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm" style={{ cursor: 'pointer' }}>
                         <Group align="flex-start" justify="space-between">
                             <Stack gap={4} style={{ flex: 1 }} onClick={() => navigate(`/notices/${n.id}`)}>
                                 <Group gap="xs">

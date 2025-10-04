@@ -12,7 +12,7 @@ const ExamPage = () => {
     // NOTE: 실제 구현 시 URL param 기반 시험/attempt fetch로 교체
     return (
         <PageContainer roleMain py={48} size="sm">
-            <Card withBorder padding="xl" radius="lg" shadow="sm">
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 <Stack>
                     <Title order={2}>{t('exam.pageTitle')}</Title>
                     <Text fw={700}>{placeholderExam.courseTitle}</Text>

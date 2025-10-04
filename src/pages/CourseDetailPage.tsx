@@ -348,7 +348,7 @@ export default function CourseDetailPage() {
         if (!embed) return null;
 
         return (
-            <Card withBorder mb="lg" p="md" radius="lg" shadow="sm">
+            <Card withBorder mb="lg" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 <TextTitle c="blue.6" fw={600} mb={8}>
                     {t('course.detail.preview.title')}
                 </TextTitle>
@@ -435,7 +435,7 @@ export default function CourseDetailPage() {
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
                 {/* 좌측: 썸네일/가격/수강신청 */}
                 <Box>
-                    <Card withBorder p="xl" radius="lg" shadow="sm">
+                    <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                         <AppImage alt={course.title} height={220} mb={16} radius="lg" src={course.thumbnail_url || ''} />
                         <Group gap={4} mb={8}>
                             {course.tags?.map((tag) => (
@@ -482,7 +482,7 @@ export default function CourseDetailPage() {
                         </Button>
                     </Card>
                     {/* 강사 정보 */}
-                    <Card withBorder mt="lg" p="lg" radius="lg" shadow="sm">
+                    <Card withBorder mt="lg" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                         <Group align="center" gap={16}>
                             <Avatar radius="xl" size={56} src={''} />
                             <Box>
@@ -627,7 +627,7 @@ export default function CourseDetailPage() {
             </SimpleGrid>
             <PageSection withGapTop headingOrder={2} title={t('course.detail.marketingSection.sectionTitle')}>
                 {marketingCopy?.headline || marketingCopy?.body_md ? (
-                    <Card withBorder p="lg" radius="lg" shadow="sm">
+                    <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                         {marketingCopy?.headline && (
                             <Text fw={700} mb={8} size="lg">
                                 {marketingCopy.headline}

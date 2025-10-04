@@ -107,7 +107,7 @@ export default function AdminExamEditPage() {
                     <Title order={1}>시험 수정</Title>
                 </Group>
 
-                <Card withBorder padding="xl" radius="md">
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                     <form onSubmit={form.onSubmit(handleSubmit)}>
                         <Stack gap="lg">
                             <Select disabled data={courseOptions} description="코스는 변경할 수 없습니다" label="대상 코스" value={exam.courseId} />

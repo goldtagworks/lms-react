@@ -43,7 +43,7 @@ export function InstructorApplyPage() {
 
     return (
         <AuthLayout hero={<InstructorHero variant="apply" />}>
-            <Card withBorder p="xl" radius="lg" shadow="md">
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                 <Stack gap="lg">
                     <Stack gap={4}>
                         <Group justify="space-between">

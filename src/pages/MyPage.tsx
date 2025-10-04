@@ -31,14 +31,12 @@ export default function MyPage() {
     if (userId && enrolledCourses.length === 0) {
         return (
             <HeroLayout hero={<EmptyStateHero variant="enrollments" />}>
-                <Card withBorder p="lg" radius="lg" shadow="sm">
-                    <EmptyState
-                        actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}
-                        message={t('empty.enrollmentsNone', {}, '아직 수강중인 강의가 없습니다.')}
-                        title={t('empty.enrollmentsEmpty', {}, '수강중 강의 없음')}
-                        to="/courses"
-                    />
-                </Card>
+                <EmptyState
+                    actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}
+                    message={t('empty.enrollmentsNone', {}, '아직 수강중인 강의가 없습니다.')}
+                    title={t('empty.enrollmentsEmpty', {}, '수강중 강의 없음')}
+                    to="/courses"
+                />
             </HeroLayout>
         );
     }
@@ -69,7 +67,7 @@ export default function MyPage() {
                 )}
                 title={t('nav.myPage', {}, '마이페이지')}
             />
-            <Card withBorder p="lg" radius="lg" shadow="sm">
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
@@ -88,7 +86,7 @@ export default function MyPage() {
                                 const enrolled = isEnrolled(userId!, course.id);
 
                                 return (
-                                    <Card key={course.id} withBorder p="lg" radius="lg" shadow="sm">
+                                    <Card key={course.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                                         <AppImage alt={course.title} height={140} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                         <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                             <Text fw={700} size="md">

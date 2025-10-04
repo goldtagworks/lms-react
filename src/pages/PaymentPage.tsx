@@ -5,7 +5,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Title, Text, Button, Group, Stack, Alert, Loader, Divider } from '@mantine/core';
-import PageContainer from '@main/components/layout/PageContainer';
+import AuthLayout from '@main/components/auth/AuthLayout';
+import PaymentHero from '@main/components/payment/PaymentHero';
 import { useAuth } from '@main/lib/auth';
 import { useCourse } from '@main/lib/repository';
 import { calculateEPP, formatPrice, calculateDiscountPercent } from '@main/features/payments/epp';
@@ -34,9 +35,9 @@ export default function PaymentPage() {
 
     if (!user || !course) {
         return (
-            <PageContainer roleMain py={48}>
+            <AuthLayout hero={<PaymentHero variant="pay" />}>
                 <Loader />
-            </PageContainer>
+            </AuthLayout>
         );
     }
 
@@ -82,8 +83,8 @@ export default function PaymentPage() {
     };
 
     return (
-        <PageContainer roleMain py={48}>
-            <Card withBorder p="xl" radius="lg" shadow="sm" style={{ maxWidth: 500, margin: '0 auto' }}>
+        <AuthLayout hero={<PaymentHero variant="pay" />}>
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
                 <Stack gap="lg">
                     <div>
                         <Title order={2}>{t('payment.title')}</Title>
@@ -154,7 +155,7 @@ export default function PaymentPage() {
                     {error && <Alert color="red">{error}</Alert>}
 
                     {/* 결제 버튼 */}
-                    <Group grow>
+                    <Group grow mt="md">
                         <Button disabled={isProcessing} radius="md" size="sm" variant="outline" onClick={() => navigate(-1)}>
                             {t('common.cancel')}
                         </Button>
@@ -168,6 +169,6 @@ export default function PaymentPage() {
                     </Text>
                 </Stack>
             </Card>
-        </PageContainer>
+        </AuthLayout>
     );
 }

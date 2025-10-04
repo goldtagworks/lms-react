@@ -36,7 +36,7 @@ function InstructorsSectionBase({ instructors, title, limit }: InstructorsSectio
                             key={i.user_id}
                             withBorder
                             aria-label={t('a11y.instructorCard', { name: i.name }, `${i.name} 강사`)}
-                            p="lg"
+                            p={{ base: 'lg', md: 'xl' }}
                             radius="md"
                             shadow="sm"
                             style={{

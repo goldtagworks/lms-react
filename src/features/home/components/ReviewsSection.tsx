@@ -66,7 +66,7 @@ function ReviewsSectionBase({ reviews, title = undefined, limit = 6 }: ReviewsSe
                     const displayComment = !r.comment ? '' : showFull || !isLong ? r.comment : r.comment.slice(0, 180) + '…';
 
                     return (
-                        <Card key={r.id} withBorder aria-labelledby={`review-${r.id}-user`} component="article" p="lg" radius="lg" shadow="sm">
+                        <Card key={r.id} withBorder aria-labelledby={`review-${r.id}-user`} component="article" p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                             <Group justify="space-between" mb={4}>
                                 <TextBody fw={700} sizeOverride="sm">
                                     {r.user_name || r.user_id}

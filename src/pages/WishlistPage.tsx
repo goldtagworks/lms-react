@@ -42,14 +42,12 @@ export default function WishlistPage() {
     if (userId && wishlist.length === 0) {
         return (
             <HeroLayout hero={<EmptyStateHero variant="wishlist" />}>
-                <Card withBorder p="lg" radius="lg" shadow="sm">
-                    <EmptyState
-                        actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}
-                        message={t('empty.wishlistNone', {}, '아직 찜한 강의가 없습니다.')}
-                        title={t('empty.wishlistEmpty', {}, '찜한 강의 없음')}
-                        to="/courses"
-                    />
-                </Card>
+                <EmptyState
+                    actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}
+                    message={t('empty.wishlistNone', {}, '아직 찜한 강의가 없습니다.')}
+                    title={t('empty.wishlistEmpty', {}, '찜한 강의 없음')}
+                    to="/courses"
+                />
             </HeroLayout>
         );
     }
@@ -57,7 +55,7 @@ export default function WishlistPage() {
     return (
         <PageContainer roleMain>
             <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('common.favorite.add', {}, '찜')} />
-            <Card withBorder p="lg" radius="lg" shadow="sm">
+            <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                 <Stack gap="md">
                     <Group align="center" justify="space-between">
                         <Text fw={700} size="lg">
@@ -76,7 +74,7 @@ export default function WishlistPage() {
                                 const wish = userId ? isWishlisted(userId, course.id) : false;
 
                                 return (
-                                    <Card key={course.id} withBorder p="lg" radius="lg" shadow="sm">
+                                    <Card key={course.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                                         <AppImage alt={course.title} height={120} mb={12} radius="lg" src={course.thumbnail_url || ''} />
                                         <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                             <Text fw={700} size="md">

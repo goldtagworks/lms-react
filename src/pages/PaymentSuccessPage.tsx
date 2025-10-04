@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Title, Text, Button, Stack, Alert, Loader, Center } from '@mantine/core';
-import PageContainer from '@main/components/layout/PageContainer';
+import AuthLayout from '@main/components/auth/AuthLayout';
+import PaymentHero from '@main/components/payment/PaymentHero';
 import { tossPaymentService } from '@main/services/tossPaymentService';
 import { t } from '@main/lib/i18n';
 import { useCourse } from '@main/lib/repository';
@@ -82,7 +83,7 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
 
     if (isConfirming) {
         return (
-            <PageContainer>
+            <AuthLayout hero={<PaymentHero variant="success" />}>
                 <Center style={{ minHeight: '400px' }}>
                     <Stack align="center" gap="md">
                         <Loader size="lg" />
@@ -92,33 +93,32 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                         </Text>
                     </Stack>
                 </Center>
-            </PageContainer>
+            </AuthLayout>
         );
     }
 
     if (error) {
         return (
-            <PageContainer>
-                <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
+            <AuthLayout hero={<PaymentHero variant="success" />}>
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md" style={{ maxWidth: 600, margin: '0 auto' }}>
                     <Stack align="center" gap="md">
                         <Alert color="red" radius="md" title={t('payment.error.title')} w="100%">
                             {error}
                         </Alert>
-                        <Button radius="md" size="sm" variant="outline" onClick={() => navigate('/courses')}>
+                        <Button fullWidth radius="md" size="sm" variant="outline" onClick={() => navigate('/courses')}>
                             {t('common.backToCourses')}
                         </Button>
                     </Stack>
                 </Card>
-            </PageContainer>
+            </AuthLayout>
         );
     }
 
     if (isConfirmed) {
         return (
-            <PageContainer>
-                <Card withBorder padding="xl" radius="lg" style={{ maxWidth: 600, margin: '0 auto' }}>
+            <AuthLayout hero={<PaymentHero variant="success" />}>
+                <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md" style={{ maxWidth: 600, margin: '0 auto' }}>
                     <Stack align="center" gap="lg">
-                        {/* 성공 아이콘 */}
                         <div
                             style={{
                                 backgroundColor: 'var(--mantine-color-green-light)',
@@ -131,8 +131,6 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                         >
                             ✓
                         </div>
-
-                        {/* 성공 메시지 */}
                         <Stack align="center" gap="xs">
                             <Title c="green" order={2}>
                                 {t('payment.success.title')}
@@ -141,10 +139,8 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                                 {t('payment.success.message')}
                             </Text>
                         </Stack>
-
-                        {/* 코스 정보 */}
                         {course && (
-                            <Card bg="gray.0" padding="md" radius="sm" w="100%">
+                            <Card bg="gray.0" p={{ base: 'lg', md: 'xl' }} radius="sm" shadow="md" w="100%">
                                 <Stack gap="xs">
                                     <Text c="dimmed" fw={600} size="sm">
                                         {t('payment.success.enrolledCourse')}
@@ -158,8 +154,6 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                                 </Stack>
                             </Card>
                         )}
-
-                        {/* 액션 버튼 */}
                         <Stack gap="sm" w="100%">
                             {courseId && (
                                 <Button fullWidth radius="md" size="sm" onClick={handleGoToCourse}>
@@ -170,14 +164,12 @@ const PaymentSuccessPage = (_: PaymentSuccessPageProps) => {
                                 {t('payment.success.goToMyCourses')}
                             </Button>
                         </Stack>
-
-                        {/* 추가 안내 */}
                         <Text c="dimmed" size="sm" ta="center">
                             {t('payment.success.additionalInfo')}
                         </Text>
                     </Stack>
                 </Card>
-            </PageContainer>
+            </AuthLayout>
         );
     }
 

@@ -19,7 +19,7 @@ function CourseCardBase({ course, to }: CourseCardProps) {
     const hasDiscount = !!course.sale_price_cents && course.sale_price_cents < course.list_price_cents;
 
     return (
-        <Card withBorder p="lg" radius="lg" shadow="md">
+        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
             {course.thumbnail_url && <AppImage alt={course.title} height={160} mb="md" radius="lg" src={course.thumbnail_url || ''} width="100%" />}
 
             <Title mb={4} order={4} size="md">

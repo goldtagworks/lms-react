@@ -18,7 +18,7 @@ function SupportSectionBase({ title, email = 'help@example.com', phone = '02-000
     const finalTitle = title || t('home.support.title');
     const finalHours = hours || t('home.support.hours');
     const content = (
-        <Card withBorder radius="lg">
+        <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="md">
             <Group align="center" justify="space-between">
                 <div>
                     <Title mb="sm" order={3}>

@@ -966,6 +966,36 @@
             "unknown": "មានកំហុសមិនស្គាល់កើតឡើង"
         }
     },
+    "paymentHero": {
+        "enroll": {
+            "title": "Course enrollment",
+            "subtitle": "Review key information before starting your learning",
+            "li1": "Free courses start immediately",
+            "li2": "Paid courses enroll after secure payment",
+            "li3": "Manage progress in My Page & learning room"
+        },
+        "pay": {
+            "title": "Proceed to payment",
+            "subtitle": "Double‑check final amount and discounts applied",
+            "li1": "Coupon / sale reflected",
+            "li2": "Secure payment processing environment",
+            "li3": "Instant enrollment after approval"
+        },
+        "success": {
+            "title": "Payment completed",
+            "subtitle": "Your enrollment has been processed successfully",
+            "li1": "Start the course right away",
+            "li2": "Check payment & enrollment history in My Page",
+            "li3": "Certificates available after completion/pass"
+        },
+        "fail": {
+            "title": "Payment failed",
+            "subtitle": "The payment was not processed successfully",
+            "li1": "Retry or use another method",
+            "li2": "Verify card limit / expiration",
+            "li3": "Contact support if it persists"
+        }
+    },
     "notFound": {
         "title": "ទំព័រមិនអាចរកឃើញបាន",
         "message": "វាមិនមានឬត្រូវបានផ្លាស់ទី។ សូមបន្តស្វែងរកតាមរយៈតំណភ្ជាប់ដែលបានណែនាំខាងក្រោម។",

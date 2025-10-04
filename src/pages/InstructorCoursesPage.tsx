@@ -42,7 +42,7 @@ const InstructorCoursesPage = () => {
                 {data && data.total > 0 && (
                     <CourseGrid mt="md">
                         {data.items.map((c: any) => (
-                            <Card key={c.id} withBorder p="lg" radius="lg" shadow="sm">
+                            <Card key={c.id} withBorder p={{ base: 'lg', md: 'xl' }} radius="lg" shadow="sm">
                                 <AppImage alt={c.title} height={120} mb={12} radius="lg" src={c.thumbnail_url || ''} />
                                 <Group align="center" justify="space-between" mb={4} wrap="nowrap">
                                     <Text fw={600} lineClamp={1} size="sm">
