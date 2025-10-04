@@ -5,11 +5,13 @@ import { useForm } from '@mantine/form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stack, Title, Card, TextInput, Textarea, NumberInput, Button, Group, Alert, Select, Loader, Text } from '@mantine/core';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useI18n } from '@main/lib/i18n';
 import PageContainer from '@main/components/layout/PageContainer';
 import { useExamWithQuestions, useUpdateExam } from '@main/hooks/useExamManagement';
 import { useCoursesForExam } from '@main/hooks/useCourses';
 
 export default function AdminExamEditPage() {
+    const { t } = useI18n();
     const { examId } = useParams();
     const navigate = useNavigate();
     const { data: exam, isLoading, error } = useExamWithQuestions(examId || '');
@@ -34,14 +36,14 @@ export default function AdminExamEditPage() {
             timeLimitMinutes: 30
         },
         validate: {
-            title: (value) => (!value ? '시험 제목을 입력해주세요' : null),
+            title: (value) => (!value ? t('examAdmin.create.validate.titleRequired') : null),
             passScore: (value) => {
-                if (value && (value < 0 || value > 100)) return '합격 점수는 0-100 사이여야 합니다';
+                if (value && (value < 0 || value > 100)) return t('examAdmin.create.validate.passScoreRange');
 
                 return null;
             },
             timeLimitMinutes: (value) => {
-                if (value && value <= 0) return '제한 시간은 양수여야 합니다';
+                if (value && value <= 0) return t('examAdmin.create.validate.timeLimitPositive');
 
                 return null;
             }
@@ -69,7 +71,7 @@ export default function AdminExamEditPage() {
             navigate('/admin/exams');
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('시험 수정 오류:', error);
+            console.error(t('examAdmin.errors.generic'), error);
         } finally {
             setIsSubmitting(false);
         }
@@ -80,7 +82,7 @@ export default function AdminExamEditPage() {
             <PageContainer roleMain py={48}>
                 <Group>
                     <Loader size="sm" />
-                    <Text>시험 정보를 불러오는 중...</Text>
+                    <Text>{t('examAdmin.common.loadingOne')}</Text>
                 </Group>
             </PageContainer>
         );
@@ -89,8 +91,8 @@ export default function AdminExamEditPage() {
     if (error || !exam) {
         return (
             <PageContainer roleMain py={48}>
-                <Alert color="red" title="오류가 발생했습니다">
-                    시험을 찾을 수 없습니다.
+                <Alert color="red" title={t('examAdmin.errors.generic')}>
+                    {t('examAdmin.common.notFound')}
                 </Alert>
             </PageContainer>
         );
@@ -102,48 +104,63 @@ export default function AdminExamEditPage() {
                 {/* 헤더 */}
                 <Group>
                     <Button leftSection={<ArrowLeft size={16} />} variant="subtle" onClick={() => navigate('/admin/exams')}>
-                        시험 목록으로
+                        {t('examAdmin.common.backToList')}
                     </Button>
-                    <Title order={1}>시험 수정</Title>
+                    <Title order={1}>{t('examAdmin.edit.pageTitle')}</Title>
                 </Group>
 
                 <Card withBorder p={{ base: 'lg', md: 'xl' }} radius="md" shadow="md">
                     <form onSubmit={form.onSubmit(handleSubmit)}>
                         <Stack gap="lg">
-                            <Select disabled data={courseOptions} description="코스는 변경할 수 없습니다" label="대상 코스" value={exam.courseId} />
+                            <Select disabled data={courseOptions} description={t('examAdmin.create.field.course')} label={t('examAdmin.create.field.course')} value={exam.courseId} />
 
                             {/* 시험 제목 */}
-                            <TextInput required label="시험 제목" placeholder="예: 프로그래밍 기초 이해도 평가" {...form.getInputProps('title')} />
+                            <TextInput required label={t('examAdmin.create.field.title')} placeholder={t('examAdmin.create.field.titlePlaceholder')} {...form.getInputProps('title')} />
 
                             {/* 시험 설명 */}
-                            <Textarea label="시험 설명" placeholder="시험에 대한 간단한 설명을 입력하세요 (Markdown 지원)" rows={4} {...form.getInputProps('descriptionMd')} />
+                            <Textarea label={t('examAdmin.create.field.desc')} placeholder={t('examAdmin.create.field.descPlaceholder')} rows={4} {...form.getInputProps('descriptionMd')} />
 
                             {/* 설정 */}
                             <Group grow>
-                                <NumberInput required label="합격 점수" max={100} min={0} placeholder="70" suffix="점" {...form.getInputProps('passScore')} />
-                                <NumberInput description="비워두면 무제한" label="제한 시간" min={1} placeholder="30" suffix="분" {...form.getInputProps('timeLimitMinutes')} />
+                                <NumberInput
+                                    required
+                                    label={t('examAdmin.create.field.passScore')}
+                                    max={100}
+                                    min={0}
+                                    placeholder="70"
+                                    suffix={t('examAdmin.table.scoreSuffix', { value: '' }, '점').replace(/\d+/g, '')}
+                                    {...form.getInputProps('passScore')}
+                                />
+                                <NumberInput
+                                    description={t('examAdmin.create.field.timeLimitDesc')}
+                                    label={t('examAdmin.create.field.timeLimit')}
+                                    min={1}
+                                    placeholder="30"
+                                    suffix={t('examAdmin.table.minutesSuffix', { value: '' }, '분').replace(/\d+/g, '')}
+                                    {...form.getInputProps('timeLimitMinutes')}
+                                />
                             </Group>
 
                             {/* 문제 수 표시 */}
-                            <Alert color="blue" title="현재 시험 정보">
+                            <Alert color="blue" title={t('examAdmin.edit.currentInfoTitle')}>
                                 <Stack gap="xs">
-                                    <div>• 등록된 문제 수: {exam.questionCount}문제</div>
-                                    <div>• 수정사항은 즉시 반영됩니다.</div>
-                                    <div>• 문제 관리는 별도 페이지에서 진행하세요.</div>
+                                    <div>• {t('examAdmin.edit.liQuestionsCount', { count: exam.questionCount })}</div>
+                                    <div>• {t('examAdmin.edit.liImmediate')}</div>
+                                    <div>• {t('examAdmin.edit.liManageSeparate')}</div>
                                 </Stack>
                             </Alert>
 
                             {/* 제출 버튼 */}
                             <Group justify="space-between">
                                 <Button variant="outline" onClick={() => navigate(`/admin/exams/${exam.id}/questions`)}>
-                                    문제 관리
+                                    {t('examAdmin.common.goQuestions')}
                                 </Button>
                                 <Group>
                                     <Button variant="outline" onClick={() => navigate('/admin/exams')}>
-                                        취소
+                                        {t('examAdmin.create.cancel')}
                                     </Button>
                                     <Button leftSection={<Save size={16} />} loading={isSubmitting} type="submit">
-                                        수정 완료
+                                        {t('examAdmin.edit.submit')}
                                     </Button>
                                 </Group>
                             </Group>

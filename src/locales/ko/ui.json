@@ -517,6 +517,23 @@
         "pass": "합격",
         "fail": "불합격"
     },
+    "examResult": {
+        "loading": "결과를 확인하는 중...",
+        "notFoundTitle": "결과를 찾을 수 없습니다",
+        "notFoundBody": "시험 결과를 불러올 수 없습니다.",
+        "passCriteria": "합격 기준: {{score}}점",
+        "congrats": "축하합니다!",
+        "retry": "다시 도전하세요",
+        "examTitleLabel": "시험명",
+        "totalQuestions": "총 문제 수",
+        "correctCount": "정답 수",
+        "accuracyRate": "정답률",
+        "goCertificate": "수료증 확인하기",
+        "issueCertificate": "수료증 발급받기",
+        "goMyPage": "마이페이지로",
+        "retryTitle": "재응시 안내",
+        "retryBody": "24시간 후 재응시가 가능합니다. 복습 후 다시 도전해보세요!"
+    },
     "certificate": {
         "title": "수료증",
         "pageDesc": "수료증 상세입니다. 검증 코드 및 시험 세부 이력이 표시됩니다.",
@@ -533,6 +550,8 @@
         "issuedDateLabel": "발급일",
         "scoreAndPass": "점수 / 합격기준",
         "scoreUnit": "점",
+        "minutesUnit": "분",
+        "questionsUnit": "문제",
         "examTitle": "시험명",
         "pdfDownload": "PDF 다운로드",
         "copy": "복사",
@@ -1012,6 +1031,169 @@
             "score": "점수: {{score}}점",
             "pdfDownload": "PDF 다운로드",
             "viewCourse": "강의 보기"
+        }
+    },
+    "dashboard": {
+        "title": "관리자 대시보드",
+        "loading": "로딩 중...",
+        "totalCourses": "총 코스 수",
+        "totalStudents": "총 학생 수",
+        "totalRevenue": "총 매출",
+        "certificatesIssued": "발급된 수료증",
+        "newEnrollmentsThisMonth": "이번 달 신규 등록",
+        "activeExams": "활성 시험",
+        "topCourses": "인기 코스 TOP 5",
+        "topActiveStudents": "활성 학생 TOP 5",
+        "courseTitle": "코스명",
+        "instructor": "강사",
+        "enrollments": "등록자",
+        "revenue": "매출",
+        "personSuffix": "명",
+        "currencySuffix": "원",
+        "noData": "데이터 없음",
+        "noCoursesYet": "아직 등록된 코스가 없습니다.",
+        "studentName": "학생명",
+        "courseCount": "수강 수",
+        "certificates": "수료증",
+        "countSuffix": "개",
+        "noStudentsYet": "아직 등록된 학생이 없습니다.",
+        "examStats": "시험 통계",
+        "examTitle": "시험명",
+        "course": "코스",
+        "attemptCount": "응시 횟수",
+        "avgScore": "평균 점수",
+        "passRate": "합격률",
+        "timesSuffix": "회",
+        "scoreSuffix": "점",
+        "noExamsYet": "아직 등록된 시험이 없습니다."
+    },
+    "examAdmin": {
+        "common": {
+            "title": "시험 관리",
+            "backToList": "시험 목록으로",
+            "goQuestions": "문제 관리",
+            "notFound": "시험을 찾을 수 없습니다.",
+            "loadingList": "시험 목록을 불러오는 중...",
+            "loadingOne": "시험 정보를 불러오는 중...",
+            "loadingQuestions": "문제 목록을 불러오는 중...",
+            "createNew": "새 시험 만들기",
+            "noExamsTitle": "시험이 없습니다",
+            "noExamsBody": "아직 생성된 시험이 없습니다. 새 시험을 만들어보세요!",
+            "actions": "작업"
+        },
+        "table": {
+            "name": "시험명",
+            "course": "코스",
+            "questionCount": "문제 수",
+            "passScore": "합격 점수",
+            "timeLimit": "제한 시간",
+            "unlimited": "무제한",
+            "minutesSuffix": "{{value}}분",
+            "questionsSuffix": "{{value}}문제",
+            "scoreSuffix": "{{value}}점"
+        },
+        "create": {
+            "pageTitle": "새 시험 만들기",
+            "toList": "시험 목록으로",
+            "field": {
+                "course": "대상 코스",
+                "title": "시험 제목",
+                "titlePlaceholder": "예: 프로그래밍 기초 이해도 평가",
+                "desc": "시험 설명",
+                "descPlaceholder": "시험에 대한 간단한 설명을 입력하세요 (Markdown 지원)",
+                "passScore": "합격 점수",
+                "timeLimit": "제한 시간",
+                "timeLimitDesc": "비워두면 무제한"
+            },
+            "validate": {
+                "selectCourse": "코스를 선택해주세요",
+                "titleRequired": "시험 제목을 입력해주세요",
+                "passScoreRange": "합격 점수는 0-100 사이여야 합니다",
+                "timeLimitPositive": "제한 시간은 양수여야 합니다"
+            },
+            "guide": {
+                "title": "안내",
+                "li1": "시험을 생성한 후 문제를 추가할 수 있습니다.",
+                "li2": "합격 점수는 학생이 수료증을 받기 위한 최소 점수입니다.",
+                "li3": "제한 시간을 비워두면 시간 제한 없이 응시할 수 있습니다."
+            },
+            "submitCreateAndAdd": "시험 생성 후 문제 추가",
+            "cancel": "취소"
+        },
+        "edit": {
+            "pageTitle": "시험 수정",
+            "currentInfoTitle": "현재 시험 정보",
+            "liQuestionsCount": "등록된 문제 수: {{count}}문제",
+            "liImmediate": "수정사항은 즉시 반영됩니다.",
+            "liManageSeparate": "문제 관리는 별도 페이지에서 진행하세요.",
+            "submit": "수정 완료"
+        },
+        "questions": {
+            "pageTitle": "문제 관리",
+            "addQuestion": "문제 추가",
+            "addQuestionModal": "새 문제 추가",
+            "editQuestionModal": "문제 수정",
+            "infoTitle": "시험 정보",
+            "infoEdit": "시험 정보 수정",
+            "badgeQuestions": "{{count}}문제",
+            "badgePassScore": "합격 점수: {{score}}점",
+            "badgeTimeLimit": "제한 시간: {{minutes}}분",
+            "listSection": "문제 목록 ({{count}}문제)",
+            "totalPoints": "총 {{points}}점",
+            "emptyTitle": "문제가 없습니다",
+            "emptyBody": "아직 등록된 문제가 없습니다. 첫 번째 문제를 추가해보세요!",
+            "emptyAdd": "문제 추가하기",
+            "table": {
+                "number": "#",
+                "question": "문제",
+                "type": "유형",
+                "points": "배점",
+                "actions": "작업"
+            },
+            "form": {
+                "type": "문제 유형",
+                "text": "문제 내용",
+                "textPlaceholder": "문제를 입력하세요...",
+                "choices": "선택지",
+                "choicePlaceholder": "선택지 {{index}}",
+                "correctSingle": "정답 (단일 선택)",
+                "correctMultiple": "정답 (복수 선택 가능)",
+                "correctMultiplePlaceholder": "정답을 모두 선택하세요",
+                "correctShort": "정답",
+                "correctShortPlaceholder": "정답을 입력하세요",
+                "points": "배점",
+                "pointsSuffix": "점",
+                "cancel": "취소",
+                "submitCreate": "문제 추가",
+                "submitEdit": "수정 완료"
+            },
+            "validate": {
+                "textRequired": "문제 내용을 입력해주세요",
+                "correctRequired": "정답을 입력해주세요",
+                "choicesMin": "최소 2개의 선택지를 입력해주세요",
+                "pointsMin": "점수는 1점 이상이어야 합니다"
+            },
+            "confirmDelete": {
+                "title": "문제 삭제",
+                "bodyPrompt": "다음 문제를 삭제하시겠습니까?",
+                "warnTitle": "주의사항",
+                "warnBody": "삭제된 문제는 복구할 수 없습니다.",
+                "confirm": "삭제",
+                "cancel": "취소"
+            },
+            "type": {
+                "single": "객관식 (단일 선택)",
+                "multiple": "객관식 (복수 선택)",
+                "short": "단답형"
+            }
+        },
+        "deleteExam": {
+            "confirm": "시험 \"{{title}}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+            "error": "시험 삭제 오류:"
+        },
+        "errors": {
+            "loadList": "시험 목록을 불러오는 중 오류가 발생했습니다.",
+            "generic": "오류가 발생했습니다"
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-    "__meta": "ネスト構造（i18nローダーフラット） - 既存のキー パスを維持",
+    "__meta": "Nested structure (i18n loader flatten) - Maintain existing key path",
     "image": { "error": "画像エラー" },
     "link": { "label": "リンク" },
     "markdown": { "empty": "コンテンツがありません。" },
@@ -9,7 +9,7 @@
     "user": { "fallbackName": "ユーザー" },
     "linking": {},
     "a11y": {
-        "devQuickNav": "開発者クイックナビゲーションパネル",
+        "devQuickNav": "開発者用クイックナビゲーションパネル",
         "collapse": "折りたたむ",
         "expand": "展開",
         "panelCollapse": "パネルを折りたたむ",
@@ -28,10 +28,10 @@
         "roleFilter": "役割フィルター",
         "categorySelect": "カテゴリ選択",
         "searchCertificatePlaceholder": "証明書を検索",
-        "searchPlaceholder": "検索語句を入力",
-        "sortSelect": "並べ替え",
+        "searchPlaceholder": "検索語を入力",
+        "sortSelect": "並び替え",
         "admin": {
-            "activateToggle": "アクティブ/非アクティブ トグル",
+            "activateToggle": "アクティブ/非アクティブ切替",
             "categoryNameInput": "カテゴリ名を入力",
             "codeSearch": "コード検索",
             "filterActive": "アクティブステータスフィルター",
@@ -81,14 +81,14 @@
     },
     "faq": {
         "title": "よくある質問",
-        "subtitle": "学習または支払いの前によくある質問を確認してください。",
-        "more": "追加の質問については、1:1のお問い合わせをご利用ください。",
+        "subtitle": "学習や支払いの前に、よくある質問を確認してください。",
+        "more": "追加の質問がある場合は、1:1お問い合わせをご利用ください。",
         "empty": "登録されたFAQ項目はありません。",
         "searchPlaceholder": "質問を検索...",
         "searchAria": "FAQ検索",
         "items": {
             "payments": { "question": "支払いに関するよくある質問" },
-            "getting-started": { "question": "はじめに: メンバーシップと最初のコース手続き" },
+            "getting-started": { "question": "始め方：メンバーシップと最初のコース手続き" },
             "refunds": { "question": "返金ポリシーと条件" }
         },
         "meta": {
@@ -107,14 +107,14 @@
         "signUp": "サインアップ",
         "signOut": "ログアウト",
         "forgot": "パスワードをリセット",
-        "subtitleSignIn": "登録済みのメールアドレスとパスワードでログインします。",
+        "subtitleSignIn": "登録済みのメールアドレスとパスワードでログインしてください。",
         "subtitleSignUp": "簡単な情報を入力するだけで、すぐに学習を開始できます。",
         "changeTitle": "パスワードを変更",
         "changeSubtitle": "現在のパスワードを確認後、新しいパスワードに変更します。",
         "resetTitle": "パスワードリセットをリクエスト",
         "resetSubtitle": "登録時に使用したメールアドレスを入力すると、リセットリンクをお送りします。",
         "hero": {
-            "signIn": "信頼できる学習アカウントですぐに始めましょう",
+            "signIn": "信頼できる学習アカウントですぐに始める",
             "signUp": "アカウントを作成して数秒で学習を開始",
             "reset": "メールでパスワードリセット手順を受け取る",
             "change": "新しいパスワードに変更"
@@ -125,9 +125,9 @@
             "change": { "1": "現在のパスワードを確認", "2": "新しいパスワードを入力", "3": "即時反映" }
         },
         "reset": {
-            "emailPlaceholder": "メールアドレスを入力",
-            "emailPrompt": "登録済みのメールアドレスを入力",
-            "sent": { "title": "リセットメールを送信しました", "desc": "受信トレイを確認し、新しいパスワードを設定するための手順に従ってください。" },
+            "emailPlaceholder": "メールを入力",
+            "emailPrompt": "登録済みのメールを入力",
+            "sent": { "title": "リセットメールを送信しました", "desc": "受信トレイを確認し、新しいパスワード設定手順に従ってください。" },
             "submit": "リセットリンクを送信",
             "invalidLink": "無効なリセットリンクです。新しいリセットをリクエストしてください。",
             "newPasswordTitle": "新しいパスワードを設定",
@@ -151,13 +151,13 @@
         },
         "noAccountYet": "まだアカウントをお持ちでないですか？",
         "haveAccount": "すでにアカウントをお持ちですか？",
-        "continueWithEmail": "メールで続行",
+        "continueWithEmail": "メールで続ける",
         "name": "名前",
         "password.mismatch": "パスワードが一致しません"
     },
     "errors": {
         "notFound": "リクエストされたページが見つかりませんでした",
-        "forbidden": "アクセス拒否",
+        "forbidden": "アクセスが拒否されました",
         "network": "ネットワークエラーが発生しました",
         "timeout": "リクエストがタイムアウトしました",
         "unknown": "不明なエラーが発生しました",
@@ -195,7 +195,7 @@
         "create": "作成",
         "confirm": "確認",
         "total": "合計",
-        "fetchError": "データ取得中にエラーが発生しました",
+        "fetchError": "データの取得中にエラーが発生しました",
         "status": {
             "active": "アクティブ",
             "inactive": "非アクティブ",
@@ -224,7 +224,7 @@
         "coursesExplore": "コースを探る",
         "notices": "お知らせ",
         "learn": "学習ルーム",
-        "myLearning": "マイラーニング",
+        "myLearning": "マイ学習",
         "wishlist": "ウィッシュリスト",
         "instructor": "インストラクター",
         "instructorCourses": "コースを管理",
@@ -282,9 +282,9 @@
                 "modal": {
                     "title": "マーケティング推奨コピー",
                     "headlineLabel": "見出し",
-                    "headlinePlaceholder": "(最大 120 文字) コースのコアバリューを 1 行で強調",
+                    "headlinePlaceholder": "(最大120文字) コースのコアバリューを1行で強調",
                     "bodyLabel": "詳細な推奨テキスト",
-                    "bodyPlaceholder": "(最大 1200 文字) 購入転換を誘発するコンテンツを書く。\n• 問題認識\n• 解決策の視点\n• 学習後の期待される価値\n• 差別化要因",
+                    "bodyPlaceholder": "(最大1200文字) 購入転換を誘導するコンテンツを書く。\n• 問題認識\n• 解決策の視点\n• 学習後の期待される価値\n• 差別化要因",
                     "counter": "見出し {{hCount}}/120 · 本文 {{bCount}}/1200",
                     "updateSuccessTitle": "保存完了",
                     "updateSuccessMessage": "マーケティングコピーが更新されました。",
@@ -292,7 +292,7 @@
                 }
             },
             "preview": { "title": "プレビュー動画", "desc": "これはコースの無料プレビューレッスンです。" },
-            "empty": { "title": "コースが見つかりません", "message": "このコースは存在しないか、削除されています。", "back": "リストに戻る" },
+            "empty": { "title": "コースが見つかりません", "message": "このコースは存在しないか、削除されました。", "back": "リストに戻る" },
             "tabs": { "desc": "コース紹介", "curriculum": "カリキュラム", "reviews": "レビュー", "qna": "Q&A" },
             "sidebar": {
                 "enrolled": "登録済み",
@@ -307,12 +307,12 @@
             "curriculum": {
                 "empty": "まだレッスンは利用できません。",
                 "blockAria": "{{outline}} ブロック {{index}}",
-                "previewPlayAlert": "プレビュー再生: {{title}}",
+                "previewPlayAlert": "プレビュー再生： {{title}}",
                 "minutes": "{{mins}} 分"
             },
 
             "marketingSection": {
-                "sectionTitle": "コースの詳細を見る",
+                "sectionTitle": "コースについての詳細",
                 "empty": "まだマーケティングコピーは利用できません。",
                 "placeholder": "このエリアは追加のマーケティング/推奨事項または関連コースリスト用です。"
             }
@@ -323,27 +323,27 @@
             "field": {
                 "title": "タイトル",
                 "titlePlaceholder": "コースタイトル",
-                "summary": "概要",
-                "summaryPlaceholder": "簡潔な概要",
+                "summary": "サマリー",
+                "summaryPlaceholder": "簡潔なサマリー",
                 "desc": "詳細説明",
                 "descPlaceholder": "コースの詳細"
             },
             "lessons": {
                 "header": "セクション & レッスン",
                 "count": "{{count}} レッスン",
-                "saveFirstHint": "最初にコースを保存した後にレッスン/セクションを追加できます。",
+                "saveFirstHint": "まずコースを保存した後にレッスン/セクションを追加できます。",
                 "newLessonLabel": "新しいレッスンタイトル",
-                "newLessonPlaceholder": "例: 1. はじめに",
+                "newLessonPlaceholder": "例：1. イントロダクション",
                 "addLesson": "レッスンを追加",
                 "addSection": "セクション区切りを追加",
-                "noPreview": "現在利用可能なプレビューレッスンはありません。（選択は任意）",
-                "noLessons": "まだレッスンは利用できません。最初のレッスンを追加してください。"
+                "noPreview": "現在プレビューレッスンは利用できません。（選択は任意）",
+                "noLessons": "まだレッスンはありません。最初のレッスンを追加してください。"
             },
             "save": {
                 "saveChanges": "変更を保存",
                 "cancelChanges": "変更をキャンセル",
-                "inlineHelp": "簡略化されたガイド: セクションはヘッダー行で、is_section フラグがあります。（ドラッグで並べ替え / 詳細フィールドは後で追加されます）",
-                "unsavedIndicator": " · 保存されていない変更",
+                "inlineHelp": "簡略ガイド：セクションはヘッダー行で、is_sectionフラグがあります。（ドラッグでソート / 詳細フィールドは後で追加予定）",
+                "unsavedIndicator": " · 未保存の変更",
                 "navigateAwayConfirm": "変更が保存されていません。離れてもよろしいですか？"
             },
             "notify": {
@@ -356,7 +356,7 @@
                 "savedTitle": "保存完了",
                 "savedMessage": "コースが保存されました。",
                 "courseNeededTitle": "コースが必要",
-                "courseNeededMessage": "最初にコースを保存してください。",
+                "courseNeededMessage": "まずコースを保存してください。",
                 "renameErrorTitle": "名前エラー",
                 "renameErrorMessage": "2文字以上のタイトルを入力してください"
             }
@@ -374,12 +374,12 @@
             "loginRequired": "ログインが必要です。",
             "alreadyApproved": "あなたはすでに承認されたインストラクターです。",
             "approvedBadge": "承認完了",
-            "approvedDesc": "コースの作成を開始できます。",
+            "approvedDesc": "これでコースの作成を開始できます。",
             "title": "インストラクター申請",
             "pendingNotice": "承認待ち。管理者がレビューし、承認または拒否します。",
             "displayNameLabel": "表示名",
             "displayNamePh": "公開されるインストラクター名",
-            "bioLabel": "自己紹介 (Markdown 許可)",
+            "bioLabel": "自己紹介（Markdown可）",
             "bioPh": "簡単な経歴、専門分野などを記入してください。",
             "linksTitle": "関連リンク",
             "linkLabel": "ラベル",
@@ -392,44 +392,44 @@
         },
         "profile": {
             "coursesDivider": "コース",
-            "emptyCourses": "公開コースはまだありません。",
+            "emptyCourses": "まだ公開コースはありません。",
             "featuredBadge": "おすすめ",
-            "allCoursesLink": "すべてのコースを見る ({{count}})"
+            "allCoursesLink": "すべてのコースを見る（{{count}}）"
         },
         "hero": {
             "apply": {
-                "title": "インストラクター申請",
-                "subtitle": "専門知識を学習者に共有しましょう",
-                "li1": "簡単な紹介/リンク記入",
-                "li2": "管理者承認後にコース作成可能",
-                "li3": "いつでもプロフィール更新"
+                "title": "インストラクターとして申し込む",
+                "subtitle": "学習者と専門知識を共有",
+                "li1": "簡単な自己紹介 / リンクを記入",
+                "li2": "管理者の承認後にコースを作成",
+                "li3": "いつでもプロフィールを更新"
             },
             "courses": {
-                "title": "コース管理",
-                "subtitle": "コースのステータスとコンテンツを一元管理",
-                "li1": "コース一覧/おすすめ設定",
-                "li2": "概要・タグ・プレビュー管理",
-                "li3": "おすすめ/価格/追加メタ拡張予定"
+                "title": "コースを管理",
+                "subtitle": "1か所でコースのステータスとコンテンツを管理",
+                "li1": "コースリスト / おすすめ設定",
+                "li2": "サマリー · タグ · プレビュー管理",
+                "li3": "おすすめ / 価格設定 / 追加メタ情報のロードマップ"
             },
             "courseEdit": {
-                "newTitle": "新規コース作成",
-                "editTitle": "コース編集",
-                "subtitle": "セクションとレッスン構成・メタ情報を設定",
-                "li1": "ドラッグでセクション & レッスン並べ替え",
-                "li2": "プレビューレッスン1件選択可",
+                "newTitle": "新しいコースを作成",
+                "editTitle": "コースを編集",
+                "subtitle": "セクション、レッスン、メタ情報を設定",
+                "li1": "セクションとレッスンの順序をドラッグで並べ替え",
+                "li2": "1つのプレビューレッスンを選択",
                 "li3": "保存時に基本情報と構造をスナップショット"
             },
             "profile": {
                 "title": "インストラクタープロフィール",
-                "subtitle": "学習者に表示される公開プロフィール",
-                "li1": "コースカード・一覧からリンク",
-                "li2": "軽量なMarkdown紹介",
-                "li3": "外部リンクで専門性を強調"
+                "subtitle": "学習者に公開されるプロフィール",
+                "li1": "コースカードやリストからリンクされる",
+                "li2": "軽量Markdownによる自己紹介",
+                "li3": "外部リンクを通じて専門性を強調"
             }
         },
         "appApproved": "承認された申請",
         "appRejected": "拒否された申請",
-        "appRevoked": "権限が取り消された",
+        "appRevoked": "取り消された権限",
         "appliedAt": "申請日",
         "approveTooltip": "承認",
         "rejectTooltip": "拒否",
@@ -450,8 +450,8 @@
         "edit": {
             "title": "プロフィールを編集",
             "displayName": "表示名",
-            "bio": "自己紹介 (Markdown)",
-            "bioPlaceholder": "## 自己紹介\n経歴の概要 ...",
+            "bio": "自己紹介（Markdown）",
+            "bioPlaceholder": "## 自己紹介\n経歴概要 ...",
             "linkLabel": "外部リンク",
             "linkAdd": "リンクを追加",
             "linkLabelIndexed": "リンク {{index}}",
@@ -469,7 +469,7 @@
         "onlyEnrolled": "登録済みのユーザーのみがレビューを書けます",
         "form": {
             "ratingLabel": "評価を選択",
-            "commentPlaceholder": "(オプション) コメントを入力",
+            "commentPlaceholder": "(任意) コメントを入力",
             "ratingValue": "{{rating}} ポイント"
         },
         "sort": {
@@ -493,7 +493,7 @@
         "titlePlaceholder": "タイトル",
         "bodyPlaceholder": "本文を入力",
         "private": "プライベート",
-        "privateOnlyMe": "プライベート (自分のみ)",
+        "privateOnlyMe": "プライベート（自分のみ）",
         "solve": "解決",
         "answerPlaceholder": "回答を入力",
         "instructor": "インストラクター"
@@ -501,21 +501,38 @@
     "validation": {
         "lesson": {
             "title": { "min": "タイトルは2文字以上である必要があります。", "max": "タイトルは150文字以内に収めてください。" },
-            "duration": { "min": "期間は0以上である必要があります。", "max": "期間は5時間以内に収めてください。" }
+            "duration": { "min": "所要時間は0分以上である必要があります。", "max": "所要時間は5時間以内に収めてください。" }
         }
     },
     "exam": {
         "pageTitle": "試験を受ける",
-        "attemptTitle": "試験の試み",
+        "attemptTitle": "試験の試行",
         "status": "ステータス",
         "status.before": "試験前",
         "candidate": "受験者",
-        "completeToCertificate": "試験を完了する（証明書を見る）",
+        "completeToCertificate": "試験を完了して証明書を取得",
         "backMyPage": "マイページに戻る",
         "attemptId": "試験ID",
         "attemptPlaceholder": "問題解決/提出エリア",
         "pass": "合格",
         "fail": "不合格"
+    },
+    "examResult": {
+        "loading": "結果を読み込み中...",
+        "notFoundTitle": "結果が見つかりません",
+        "notFoundBody": "試験結果を読み込めません。",
+        "passCriteria": "合格基準： {{score}}",
+        "congrats": "おめでとうございます！",
+        "retry": "再試行",
+        "examTitleLabel": "試験名",
+        "totalQuestions": "総質問数",
+        "correctCount": "正解数",
+        "accuracyRate": "正確さ",
+        "goCertificate": "証明書を見る",
+        "issueCertificate": "証明書を発行",
+        "goMyPage": "マイページに移動",
+        "retryTitle": "再受験情報",
+        "retryBody": "24時間後に再受験できます。レビューして再試行してください！"
     },
     "certificate": {
         "title": "証明書",
@@ -533,6 +550,8 @@
         "issuedDateLabel": "発行日",
         "scoreAndPass": "スコア / 合格基準",
         "scoreUnit": "ポイント",
+        "minutesUnit": "分",
+        "questionsUnit": "質問",
         "examTitle": "試験名",
         "pdfDownload": "PDFをダウンロード",
         "copy": "コピー",
@@ -545,9 +564,9 @@
         "reissueTitle": "証明書を再発行",
         "existingSerial": "既存のシリアル番号",
         "memoAria": "メモ",
-        "memoLabel": "管理者メモ（オプション）",
+        "memoLabel": "管理者メモ（任意）",
         "memoPlaceholder": "理由/メモ",
-        "toggleActive": "アクティブ トグル",
+        "toggleActive": "アクティブ切替",
         "statusLabel": "証明書ステータス",
         "activate": "アクティブ化",
         "deactivate": "非アクティブ化",
@@ -557,7 +576,7 @@
         "print": "印刷"
     },
     "price": { "free": "無料", "original": "通常価格 {{price}} ウォン", "sale": "割引価格 {{price}} ウォン", "currencyWon": "ウォン" },
-    "filter": { "category": "カテゴリ", "level": "レベル", "rating": "評価", "priceType": "価格タイプ", "sort": "並べ替え" },
+    "filter": { "category": "カテゴリ", "level": "レベル", "rating": "評価", "priceType": "価格タイプ", "sort": "並び替え" },
     "sort": { "recommended": "おすすめ", "new": "新着", "rating": "評価", "students": "学生数", "popular": "人気" },
     "pagination": { "prev": "前へ", "next": "次へ" },
     "lesson": {
@@ -568,11 +587,11 @@
             "sectionTitle": "セクションを編集",
             "field": {
                 "title": "タイトル",
-                "url": "ビデオ URL",
+                "url": "ビデオURL",
                 "youtubeUrl": "YouTube URL",
-                "durationSeconds": "期間 (秒)",
-                "content": "本文 (Markdown)",
-                "attachments": "添付ファイル (カンマ区切り)"
+                "durationSeconds": "所要時間（秒）",
+                "content": "本文（Markdown）",
+                "attachments": "添付ファイル（カンマ区切り）"
             },
             "placeholder": {
                 "content": "# タイトル\nコンテンツ ...",
@@ -582,7 +601,7 @@
             },
             "videoType": { "none": "ビデオなし", "youtube": "YouTube", "cdn": "CDN/その他" },
             "actions": {},
-            "needCourse": "最初にコースを保存してください。",
+            "needCourse": "まずコースを保存してください。",
             "added": "レッスンが追加されました。",
             "sectionAdded": "セクションヘッダーが追加されました。",
             "deleted": "レッスンが削除されました。",
@@ -594,7 +613,7 @@
         "sectionAdd": {
             "title": "セクション区切りを追加",
             "field": { "title": "セクションタイトル" },
-            "placeholder": { "title": "例: セクション 1. はじめに" }
+            "placeholder": { "title": "例：セクション1. イントロダクション" }
         }
     },
     "player": {
@@ -603,15 +622,15 @@
         "nextLesson": "次のクラス",
         "prevLesson": "前のクラス",
         "completed": "完了",
-        "resume": "進行状況を再開",
-        "saving": "進行状況を保存中...",
-        "saved": "進行状況が保存されました",
-        "saveFailed": "進行状況の保存に失敗しました",
+        "resume": "続きから再開",
+        "saving": "進捗を保存中...",
+        "saved": "進捗が保存されました",
+        "saveFailed": "進捗の保存に失敗しました",
         "loading": "レッスンを読み込み中...",
         "lessonNotFound": "レッスンが見つかりません",
         "sectionHeader": "これはセクションヘッダーです",
-        "duration": "期間: {{minutes}} 分",
-        "progress": "進行状況: {{current}} / {{total}}",
+        "duration": "所要時間： {{minutes}} 分",
+        "progress": "進捗： {{current}} / {{total}}",
         "externalContent": "外部コンテンツ",
         "openContent": "コンテンツを開く",
         "markComplete": "完了としてマーク",
@@ -623,7 +642,7 @@
     "home": {
         "popular": "人気のコース",
         "new": "新しいコース",
-        "bestReviews": "学生のベストレビュー",
+        "bestReviews": "最高の学生レビュー",
         "featured": "おすすめコース",
         "noFeatured": "おすすめコースはありません",
         "instructors": "インストラクター紹介",
@@ -633,14 +652,14 @@
         "guide": "ユーザーガイド",
         "guide.title": "学生ユーザーガイド",
         "guide.intro": "コース手続き、資料ダウンロード、ビューワーインストールガイドを確認してください。",
-        "guide.item.guidePdf": "学習者ガイド PDF",
+        "guide.item.guidePdf": "学習者ガイドPDF",
         "guide.item.resources": "リソースルームに移動",
         "guide.item.viewer": "ファイルビューワーをダウンロード",
         "support": "カスタマーサポート",
         "support.title": "ヘルプが必要ですか？",
         "support.hours": "平日 09:00–18:00",
         "support.faq": "FAQ",
-        "support.contact": "1:1 お問い合わせ",
+        "support.contact": "1:1お問い合わせ",
         "support.meta": "営業時間 {{hours}} · {{email}} · {{phone}}",
         "hero": {
             "title": "最高のオンライン講義プラットフォーム",
@@ -649,10 +668,10 @@
             "secondaryCta": "サインアップ",
             "imageAlt": "メインバナー"
         },
-        "promo": { "couponLabel": "クーポンコード: {{code}}" },
+        "promo": { "couponLabel": "クーポンコード： {{code}}" },
         "courses": { "viewAll": "すべて見る" },
         "card": { "students": "{{count}} 人の学生", "rating": "評価 {{rating}}" },
-        "reviews": { "title": "実際の学生レビュー", "ariaRating": "評価 {{value}} (5点満点中)" }
+        "reviews": { "title": "実際の学生レビュー", "ariaRating": "評価 {{value}} （5点満点中）" }
     },
     "empty": {
         "reviews": "まだレビューはありません",
@@ -660,7 +679,7 @@
         "notices": "登録されたお知らせはありません",
         "links": "登録されたリンクはありません",
         "bio": "まだ自己紹介はありません",
-        "coursesFiltered": "検索語句またはフィルターを調整して再試行してください。",
+        "coursesFiltered": "検索語またはフィルターを調整して再試行してください。",
         "coursesNotFound": "コースが見つかりません",
         "myPageIntro": "情報、登録履歴、証明書、ウィッシュリストなどを管理できます。",
         "enrolledCoursesHeader": "進行中のコース",
@@ -676,22 +695,22 @@
         "wishlistInfo": "ウィッシュリスト機能ガイド",
         "wishlistNone": "まだコースは保存されていません。",
         "wishlistEmpty": "ウィッシュリストにコースはありません",
-        "courseMissing": "コースは削除されたか、アドレスが間違っています。",
+        "courseMissing": "コースが削除されたか、アドレスが間違っています。",
         "instructorLabel": "インストラクター",
-        "alreadyEnrolled": "あなたはすでに登録されています。今すぐ学習を続けてください。",
+        "alreadyEnrolled": "すでに登録されています。今すぐ学習を続けてください。",
         "categoryLabel": "カテゴリ",
         "courseIntro": "コース紹介",
         "courseDescriptionPending": "詳細説明はまだ準備中です。",
         "noticesIntro": "サービス更新およびメンテナンスのお知らせ",
         "noticeCreate": "新しいお知らせを作成",
         "issueCertificate": "証明書を発行",
-        "certificatesIntro": "発行された証明書をPDFとして表示および保存するか、検証コードを使用できます。これは、試験に合格した後の実際の発行ロジックに置き換えられます。",
+        "certificatesIntro": "発行された証明書をPDFとして表示および保存するか、検証コードを使用します。これは、試験に合格した後の実際の発行ロジックに置き換えられます。",
         "certificatesHeader": "発行された証明書",
         "certificatesLoginNeeded": "ログイン後に証明書を確認できます。",
         "certificatesNone": "まだ証明書は発行されていません。",
         "certificatesEmpty": "証明書はありません",
         "certificateIssueNote": "発行ボタンは、最初の進行中のコースに基づいて冪等的に発行されます。同じ登録に対してすでに証明書がある場合、それが再利用されます。",
-        "adminUsersIntro": "プラットフォームユーザーリストを表示し、役割を変更またはユーザーを非アクティブ化します。",
+        "adminUsersIntro": "プラットフォームユーザーリストを表示し、役割の変更やユーザーの非アクティブ化を行います。",
         "userRoleChange": "役割を変更",
         "selfDeactivateBlock": "自分自身を非アクティブ化することはできません",
         "deactivate": "非アクティブ化",
@@ -701,7 +720,7 @@
         "deactivateUserTitle": "ユーザーを非アクティブ化",
         "deactivateUserConfirm": "本当にこのユーザーを非アクティブ化しますか？",
         "passwordResetDone": "リセット完了",
-        "passwordResetConfirm": "これにより、ユーザーのパスワードがリセットされ、リセット手順のメールが送信されます。続行しますか？",
+        "passwordResetConfirm": "これにより、ユーザーのパスワードがリセットされ、リセット手順のメールが送信されます。続行してもよろしいですか？",
         "passwordResetAndSend": "リセットして送信",
         "passwordResetMailSentTitle": "メール送信済み",
         "passwordResetMailSentBody": "リセットメール（モックログ）が送信されました。ユーザーはリンクを通じて新しいパスワードを設定できます。",
@@ -709,44 +728,44 @@
         "noticeMissing": "お知らせが見つかりません。",
         "certificatesAdminIntro": "発行された証明書を表示し、再発行/アクティブ化ステータスを管理します。",
         "certificatesNoneAdmin": "まだ証明書は発行されていません。",
-        "sortNoResults": "並べ替えの結果がありません",
+        "sortNoResults": "並び替えの結果がありません",
         "certificateIssueBlocked": "進行中のコースがないため、証明書を発行できません。"
     },
     "hero": {
         "courses": {
-            "title": "数千のコース",
-            "subtitle": "専門家が制作した高品質コースで新しいスキルを習得",
-            "item1": "実務志向のプロジェクトベース学習",
-            "item2": "業界エキスパートが検証したカリキュラム",
-            "item3": "学習完了から就職支援までのロードマップ"
+            "title": "何千ものコース",
+            "subtitle": "専門家が構築した高品質のコースで新しいスキルを学ぶ",
+            "item1": "プロジェクトベースの実践的な学習",
+            "item2": "業界専門家による検証済みのカリキュラム",
+            "item3": "雇用につながる完全なロードマップ"
         },
         "wishlist": {
-            "title": "自分だけの学習プラン",
-            "subtitle": "気になるコースを保存し体系的に学習",
-            "item1": "保存したコースへいつでも即アクセス",
-            "item2": "割引 & 更新通知を受信",
-            "item3": "パーソナライズされた学習推薦"
+            "title": "あなたの学習計画",
+            "subtitle": "興味のあるコースを保存して体系的に学習",
+            "item1": "保存したコースにいつでも迅速にアクセス",
+            "item2": "割引および更新通知を受け取る",
+            "item3": "パーソナライズされた学習推奨を受ける"
         },
         "certificates": {
             "title": "達成の証明",
-            "subtitle": "修了したコースの証明書を管理・共有",
+            "subtitle": "修了したコースの証明書を管理および共有",
             "item1": "公式証明書の発行とダウンロード",
-            "item2": "LinkedIn プロフィールに直接追加",
-            "item3": "就職活動で実力証明として活用"
+            "item2": "LinkedInプロフィールに直接追加",
+            "item3": "採用時の能力証明として使用"
         },
         "enrollments": {
             "title": "学習の旅の始まり",
-            "subtitle": "体系的な学習でプロフェッショナルへ",
-            "item1": "段階的な進捗管理とトラッキング",
-            "item2": "専門講師の 1:1 フィードバック",
-            "item3": "実務プロジェクトでポートフォリオ構築"
+            "subtitle": "体系的な学習を通じてプロフェッショナルになる",
+            "item1": "ステップバイステップの進捗追跡",
+            "item2": "専門インストラクターからの1:1フィードバック",
+            "item3": "実際のプロジェクトでポートフォリオを構築"
         },
         "default": {
             "title": "KSI LMS",
-            "subtitle": "プロフェッショナル向けオンライン学習プラットフォーム",
-            "item1": "高品質オンラインコース",
-            "item2": "体系化された学習マネジメント",
-            "item3": "実務中心カリキュラム"
+            "subtitle": "プロフェッショナルなオンライン学習プラットフォーム",
+            "item1": "高品質のオンライン講義",
+            "item2": "体系的な学習管理",
+            "item3": "実践的なカリキュラム"
         }
     },
     "notify": {
@@ -773,7 +792,7 @@
             "sectionAdd": "セクション追加に失敗しました"
         }
     },
-    "my": { "title": "マイ教室", "noEnrollments": "進行中のコースはありません", "progressNow": "現在の進行状況 {{now}}% / 必要 {{req}}%" },
+    "my": { "title": "マイクラスルーム", "noEnrollments": "進行中のコースはありません", "progressNow": "現在の進捗 {{now}}% / 必要 {{req}}%" },
     "consent": {
         "acceptAll": "すべて受け入れる",
         "termsRequired": "(必須) 利用規約に同意する",
@@ -781,16 +800,16 @@
         "marketingOptional": "(任意) マーケティング情報の受信に同意する",
         "instructorPolicy": "(必須) インストラクター活動規則と著作権保証に同意する",
         "viewDetail": "詳細を見る",
-        "ageConfirm": "(必須) 私は14歳以上です"
+        "ageConfirm": "(必須) 14歳以上です"
     },
     "time": { "today": "今日", "daysAgo": "{{count}}日前", "monthsAgo": "{{count}}ヶ月前", "yearsAgo": "{{count}}年前" },
     "access": {
         "forbidden": "アクセス拒否",
-        "instructorOnly": "インストラクター専用ページ。申請して承認を受けた後にアクセス可能。",
+        "instructorOnly": "インストラクター専用ページ。申請して承認された後にアクセス可能。",
         "adminOnly": "管理者専用ページ。",
         "applyInstructorCta": "インストラクターに申し込む",
         "goHome": "ホームに移動",
-        "requiredRole": "必要な役割: {{required}} / 現在の役割: {{current}}"
+        "requiredRole": "必要な役割： {{required}} / 現在の役割： {{current}}"
     },
     "terms": {
         "courseOutline": "コース概要",
@@ -806,7 +825,7 @@
         "deleteTitle": "お知らせを削除",
         "deleteConfirm": "本当にこのお知らせを削除しますか？この操作は元に戻せません。",
         "deleteDone": "お知らせが削除されました",
-        "deleteFail": "削除に失敗しました: すでに削除されているか、見つかりません。",
+        "deleteFail": "削除に失敗しました：すでに削除されているか、見つかりません。",
         "pin": "トップにピン留め",
         "unpin": "トップからピン留め解除",
         "pinned": "トップにピン留めされました",
@@ -818,7 +837,7 @@
         "bodyLabel": "内容",
         "titlePlaceholder": "タイトルを入力",
         "bodyPlaceholder": "内容を入力",
-        "postedAt": "{date} に投稿されました",
+        "postedAt": "投稿日 {date}",
         "backToList": "お知らせリストに戻る",
         "backLink": "リストに戻る",
         "viewAll": "すべて見る",
@@ -832,7 +851,7 @@
             "filter": { "all": "すべて", "active": "アクティブ", "inactive": "非アクティブ", "current": { "active": "アクティブフィルター", "inactive": "非アクティブフィルター" } },
             "table": { "order": "順序", "name": "名前", "slug": "スラッグ", "status": "ステータス", "actions": "アクション", "empty": "カテゴリはありません。" },
             "modal": { "newTitle": "新しいカテゴリ" },
-            "form": { "nameLabel": "名前", "namePlaceholder": "例: 開発" },
+            "form": { "nameLabel": "名前", "namePlaceholder": "例：開発" },
             "tooltip": { "instantDeactivate": "即時非アクティブ化（ソフト）", "activate": "アクティブ化", "deactivate": "非アクティブ化", "rename": "リネーム" }
         },
         "coupons": {
@@ -849,17 +868,17 @@
                 "currency": "通貨",
                 "maxUses": "総使用制限",
                 "perUser": "ユーザーごとの制限",
-                "start": "開始 (ISO)",
-                "end": "終了 (ISO)",
+                "start": "開始（ISO）",
+                "end": "終了（ISO）",
                 "unlimited": "無制限",
                 "activeState": "アクティブ状態"
             }
         },
         "instructorApps": {
             "title": "インストラクター申請管理",
-            "description": "インストラクター申請をレビュー/承認/拒否/管理します。",
+            "description": "インストラクター申請のレビュー/承認/拒否/管理を行います。",
             "tabs": { "pending": "保留中", "decided": "承認済み / 拒否", "revoked": "取り消された" },
-            "searchPlaceholder": "検索: ユーザー/表示名",
+            "searchPlaceholder": "検索：ユーザー/表示名",
             "table": {
                 "user": "ユーザー",
                 "displayName": "表示名",
@@ -878,15 +897,15 @@
                 "rejectTitle": "拒否理由",
                 "revokeTitle": "インストラクター権限の取り消し",
                 "rejectReasonPlaceholder": "理由（任意）",
-                "revokeInfo": "これにより、承認されたインストラクターの権限が取り消されます。以降の処理（作成されたコースなど）は、後続ポリシーに従います。",
-                "revokeReasonPlaceholder": "取り消し理由（任意） - 例: 不適切なコンテンツ、ポリシー違反"
+                "revokeInfo": "これは、承認されたインストラクターの権限を取り消します。その後の処理（作成されたコースなど）は後続ポリシーに従います。",
+                "revokeReasonPlaceholder": "取り消し理由（任意） - 例：不適切なコンテンツ、ポリシー違反"
             },
             "tooltip": { "approve": "承認", "reject": "拒否", "revoke": "権限を取り消す" },
-            "notify": { "approved": "{{name}} 承認されました", "rejected": "{{name}} 拒否されました", "revoked": "{{name}} インストラクター権限取り消し" }
+            "notify": { "approved": "{{name}} が承認されました", "rejected": "{{name}} が拒否されました", "revoked": "{{name}} のインストラクター権限が取り消されました" }
         },
         "users": {
             "title": "ユーザー管理",
-            "description": "プラットフォームユーザーリストを表示し、役割を変更またはユーザーを非アクティブ化します。",
+            "description": "プラットフォームユーザーリストを表示し、役割の変更やユーザーの非アクティブ化を行います。",
             "searchPlaceholder": "名前/メール/ID",
             "filter": { "roleAll": "すべての役割" },
             "table": { "id": "ID", "name": "名前", "email": "メール", "role": "役割", "actions": "アクション" },
@@ -899,21 +918,21 @@
                 "deactivateConfirm": "本当にこのユーザーを非アクティブ化しますか？",
                 "passwordResetTitle": "パスワードをリセット",
                 "passwordResetDone": "リセット完了",
-                "passwordResetConfirm": "これにより、ユーザーのパスワードがリセットされ、リセット手順のメールが送信されます。続行しますか？",
+                "passwordResetConfirm": "これにより、ユーザーのパスワードがリセットされ、リセット手順のメールが送信されます。続行してもよろしいですか？",
                 "passwordResetAndSend": "リセットして送信",
                 "passwordResetMailSentTitle": "メール送信済み",
                 "passwordResetMailSentBody": "リセットメール（モックログ）が送信されました。ユーザーはリンクを通じて新しいパスワードを設定できます。"
             }
         }
     },
-    "category": { "all": "すべて", "frontend": "フロントエンド", "backend": "バックエンド", "data": "データ分析", "ai": "AI/ML", "cert": "認証", "biz": "ビジネス" },
+    "category": { "all": "すべて", "frontend": "フロントエンド", "backend": "バックエンド", "data": "データ分析", "ai": "AI/ML", "cert": "認定", "biz": "ビジネス" },
     "result": { "pass": "合格", "fail": "不合格" },
     "payment": {
         "title": "お支払い",
         "subtitle": "コースに登録するにはお支払いを進めてください。",
         "button": "今すぐ支払う",
         "confirming": "お支払いを確認中",
-        "confirmingMessage": "お支払いの承認を処理中です。しばらくお待ちください。",
+        "confirmingMessage": "お支払い承認を処理中です。しばらくお待ちください。",
         "originalPrice": "通常価格",
         "salePrice": "割引価格",
         "discount": "割引",
@@ -947,9 +966,9 @@
             "missingParameters": "必要な支払い情報が不足しています",
             "orderNotFound": "注文情報が見つかりません",
             "confirmationFailed": "お支払い承認に失敗しました",
-            "request": "お支払いリクエストの処理中にエラーが発生しました",
+            "request": "お支払いリクエスト処理中にエラーが発生しました",
             "userCanceled": "ユーザーが支払いをキャンセルしました",
-            "processAborted": "支払いプロセスが中止されました",
+            "processAborted": "お支払いプロセスが中止されました",
             "cardRejected": "カード発行者によって支払いが拒否されました",
             "invalidCardExpiration": "無効なカードの有効期限",
             "insufficientFunds": "カードの残高不足",
@@ -959,32 +978,32 @@
     },
     "paymentHero": {
         "enroll": {
-            "title": "受講登録",
-            "subtitle": "学習を始める前に重要な情報を確認してください",
+            "title": "コース登録",
+            "subtitle": "学習を開始する前に重要な情報を確認してください",
             "li1": "無料コースはすぐに開始",
-            "li2": "有料コースは安全な決済後に登録",
-            "li3": "進捗はマイページと学習画面で管理"
+            "li2": "有料コースは安全なお支払い後に登録",
+            "li3": "マイページと学習ルームで進捗を管理"
         },
         "pay": {
-            "title": "決済を進める",
-            "subtitle": "最終金額と割引適用をもう一度確認してください",
-            "li1": "クーポン / セール反映済み",
-            "li2": "安全な決済処理環境",
-            "li3": "承認後すぐに受講開始"
+            "title": "お支払いを進める",
+            "subtitle": "最終金額と適用された割引を再確認",
+            "li1": "クーポン / セールが反映されています",
+            "li2": "安全なお支払い処理環境",
+            "li3": "承認後に即時登録"
         },
         "success": {
-            "title": "決済が完了しました",
-            "subtitle": "受講登録が正常に処理されました",
-            "li1": "今すぐ学習を始める",
-            "li2": "決済 / 登録履歴はマイページで確認",
-            "li3": "修了 / 合格後に証明書を取得"
+            "title": "お支払い完了",
+            "subtitle": "登録が正常に処理されました",
+            "li1": "すぐにコースを開始",
+            "li2": "マイページでお支払いと登録履歴を確認",
+            "li3": "修了/合格後に証明書が利用可能"
         },
         "fail": {
-            "title": "決済に失敗しました",
-            "subtitle": "決済が正常に処理されませんでした",
-            "li1": "再試行または他の方法を利用",
-            "li2": "カード限度額 / 有効期限を確認",
-            "li3": "継続する場合はサポートへ連絡"
+            "title": "お支払い失敗",
+            "subtitle": "お支払いが正常に処理されませんでした",
+            "li1": "再試行するか、別の方法を使用",
+            "li2": "カードの限度額/有効期限を確認",
+            "li3": "問題が続く場合はサポートに連絡"
         }
     },
     "notFound": {
@@ -1000,18 +1019,181 @@
             "title": "マイ証明書",
             "loading": "証明書を読み込み中...",
             "errorTitle": "エラーが発生しました",
-            "errorBody": "証明書一覧の読み込み中にエラーが発生しました。",
-            "emptyTitle": "証明書がありません",
-            "emptyBody": "まだ発行された証明書はありません。試験に合格して取得しましょう！"
+            "errorBody": "証明書の読み込み中にエラーが発生しました。",
+            "emptyTitle": "証明書はありません",
+            "emptyBody": "まだ証明書は発行されていません。試験に合格して取得してください！"
         },
         "item": {
-            "instructor": "講師: {{name}}",
+            "instructor": "インストラクター： {{name}}",
             "passedBadge": "合格",
-            "issuedAt": "発行日: {{date}}",
-            "serial": "シリアル番号",
-            "score": "スコア: {{score}}",
-            "pdfDownload": "PDFダウンロード",
+            "issuedAt": "発行日： {{date}}",
+            "serial": "シリアル",
+            "score": "スコア： {{score}}",
+            "pdfDownload": "PDFをダウンロード",
             "viewCourse": "コースを見る"
+        }
+    },
+    "dashboard": {
+        "title": "管理者ダッシュボード",
+        "loading": "読み込み中...",
+        "totalCourses": "総コース数",
+        "totalStudents": "総学生数",
+        "totalRevenue": "総収益",
+        "certificatesIssued": "発行された証明書",
+        "newEnrollmentsThisMonth": "今月の新規登録",
+        "activeExams": "アクティブな試験",
+        "topCourses": "トップコース（TOP 5）",
+        "topActiveStudents": "アクティブな学生（TOP 5）",
+        "courseTitle": "コースタイトル",
+        "instructor": "インストラクター",
+        "enrollments": "登録数",
+        "revenue": "収益",
+        "personSuffix": "",
+        "currencySuffix": "₩",
+        "noData": "データがありません",
+        "noCoursesYet": "まだコースは作成されていません。",
+        "studentName": "学生",
+        "courseCount": "コース",
+        "certificates": "証明書",
+        "countSuffix": "",
+        "noStudentsYet": "まだ学生はいません。",
+        "examStats": "試験統計",
+        "examTitle": "試験タイトル",
+        "course": "コース",
+        "attemptCount": "試行回数",
+        "avgScore": "平均スコア",
+        "passRate": "合格率",
+        "timesSuffix": "",
+        "scoreSuffix": "pts",
+        "noExamsYet": "まだ試験はありません。"
+    },
+    "examAdmin": {
+        "common": {
+            "title": "試験管理",
+            "backToList": "試験一覧に戻る",
+            "goQuestions": "問題を管理",
+            "notFound": "試験が見つかりません。",
+            "loadingList": "試験一覧を読み込み中...",
+            "loadingOne": "試験情報を読み込み中...",
+            "loadingQuestions": "問題を読み込み中...",
+            "createNew": "新しい試験を作成",
+            "noExamsTitle": "試験はありません",
+            "noExamsBody": "まだ試験は作成されていません。作成してください！",
+            "actions": "アクション"
+        },
+        "table": {
+            "name": "タイトル",
+            "course": "コース",
+            "questionCount": "問題数",
+            "passScore": "合格スコア",
+            "timeLimit": "制限時間",
+            "unlimited": "無制限",
+            "minutesSuffix": "{{value}} 分",
+            "questionsSuffix": "{{value}} 問題",
+            "scoreSuffix": "{{value}} pts"
+        },
+        "create": {
+            "pageTitle": "試験を作成",
+            "toList": "試験一覧に戻る",
+            "field": {
+                "course": "コース",
+                "title": "試験タイトル",
+                "titlePlaceholder": "例：基礎理解度テスト",
+                "desc": "説明",
+                "descPlaceholder": "簡単な説明を入力（Markdown対応）",
+                "passScore": "合格スコア",
+                "timeLimit": "制限時間",
+                "timeLimitDesc": "無制限にするには空白のままにする"
+            },
+            "validate": {
+                "selectCourse": "コースを選択してください",
+                "titleRequired": "試験タイトルを入力してください",
+                "passScoreRange": "合格スコアは0〜100の範囲で設定してください",
+                "timeLimitPositive": "制限時間は正の値で設定してください"
+            },
+            "guide": {
+                "title": "情報",
+                "li1": "試験作成後に問題を追加します。",
+                "li2": "合格スコアは証明書取得のための最低スコアです。",
+                "li3": "空の制限時間＝制限なし。"
+            },
+            "submitCreateAndAdd": "作成して問題を追加",
+            "cancel": "キャンセル"
+        },
+        "edit": {
+            "pageTitle": "試験を編集",
+            "currentInfoTitle": "現在の試験情報",
+            "liQuestionsCount": "問題数： {{count}}",
+            "liImmediate": "変更は即時反映されます。",
+            "liManageSeparate": "問題は別ページで管理します。",
+            "submit": "変更を保存"
+        },
+        "questions": {
+            "pageTitle": "問題管理",
+            "addQuestion": "問題を追加",
+            "addQuestionModal": "新しい問題を追加",
+            "editQuestionModal": "問題を編集",
+            "infoTitle": "試験情報",
+            "infoEdit": "試験情報を編集",
+            "badgeQuestions": "{{count}} 問題",
+            "badgePassScore": "合格： {{score}}",
+            "badgeTimeLimit": "制限： {{minutes}} 分",
+            "listSection": "問題（{{count}}）",
+            "totalPoints": "合計 {{points}} pts",
+            "emptyTitle": "問題はありません",
+            "emptyBody": "まだ問題は追加されていません。最初の問題を追加してください！",
+            "emptyAdd": "問題を追加",
+            "table": {
+                "number": "#",
+                "question": "問題",
+                "type": "タイプ",
+                "points": "ポイント",
+                "actions": "アクション"
+            },
+            "form": {
+                "type": "問題タイプ",
+                "text": "問題文",
+                "textPlaceholder": "問題文を入力...",
+                "choices": "選択肢",
+                "choicePlaceholder": "選択肢 {{index}}",
+                "correctSingle": "正解（単一）",
+                "correctMultiple": "正解（複数）",
+                "correctMultiplePlaceholder": "すべての正解を選択",
+                "correctShort": "正解",
+                "correctShortPlaceholder": "正解を入力",
+                "points": "ポイント",
+                "pointsSuffix": "pts",
+                "cancel": "キャンセル",
+                "submitCreate": "問題を追加",
+                "submitEdit": "保存"
+            },
+            "validate": {
+                "textRequired": "問題文を入力してください",
+                "correctRequired": "正解を入力してください",
+                "choicesMin": "選択肢を最低2つ以上入力してください",
+                "pointsMin": "ポイントは1以上で設定してください"
+            },
+            "confirmDelete": {
+                "title": "問題を削除",
+                "bodyPrompt": "この問題を削除しますか？",
+                "warnTitle": "警告",
+                "warnBody": "削除された問題は復元できません。",
+                "confirm": "削除",
+                "cancel": "キャンセル"
+            },
+            "type": {
+                "single": "単一選択式",
+                "multiple": "複数選択式",
+                "short": "短答式"
+            }
+        },
+        "deleteExam": {
+            "confirm": "試験「{{title}}」を削除しますか？この操作は元に戻せません。",
+            "error": "試験削除エラー："
+        },
+        "errors": {
+            "loadList": "試験の読み込み中にエラーが発生しました。",
+            "generic": "エラーが発生しました"
         }
     }
 }

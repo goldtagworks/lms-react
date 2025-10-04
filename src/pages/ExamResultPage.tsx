@@ -6,8 +6,10 @@ import PageContainer from '@main/components/layout/PageContainer';
 import useExam from '@main/hooks/useExam';
 import { useCertificateByEnrollment, useIssueCertificate } from '@main/hooks/useCertificate';
 import { getExamResult, type ExamGradeResult } from '@main/services/examService';
+import { useI18n } from '@main/lib/i18n';
 
 export default function ExamResultPage() {
+    const { t } = useI18n();
     const { examId } = useParams();
     const location = useLocation();
     const [result, setResult] = useState<ExamGradeResult | null>(null);
@@ -59,7 +61,7 @@ export default function ExamResultPage() {
     if (isLoading) {
         return (
             <PageContainer roleMain py={48}>
-                <Text>결과를 확인하는 중...</Text>
+                <Text>{t('examResult.loading', undefined, '결과를 확인하는 중...')}</Text>
             </PageContainer>
         );
     }
@@ -67,8 +69,8 @@ export default function ExamResultPage() {
     if (!result || !exam) {
         return (
             <PageContainer roleMain py={48}>
-                <Alert color="red" title="결과를 찾을 수 없습니다">
-                    시험 결과를 불러올 수 없습니다.
+                <Alert color="red" title={t('examResult.notFoundTitle', undefined, '결과를 찾을 수 없습니다')}>
+                    {t('examResult.notFoundBody', undefined, '시험 결과를 불러올 수 없습니다.')}
                 </Alert>
             </PageContainer>
         );
@@ -84,16 +86,19 @@ export default function ExamResultPage() {
                     <Group>
                         <Trophy color={passed ? '#51cf66' : '#ff6b6b'} size={32} />
                         <Title c={passed ? 'green' : 'red'} order={1}>
-                            {passed ? '합격' : '불합격'}
+                            {passed ? t('result.pass', undefined, '합격') : t('result.fail', undefined, '불합격')}
                         </Title>
                     </Group>
 
                     {/* 점수 표시 */}
                     <Stack align="center" gap="sm">
-                        <Title order={2}>{score}점</Title>
-                        <Text c="dimmed">합격 기준: {exam.pass_score}점</Text>
+                        <Title order={2}>
+                            {score}
+                            {t('dashboard.scoreSuffix', undefined, '점')}
+                        </Title>
+                        <Text c="dimmed">{t('examResult.passCriteria', { score: exam.pass_score }, '합격 기준: {{score}}점')}</Text>
                         <Badge color={passed ? 'green' : 'red'} size="lg" variant={passed ? 'filled' : 'light'}>
-                            {passed ? '축하합니다!' : '다시 도전하세요'}
+                            {passed ? t('examResult.congrats', undefined, '축하합니다!') : t('examResult.retry', undefined, '다시 도전하세요')}
                         </Badge>
                     </Stack>
 
@@ -102,21 +107,21 @@ export default function ExamResultPage() {
                     {/* 상세 정보 */}
                     <Stack gap="md" w="100%">
                         <Group justify="space-between">
-                            <Text>시험명</Text>
+                            <Text>{t('examResult.examTitleLabel', undefined, '시험명')}</Text>
                             <Text fw={500}>{exam.title}</Text>
                         </Group>
                         <Group justify="space-between">
-                            <Text>총 문제 수</Text>
-                            <Text fw={500}>{totalQuestions}문제</Text>
+                            <Text>{t('examResult.totalQuestions', undefined, '총 문제 수')}</Text>
+                            <Text fw={500}>{t('examAdmin.table.questionsSuffix', { value: totalQuestions }, totalQuestions + '문제')}</Text>
                         </Group>
                         <Group justify="space-between">
-                            <Text>정답 수</Text>
+                            <Text>{t('examResult.correctCount', undefined, '정답 수')}</Text>
                             <Text c={passed ? 'green' : 'red'} fw={500}>
-                                {correctCount}문제
+                                {t('examAdmin.table.questionsSuffix', { value: correctCount }, correctCount + '문제')}
                             </Text>
                         </Group>
                         <Group justify="space-between">
-                            <Text>정답률</Text>
+                            <Text>{t('examResult.accuracyRate', undefined, '정답률')}</Text>
                             <Text fw={500}>{Math.round((correctCount / totalQuestions) * 100)}%</Text>
                         </Group>
                     </Stack>
@@ -129,24 +134,24 @@ export default function ExamResultPage() {
                             <>
                                 {existingCertificate ? (
                                     <Button component={Link} leftSection={<FileText size={16} />} size="lg" to="/my/certificates" variant="filled">
-                                        수료증 확인하기
+                                        {t('examResult.goCertificate', undefined, '수료증 확인하기')}
                                     </Button>
                                 ) : (
                                     <Button leftSection={<FileText size={16} />} loading={issueCertificateMutation.isPending} size="lg" variant="filled" onClick={handleIssueCertificate}>
-                                        수료증 발급받기
+                                        {t('examResult.issueCertificate', undefined, '수료증 발급받기')}
                                     </Button>
                                 )}
                                 <Button component={Link} leftSection={<Home size={16} />} to="/my" variant="outline">
-                                    마이페이지로
+                                    {t('examResult.goMyPage', undefined, '마이페이지로')}
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Alert color="orange" title="재응시 안내">
-                                    <Text size="sm">24시간 후 재응시가 가능합니다. 복습 후 다시 도전해보세요!</Text>
+                                <Alert color="orange" title={t('examResult.retryTitle', undefined, '재응시 안내')}>
+                                    <Text size="sm">{t('examResult.retryBody', undefined, '24시간 후 재응시가 가능합니다. 복습 후 다시 도전해보세요!')}</Text>
                                 </Alert>
                                 <Button component={Link} leftSection={<Home size={16} />} to="/my" variant="outline">
-                                    마이페이지로
+                                    {t('examResult.goMyPage', undefined, '마이페이지로')}
                                 </Button>
                             </>
                         )}

@@ -3,18 +3,20 @@ import { Link } from 'react-router-dom';
 import { Plus, Edit, Trash2, FileText, Clock, Target, BookOpen } from 'lucide-react';
 import PageContainer from '@main/components/layout/PageContainer';
 import { useExamsForAdmin, useDeleteExam } from '@main/hooks/useExamManagement';
+import { useI18n } from '@main/lib/i18n';
 
 export default function AdminExamsPage() {
+    const { t } = useI18n();
     const { data: exams, isLoading, error } = useExamsForAdmin();
     const deleteExamMutation = useDeleteExam();
 
     const handleDeleteExam = async (examId: string, title: string) => {
-        if (window.confirm(`시험 "${title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+        if (window.confirm(t('examAdmin.deleteExam.confirm', { title }))) {
             try {
                 await deleteExamMutation.mutateAsync(examId);
             } catch (error) {
                 // eslint-disable-next-line no-console
-                console.error('시험 삭제 오류:', error);
+                console.error(t('examAdmin.deleteExam.error'), error);
             }
         }
     };
@@ -22,7 +24,7 @@ export default function AdminExamsPage() {
     if (isLoading) {
         return (
             <PageContainer roleMain py={48}>
-                <Text>시험 목록을 불러오는 중...</Text>
+                <Text>{t('examAdmin.common.loadingList')}</Text>
             </PageContainer>
         );
     }
@@ -30,8 +32,8 @@ export default function AdminExamsPage() {
     if (error) {
         return (
             <PageContainer roleMain py={48}>
-                <Alert color="red" title="오류가 발생했습니다">
-                    시험 목록을 불러오는 중 오류가 발생했습니다.
+                <Alert color="red" title={t('examAdmin.errors.generic')}>
+                    {t('examAdmin.errors.loadList')}
                 </Alert>
             </PageContainer>
         );
@@ -42,19 +44,19 @@ export default function AdminExamsPage() {
             <Stack gap="xl">
                 {/* 헤더 */}
                 <Group justify="space-between">
-                    <Title order={1}>시험 관리</Title>
+                    <Title order={1}>{t('dashboard.title')}</Title>
                     <Button component={Link} leftSection={<Plus size={16} />} to="/admin/exams/new">
-                        새 시험 만들기
+                        {t('examAdmin.common.createNew')}
                     </Button>
                 </Group>
 
                 {/* 시험 목록 */}
                 {!exams || exams.length === 0 ? (
-                    <Alert color="blue" title="시험이 없습니다">
+                    <Alert color="blue" title={t('examAdmin.common.noExamsTitle')}>
                         <Stack gap="md">
-                            <Text>아직 생성된 시험이 없습니다. 새 시험을 만들어보세요!</Text>
+                            <Text>{t('examAdmin.common.noExamsBody')}</Text>
                             <Button component={Link} leftSection={<Plus size={16} />} size="sm" to="/admin/exams/new" variant="light">
-                                새 시험 만들기
+                                {t('examAdmin.common.createNew')}
                             </Button>
                         </Stack>
                     </Alert>
@@ -63,12 +65,12 @@ export default function AdminExamsPage() {
                         <Table>
                             <Table.Thead>
                                 <Table.Tr>
-                                    <Table.Th>시험명</Table.Th>
-                                    <Table.Th>코스</Table.Th>
-                                    <Table.Th>문제 수</Table.Th>
-                                    <Table.Th>합격 점수</Table.Th>
-                                    <Table.Th>제한 시간</Table.Th>
-                                    <Table.Th>작업</Table.Th>
+                                    <Table.Th>{t('examAdmin.table.name')}</Table.Th>
+                                    <Table.Th>{t('examAdmin.table.course')}</Table.Th>
+                                    <Table.Th>{t('examAdmin.table.questionCount')}</Table.Th>
+                                    <Table.Th>{t('examAdmin.table.passScore')}</Table.Th>
+                                    <Table.Th>{t('examAdmin.table.timeLimit')}</Table.Th>
+                                    <Table.Th>{t('examAdmin.common.actions')}</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
@@ -93,22 +95,24 @@ export default function AdminExamsPage() {
                                         </Table.Td>
                                         <Table.Td>
                                             <Badge color="blue" leftSection={<FileText size={12} />} variant="light">
-                                                {exam.questionCount}문제
+                                                {t('examAdmin.table.questionsSuffix', { value: exam.questionCount })}
                                             </Badge>
                                         </Table.Td>
                                         <Table.Td>
                                             <Badge color="green" leftSection={<Target size={12} />} variant="light">
-                                                {exam.passScore}점
+                                                {exam.passScore}
+                                                {t('scoreUnit')}
                                             </Badge>
                                         </Table.Td>
                                         <Table.Td>
                                             {exam.timeLimitMinutes ? (
                                                 <Badge color="orange" leftSection={<Clock size={12} />} variant="light">
-                                                    {exam.timeLimitMinutes}분
+                                                    {exam.timeLimitMinutes}
+                                                    {t('minutesUnit')}
                                                 </Badge>
                                             ) : (
                                                 <Text c="dimmed" size="sm">
-                                                    무제한
+                                                    {t('examAdmin.table.unlimited')}
                                                 </Text>
                                             )}
                                         </Table.Td>

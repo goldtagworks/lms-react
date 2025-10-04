@@ -517,6 +517,23 @@
         "pass": "Pass",
         "fail": "Fail"
     },
+    "examResult": {
+        "loading": "Loading result...",
+        "notFoundTitle": "Result not found",
+        "notFoundBody": "Unable to load exam result.",
+        "passCriteria": "Pass criteria: {{score}}",
+        "congrats": "Congratulations!",
+        "retry": "Try again",
+        "examTitleLabel": "Exam title",
+        "totalQuestions": "Total questions",
+        "correctCount": "Correct answers",
+        "accuracyRate": "Accuracy",
+        "goCertificate": "View certificate",
+        "issueCertificate": "Issue certificate",
+        "goMyPage": "Go to My Page",
+        "retryTitle": "Retake info",
+        "retryBody": "You can retake after 24 hours. Review and try again!"
+    },
     "certificate": {
         "title": "Certificate",
         "pageDesc": "Details of the certificate. Verification code and exam details are displayed.",
@@ -533,6 +550,8 @@
         "issuedDateLabel": "Issue date",
         "scoreAndPass": "Score / Passing criteria",
         "scoreUnit": "points",
+        "minutesUnit": "minutes",
+        "questionsUnit": "questions",
         "examTitle": "Exam name",
         "pdfDownload": "Download PDF",
         "copy": "Copy",
@@ -1012,6 +1031,169 @@
             "score": "Score: {{score}}",
             "pdfDownload": "Download PDF",
             "viewCourse": "View course"
+        }
+    },
+    "dashboard": {
+        "title": "Admin dashboard",
+        "loading": "Loading...",
+        "totalCourses": "Total courses",
+        "totalStudents": "Total students",
+        "totalRevenue": "Total revenue",
+        "certificatesIssued": "Certificates issued",
+        "newEnrollmentsThisMonth": "New enrollments this month",
+        "activeExams": "Active exams",
+        "topCourses": "Top courses (TOP 5)",
+        "topActiveStudents": "Active students (TOP 5)",
+        "courseTitle": "Course title",
+        "instructor": "Instructor",
+        "enrollments": "Enrollments",
+        "revenue": "Revenue",
+        "personSuffix": "",
+        "currencySuffix": "₩",
+        "noData": "No data",
+        "noCoursesYet": "No courses created yet.",
+        "studentName": "Student",
+        "courseCount": "Courses",
+        "certificates": "Certificates",
+        "countSuffix": "",
+        "noStudentsYet": "No students yet.",
+        "examStats": "Exam stats",
+        "examTitle": "Exam title",
+        "course": "Course",
+        "attemptCount": "Attempts",
+        "avgScore": "Average score",
+        "passRate": "Pass rate",
+        "timesSuffix": "",
+        "scoreSuffix": "pts",
+        "noExamsYet": "No exams yet."
+    },
+    "examAdmin": {
+        "common": {
+            "title": "Exam Management",
+            "backToList": "Back to exams",
+            "goQuestions": "Manage questions",
+            "notFound": "Exam not found.",
+            "loadingList": "Loading exam list...",
+            "loadingOne": "Loading exam info...",
+            "loadingQuestions": "Loading questions...",
+            "createNew": "Create new exam",
+            "noExamsTitle": "No exams",
+            "noExamsBody": "No exams have been created yet. Create one!",
+            "actions": "Actions"
+        },
+        "table": {
+            "name": "Title",
+            "course": "Course",
+            "questionCount": "Questions",
+            "passScore": "Pass score",
+            "timeLimit": "Time limit",
+            "unlimited": "Unlimited",
+            "minutesSuffix": "{{value}} min",
+            "questionsSuffix": "{{value}} questions",
+            "scoreSuffix": "{{value}} pts"
+        },
+        "create": {
+            "pageTitle": "Create exam",
+            "toList": "Back to exams",
+            "field": {
+                "course": "Course",
+                "title": "Exam title",
+                "titlePlaceholder": "e.g. Fundamentals comprehension test",
+                "desc": "Description",
+                "descPlaceholder": "Enter a brief description (Markdown supported)",
+                "passScore": "Pass score",
+                "timeLimit": "Time limit",
+                "timeLimitDesc": "Leave empty for unlimited"
+            },
+            "validate": {
+                "selectCourse": "Please select a course",
+                "titleRequired": "Please enter the exam title",
+                "passScoreRange": "Pass score must be 0-100",
+                "timeLimitPositive": "Time limit must be positive"
+            },
+            "guide": {
+                "title": "Info",
+                "li1": "Add questions after creating the exam.",
+                "li2": "Pass score is the minimum for certificate.",
+                "li3": "Empty time limit = no restriction."
+            },
+            "submitCreateAndAdd": "Create & add questions",
+            "cancel": "Cancel"
+        },
+        "edit": {
+            "pageTitle": "Edit exam",
+            "currentInfoTitle": "Current exam info",
+            "liQuestionsCount": "Questions: {{count}}",
+            "liImmediate": "Changes apply immediately.",
+            "liManageSeparate": "Manage questions on separate page.",
+            "submit": "Save changes"
+        },
+        "questions": {
+            "pageTitle": "Question management",
+            "addQuestion": "Add question",
+            "addQuestionModal": "Add new question",
+            "editQuestionModal": "Edit question",
+            "infoTitle": "Exam info",
+            "infoEdit": "Edit exam info",
+            "badgeQuestions": "{{count}} questions",
+            "badgePassScore": "Pass: {{score}}",
+            "badgeTimeLimit": "Limit: {{minutes}} min",
+            "listSection": "Questions ({{count}})",
+            "totalPoints": "Total {{points}} pts",
+            "emptyTitle": "No questions",
+            "emptyBody": "No questions yet. Add the first one!",
+            "emptyAdd": "Add question",
+            "table": {
+                "number": "#",
+                "question": "Question",
+                "type": "Type",
+                "points": "Points",
+                "actions": "Actions"
+            },
+            "form": {
+                "type": "Question type",
+                "text": "Question text",
+                "textPlaceholder": "Enter the question...",
+                "choices": "Choices",
+                "choicePlaceholder": "Choice {{index}}",
+                "correctSingle": "Answer (single)",
+                "correctMultiple": "Answers (multiple)",
+                "correctMultiplePlaceholder": "Select all correct answers",
+                "correctShort": "Answer",
+                "correctShortPlaceholder": "Enter the answer",
+                "points": "Points",
+                "pointsSuffix": "pts",
+                "cancel": "Cancel",
+                "submitCreate": "Add question",
+                "submitEdit": "Save"
+            },
+            "validate": {
+                "textRequired": "Please enter question text",
+                "correctRequired": "Please enter the answer",
+                "choicesMin": "Enter at least 2 choices",
+                "pointsMin": "Points must be >= 1"
+            },
+            "confirmDelete": {
+                "title": "Delete question",
+                "bodyPrompt": "Delete this question?",
+                "warnTitle": "Warning",
+                "warnBody": "Deleted questions cannot be restored.",
+                "confirm": "Delete",
+                "cancel": "Cancel"
+            },
+            "type": {
+                "single": "Multiple choice (single)",
+                "multiple": "Multiple choice (multiple)",
+                "short": "Short answer"
+            }
+        },
+        "deleteExam": {
+            "confirm": "Delete exam \"{{title}}\"? This cannot be undone.",
+            "error": "Delete exam error:"
+        },
+        "errors": {
+            "loadList": "Error occurred while loading exams.",
+            "generic": "An error occurred"
         }
     }
 }
