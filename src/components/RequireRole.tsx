@@ -21,7 +21,8 @@ export function RequireRole({ requiredRole, children }: RequireRoleProps) {
     const location = useLocation();
     const { t } = useI18n();
 
-    if (loading) return null; // 또는 스켈레톤
+    // 로딩 중이면 children을 그대로 표시 (또는 스켈레톤)
+    if (loading) return <>{children}</>;
 
     if (!user) {
         // 로그인 필요 → 로그인 후 돌아올 수 있게 상태 값 전달

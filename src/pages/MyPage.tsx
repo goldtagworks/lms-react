@@ -3,6 +3,8 @@ import { List, Heart, Award, Home, ArrowRight } from 'lucide-react';
 import EmptyState from '@main/components/EmptyState';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
+import HeroLayout from '@main/components/layout/HeroLayout';
+import { EmptyStateHero } from '@main/components/EmptyStateHero';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@main/lib/auth';
 import { useState } from 'react';
@@ -24,6 +26,22 @@ export default function MyPage() {
     const { data } = useEnrollmentsPaged(userId, page, { pageSize: 8 });
     const enrolledCourses = data?.items || [];
     const totalPages = data?.pageCount || 1;
+
+    // 강의가 없을 때는 Hero 레이아웃 사용
+    if (userId && enrolledCourses.length === 0) {
+        return (
+            <HeroLayout hero={<EmptyStateHero variant="enrollments" />}>
+                <Card withBorder p="lg" radius="lg" shadow="sm">
+                    <EmptyState
+                        actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}
+                        message={t('empty.enrollmentsNone', {}, '아직 수강중인 강의가 없습니다.')}
+                        title={t('empty.enrollmentsEmpty', {}, '수강중 강의 없음')}
+                        to="/courses"
+                    />
+                </Card>
+            </HeroLayout>
+        );
+    }
 
     return (
         <PageContainer roleMain>
@@ -63,14 +81,6 @@ export default function MyPage() {
                             </Badge>
                         )}
                     </Group>
-                    {userId && enrolledCourses.length === 0 && (
-                        <EmptyState
-                            actionLabel={t('empty.exploreCourses', {}, '강의 탐색')}
-                            message={t('empty.enrollmentsNone', {}, '아직 수강중인 강의가 없습니다.')}
-                            title={t('empty.enrollmentsEmpty', {}, '수강중 강의 없음')}
-                            to="/courses"
-                        />
-                    )}
                     {userId && enrolledCourses.length > 0 && (
                         <CourseGrid mt="md">
                             {enrolledCourses.map((course) => {

@@ -1,9 +1,10 @@
--- LMS schema v1.4 (2025-10-01)
+-- LMS schema v1.5 (2025-10-04)
 -- Change Log:
 --  * v1.1: Removed course_sections table; simplified curriculum model.
 --          Added lessons.is_section boolean; deprecated lessons.section_id.
 --          Rationale: 프론트/UX 단순화 요구. (섹션 헤더를 레슨 Row로 통합)
 --  * v1.4: Added notices, instructor_applications tables (migrating from in-memory repository)
+--  * v1.5: Public RLS 추가 (courses/preview lessons/notices/reviews), recursion 위험 정책 정리
 -- =============================
 
 -- =====================================================================
@@ -12,6 +13,34 @@
 -- prod 환경이나 마이그레이션 체인에서는 사용 금지. (명시적 버전 이동시 별도 migration 작성)
 -- 주의: 외래키 CASCADE 로 의존 데이터 전부 삭제됨.
 -- =====================================================================
+-- 순서: FK 의존도 낮은 말단 → 상위 (CASCADE 있으나 가독성 위해 명시적 정렬)
+DO $$
+BEGIN
+  -- Support / messaging
+  EXECUTE 'DROP TABLE IF EXISTS support_ticket_messages CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS support_tickets CASCADE';
+  -- Exams & attempts & certificates
+  EXECUTE 'DROP TABLE IF EXISTS certificates CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS exam_attempts CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS exam_questions CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS exams CASCADE';
+  -- Payments / enrollments / coupons
+  EXECUTE 'DROP TABLE IF EXISTS payments CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS enrollments CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS coupon_redemptions CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS coupons CASCADE';
+  -- Content hierarchy
+  EXECUTE 'DROP TABLE IF EXISTS lesson_progress CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS lessons CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS courses CASCADE';
+  -- Applications / notices / taxonomy
+  EXECUTE 'DROP TABLE IF EXISTS instructor_applications CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS notices CASCADE';
+  EXECUTE 'DROP TABLE IF EXISTS categories CASCADE';
+  -- Profiles last (auth.users FK)
+  EXECUTE 'DROP TABLE IF EXISTS profiles CASCADE';
+END $$;
+
 DO $$
 BEGIN
   IF current_setting('server_version_num')::int >= 0 THEN  -- 형식적 가드
@@ -64,6 +93,75 @@ CREATE TABLE IF NOT EXISTS profiles (
 );
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 -- (NOTE) instructor 관련 통계/대표 강의 뷰는 후속 v1.x에서 추가 예정
+
+-- RLS (profiles) simplified to avoid self-recursive EXISTS
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop any existing policies (idempotent cleanup)
+DROP POLICY IF EXISTS profiles_select_self ON profiles;
+DROP POLICY IF EXISTS profiles_insert_self ON profiles;
+DROP POLICY IF EXISTS profiles_update_self ON profiles;
+DROP POLICY IF EXISTS profiles_admin_all ON profiles;
+DROP POLICY IF EXISTS profiles_debug_open ON profiles;
+DROP POLICY IF EXISTS profiles_service_role_bypass ON profiles;
+DROP POLICY IF EXISTS profiles_select_own ON profiles;
+DROP POLICY IF EXISTS profiles_insert_own ON profiles;
+DROP POLICY IF EXISTS profiles_update_own ON profiles;
+DROP POLICY IF EXISTS profiles_delete_own ON profiles;
+
+-- service_role bypass (server-side only)
+CREATE POLICY profiles_service_role_bypass ON profiles
+  FOR ALL TO public
+  USING ( coalesce(current_setting('request.jwt.claim.role', true) = 'service_role', false) )
+  WITH CHECK ( coalesce(current_setting('request.jwt.claim.role', true) = 'service_role', false) );
+
+-- Own row policies
+CREATE POLICY profiles_select_own ON profiles
+  FOR SELECT TO authenticated
+  USING ( auth.uid() = user_id );
+
+CREATE POLICY profiles_insert_own ON profiles
+  FOR INSERT TO authenticated
+  WITH CHECK ( auth.uid() = user_id );
+
+CREATE POLICY profiles_update_own ON profiles
+  FOR UPDATE TO authenticated
+  USING ( auth.uid() = user_id )
+  WITH CHECK ( auth.uid() = user_id );
+
+-- (Optional) delete
+-- CREATE POLICY profiles_delete_own ON profiles FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- updated_at 자동 갱신 트리거
+DROP TRIGGER IF EXISTS trg_profiles_set_updated_at ON profiles;
+DROP FUNCTION IF EXISTS set_updated_at_profiles();
+CREATE OR REPLACE FUNCTION set_updated_at_profiles()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.updated_at := now();
+  RETURN NEW;
+END;$$;
+CREATE TRIGGER trg_profiles_set_updated_at
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION set_updated_at_profiles();
+
+-- 관리자 프로필 시드 (auth.users 에 미리 admin 사용자가 존재한다고 가정)
+-- 환경별 관리자 유저 UUID 를 아래 변수 형태로 교체하거나 migration 시 변수 주입
+-- 예: SELECT '00000000-0000-0000-0000-000000000000'::uuid;
+-- (NOTE) 이미 존재하면 role 승격만 수행
+DO $$
+DECLARE
+  v_admin uuid;
+BEGIN
+  -- 실제 관리자 auth.users.id 로 교체 필요
+  v_admin := null; -- <- 필요 시 수동 설정
+  IF v_admin IS NOT NULL THEN
+    INSERT INTO profiles(user_id, display_name, role)
+      VALUES (v_admin, 'Admin', 'admin')
+    ON CONFLICT (user_id) DO UPDATE SET role='admin';
+  END IF;
+END $$;
 
 -- [코스] 강의/클래스의 기본 정보 테이블
 DROP TABLE IF EXISTS courses CASCADE;
@@ -360,21 +458,75 @@ CREATE TABLE IF NOT EXISTS notices (
 CREATE INDEX IF NOT EXISTS idx_notices_pinned ON notices(pinned) WHERE pinned = true;
 CREATE INDEX IF NOT EXISTS idx_notices_created ON notices(created_at DESC);
 
--- RLS (notices): 공개 공지 목록/상세 조회는 익명 허용, 작성/수정/삭제는 관리자만 (admin role 은 profiles.role='admin')
+-- RLS (notices) simplified (remove dependency on profiles)
 ALTER TABLE notices ENABLE ROW LEVEL SECURITY;
 
--- (PostgreSQL은 CREATE POLICY 에 IF NOT EXISTS 미지원 → 사전 DROP 후 재생성)
 DROP POLICY IF EXISTS notices_read_public ON notices;
-CREATE POLICY notices_read_public ON notices
-  FOR SELECT USING (published = true);
-
--- 관리자 전용 전체 액세스 (초안 포함)
 DROP POLICY IF EXISTS notices_admin_all ON notices;
-CREATE POLICY notices_admin_all ON notices
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
-  ) WITH CHECK (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+DROP POLICY IF EXISTS notices_public_read ON notices;
+DROP POLICY IF EXISTS notices_write_admin_only ON notices;
+DROP POLICY IF EXISTS notices_update_admin_only ON notices;
+
+CREATE POLICY notices_public_read ON notices
+  FOR SELECT TO anon, authenticated
+  USING (published = true);
+
+-- service_role only write (replace with dedicated admin claim mechanism later)
+CREATE POLICY notices_write_admin_only ON notices
+  FOR INSERT TO authenticated
+  WITH CHECK ( current_setting('request.jwt.claim.role', true) = 'service_role' );
+
+CREATE POLICY notices_update_admin_only ON notices
+  FOR UPDATE TO authenticated
+  USING ( current_setting('request.jwt.claim.role', true) = 'service_role' )
+  WITH CHECK ( current_setting('request.jwt.claim.role', true) = 'service_role' );
+
+-- =============================================================
+-- PUBLIC ACCESS RLS (v1.5)
+-- 공개 리소스: courses(published), lessons(is_preview), course_reviews(published course)
+-- =============================================================
+
+-- Courses 공개 (published=true)
+ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS courses_public_read ON courses;
+CREATE POLICY courses_public_read ON courses
+  FOR SELECT TO anon, authenticated
+  USING (published = true);
+
+-- Lessons preview 공개 + 수강생 전체 레슨
+ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS lessons_preview_public ON lessons;
+CREATE POLICY lessons_preview_public ON lessons
+  FOR SELECT TO anon, authenticated
+  USING (
+    is_preview = true AND EXISTS (
+      SELECT 1 FROM courses c WHERE c.id = lessons.course_id AND c.published = true
+    )
+  );
+
+DROP POLICY IF EXISTS lessons_enrolled_read ON lessons;
+CREATE POLICY lessons_enrolled_read ON lessons
+  FOR SELECT TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM enrollments e
+      WHERE e.course_id = lessons.course_id
+        AND e.user_id = auth.uid()
+        AND e.status = 'ENROLLED'
+    ) OR is_preview = true
+  );
+
+-- Course Reviews 공개 (해당 코스가 published)
+ALTER TABLE course_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS course_reviews_public_read ON course_reviews;
+CREATE POLICY course_reviews_public_read ON course_reviews
+  FOR SELECT TO anon, authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM courses c
+      WHERE c.id = course_reviews.course_id
+        AND c.published = true
+    )
   );
 
 
@@ -450,27 +602,25 @@ CREATE INDEX IF NOT EXISTS idx_support_msgs_author ON support_ticket_messages(au
 -- [RLS 정책] exam_questions 테이블
 ALTER TABLE exam_questions ENABLE ROW LEVEL SECURITY;
 
--- 관리자만 모든 작업 가능
-CREATE POLICY "Admins can manage exam questions" ON exam_questions
-FOR ALL USING (
-    EXISTS (
-        SELECT 1 FROM profiles 
-        WHERE profiles.user_id = auth.uid() 
-        AND profiles.role = 'admin'
-    )
-);
+-- 관리자(서비스 롤) 전체, 수강생은 해당 코스 ENROLLED 시 조회
+DROP POLICY IF EXISTS exam_questions_admin_all ON exam_questions;
+CREATE POLICY exam_questions_admin_all ON exam_questions
+  FOR ALL TO authenticated
+  USING ( current_setting('request.jwt.claim.role', true) = 'service_role' )
+  WITH CHECK ( current_setting('request.jwt.claim.role', true) = 'service_role' );
 
--- 학생은 시험 응시 중에만 문제 조회 가능 (정답 제외)
-CREATE POLICY "Students can view questions during exam" ON exam_questions
-FOR SELECT USING (
+DROP POLICY IF EXISTS exam_questions_enrolled_read ON exam_questions;
+CREATE POLICY exam_questions_enrolled_read ON exam_questions
+  FOR SELECT TO authenticated
+  USING (
     EXISTS (
-        SELECT 1 FROM enrollments e
-        JOIN exams ex ON ex.course_id = e.course_id
-        WHERE ex.id = exam_questions.exam_id
+      SELECT 1 FROM enrollments e
+      JOIN exams ex ON ex.id = exam_questions.exam_id
+      WHERE e.course_id = ex.course_id
         AND e.user_id = auth.uid()
         AND e.status = 'ENROLLED'
     )
-);
+  );
 
 
 -- Idempotency keys table
@@ -483,15 +633,24 @@ create table if not exists idempotency_keys (
 );
 create index if not exists idx_idem_scope on idempotency_keys(scope);
 
--- =============================
--- 기본 관리자 계정 생성
--- =============================
--- 주의: 실제 사용자 가입 후 이 데이터를 업데이트해야 함
--- auth.users 테이블에 해당 이메일로 가입된 사용자가 있어야 함
-INSERT INTO public.users (id, email, name, role, created_at, updated_at) 
-VALUES 
-  ('00000000-0000-0000-0000-000000000001', 'goldtagworks@gmail.com', 'GoldTag Admin', 'admin', now(), now()),
-  ('00000000-0000-0000-0000-000000000002', 'kr.lms.labs@gmail.com', 'LMS Labs Admin', 'admin', now(), now())
-ON CONFLICT (email) DO UPDATE SET 
-  role = 'admin',
-  updated_at = now();
+-- 기본 관리자 프로필 승격 (옵션)
+-- 기존 블록은 public.users (존재하지 않음)를 참조 → profiles + auth.users 로 교체
+-- 이메일이 auth.users 에 존재할 경우 profiles 에 upsert 하여 role='admin' 승격
+DO $$
+DECLARE
+  v_user uuid;
+BEGIN
+  SELECT id INTO v_user FROM auth.users WHERE email = 'goldtagworks@gmail.com';
+  IF v_user IS NOT NULL THEN
+    INSERT INTO profiles(user_id, display_name, role)
+    VALUES (v_user, 'GoldTag Admin', 'admin')
+    ON CONFLICT (user_id) DO UPDATE SET role='admin';
+  END IF;
+
+  SELECT id INTO v_user FROM auth.users WHERE email = 'kr.lms.labs@gmail.com';
+  IF v_user IS NOT NULL THEN
+    INSERT INTO profiles(user_id, display_name, role)
+    VALUES (v_user, 'LMS Labs Admin', 'admin')
+    ON CONFLICT (user_id) DO UPDATE SET role='admin';
+  END IF;
+END $$;

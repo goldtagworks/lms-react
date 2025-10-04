@@ -100,9 +100,14 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                                     {t('auth.newPassword')}
                                 </Menu.Item>
                                 <Menu.Item
-                                    onClick={() => {
-                                        logout();
-                                        navigate('/');
+                                    onClick={async () => {
+                                        try {
+                                            await logout();
+                                            navigate('/', { replace: true });
+                                        } catch {
+                                            // 로그아웃 실패해도 홈으로 이동
+                                            navigate('/', { replace: true });
+                                        }
                                     }}
                                 >
                                     {t('common.logout', undefined, t('auth.signOut') || 'Logout')}

@@ -1,6 +1,6 @@
 import { Button, Card, Divider, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { UserPlus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@main/lib/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@main/components/auth/AuthLayout';
@@ -14,9 +14,16 @@ export default function SignUpPage() {
     const [name, setName] = useState('');
     const [consent, setConsent] = useState<ConsentState | null>(null);
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    const { register, loading } = useAuth();
+    const { register, loading, user } = useAuth();
     const navigate = useNavigate();
     const { t } = useI18n();
+
+    // 이미 로그인된 사용자는 메인으로 리다이렉트
+    useEffect(() => {
+        if (user && !loading) {
+            navigate('/', { replace: true });
+        }
+    }, [user, loading, navigate]);
 
     const passwordMismatch = passwordConfirm.length > 0 && passwordConfirm !== password;
     const canSubmit = name && email && password && !passwordMismatch && consent?.terms && consent?.privacy && (consent?.age ?? true);
@@ -24,8 +31,13 @@ export default function SignUpPage() {
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!canSubmit) return;
-        await register(name, email, password);
-        navigate('/');
+        try {
+            await register(name, email, password);
+            // 회원가입 성공 후 즉시 리다이렉트
+            navigate('/', { replace: true });
+        } catch {
+            // 회원가입 실패 시 error는 context에서 설정됨
+        }
     };
 
     return (

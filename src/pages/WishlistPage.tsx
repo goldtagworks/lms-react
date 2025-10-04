@@ -1,6 +1,8 @@
 import { Text, Card, Group, Button, Badge, Stack } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import EmptyState from '@main/components/EmptyState';
+import HeroLayout from '@main/components/layout/HeroLayout';
+import { EmptyStateHero } from '@main/components/EmptyStateHero';
 import { useI18n } from '@main/lib/i18n';
 import PageContainer from '@main/components/layout/PageContainer';
 import PageHeader from '@main/components/layout/PageHeader';
@@ -36,6 +38,22 @@ export default function WishlistPage() {
         enrollAndNotify(userId, courseId);
     };
 
+    // 찜한 강의가 없을 때는 Hero 레이아웃 사용
+    if (userId && wishlist.length === 0) {
+        return (
+            <HeroLayout hero={<EmptyStateHero variant="wishlist" />}>
+                <Card withBorder p="lg" radius="lg" shadow="sm">
+                    <EmptyState
+                        actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}
+                        message={t('empty.wishlistNone', {}, '아직 찜한 강의가 없습니다.')}
+                        title={t('empty.wishlistEmpty', {}, '찜한 강의 없음')}
+                        to="/courses"
+                    />
+                </Card>
+            </HeroLayout>
+        );
+    }
+
     return (
         <PageContainer roleMain>
             <PageHeader description={t('empty.wishlistPageIntro', {}, '나중에 수강하고 싶은 강의를 한 곳에서 관리하세요.')} title={t('common.favorite.add', {}, '찜')} />
@@ -51,14 +69,6 @@ export default function WishlistPage() {
                             </Badge>
                         )}
                     </Group>
-                    {userId && wishlist.length === 0 && (
-                        <EmptyState
-                            actionLabel={t('empty.exploreCourses', {}, '강의 둘러보기')}
-                            message={t('empty.wishlistNone', {}, '아직 찜한 강의가 없습니다.')}
-                            title={t('empty.wishlistEmpty', {}, '찜한 강의 없음')}
-                            to="/courses"
-                        />
-                    )}
                     {userId && wishlist.length > 0 && (
                         <CourseGrid mt="md">
                             {paged.map((course) => {

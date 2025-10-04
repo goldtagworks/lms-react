@@ -58,7 +58,8 @@ const PaymentFailPage = lazy(() => import('@main/pages/PaymentFailPage'));
 function AuthAny({ children }: { children: ReactNode }) {
     const { user, loading } = useAuth();
 
-    if (loading) return null;
+    // 로딩 중에는 children을 표시 (스켈레톤 또는 기본 UI)
+    if (loading) return <>{children}</>;
 
     if (!user) return <Navigate replace to="/signin" />;
 

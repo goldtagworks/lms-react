@@ -1,28 +1,44 @@
 import { Button, Card, Divider, Group, Stack, Text, TextInput, Title, Alert } from '@mantine/core';
 import { LogIn } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useAuth } from '@main/lib/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useI18n } from '@main/lib/i18n';
+import { supabase } from '@main/lib/supabase';
 
 export default function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, loading, error } = useAuth();
+    const { login, loading, error, user } = useAuth();
     const errorRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
     const { t } = useI18n();
+
+    useEffect(() => {
+        const signOut = async () => {
+            await supabase.auth.signOut();
+        };
+
+        signOut();
+    }, []);
+
+    // 이미 로그인된 사용자는 메인으로 리다이렉트
+    useEffect(() => {
+        if (user) {
+            navigate('/', { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!email || !password) return;
         try {
             await login(email, password);
-            navigate('/');
+            navigate('/', { replace: true });
         } catch {
-            // 로그인 실패 시 error는 context에서 설정됨
+            // error는 context에서 처리
         }
     };
 
