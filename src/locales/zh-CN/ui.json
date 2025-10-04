@@ -195,6 +195,7 @@
         "create": "创建",
         "confirm": "确认",
         "total": "总计",
+        "fetchError": "获取数据时发生错误",
         "status": {
             "active": "活动",
             "inactive": "非活动",

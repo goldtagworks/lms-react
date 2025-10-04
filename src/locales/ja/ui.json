@@ -195,6 +195,7 @@
         "create": "作成",
         "confirm": "確認",
         "total": "合計",
+        "fetchError": "データ取得中にエラーが発生しました",
         "status": {
             "active": "アクティブ",
             "inactive": "非アクティブ",

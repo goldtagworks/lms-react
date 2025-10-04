@@ -195,6 +195,7 @@
         "create": "Yaratish",
         "confirm": "Tasdiqlash",
         "total": "Jami",
+        "fetchError": "Ma'lumotlarni yuklashda xato yuz berdi",
         "status": {
             "active": "Faol",
             "inactive": "Faol emas",

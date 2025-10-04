@@ -195,6 +195,7 @@
         "create": "생성",
         "confirm": "확정",
         "total": "총",
+        "fetchError": "데이터를 불러오는 중 오류가 발생했습니다",
         "status": {
             "active": "정상",
             "inactive": "비활성",

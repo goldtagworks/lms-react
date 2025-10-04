@@ -195,6 +195,7 @@
         "create": "Lumikha",
         "confirm": "Kumpirmahin",
         "total": "Kabuuan",
+        "fetchError": "Nagkaroon ng error habang kumukuha ng data",
         "status": {
             "active": "Aktibo",
             "inactive": "Hindi aktibo",

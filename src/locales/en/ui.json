@@ -195,6 +195,7 @@
         "create": "Create",
         "confirm": "Confirm",
         "total": "Total",
+        "fetchError": "An error occurred while fetching data",
         "status": {
             "active": "Active",
             "inactive": "Inactive",

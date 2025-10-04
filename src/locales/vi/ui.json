@@ -195,6 +195,7 @@
         "create": "Tạo",
         "confirm": "Xác nhận",
         "total": "Tổng cộng",
+        "fetchError": "Đã xảy ra lỗi khi tải dữ liệu",
         "status": {
             "active": "Hoạt động",
             "inactive": "Không hoạt động",

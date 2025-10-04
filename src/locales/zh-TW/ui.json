@@ -195,6 +195,7 @@
         "create": "創建",
         "confirm": "確認",
         "total": "總計",
+        "fetchError": "獲取資料時發生錯誤",
         "status": {
             "active": "活動",
             "inactive": "非活動",
