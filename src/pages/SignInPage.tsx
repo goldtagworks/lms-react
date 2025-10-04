@@ -1,6 +1,6 @@
-import { Button, Card, Divider, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Card, Divider, Group, Stack, Text, TextInput, Title, Alert } from '@mantine/core';
 import { LogIn } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuth } from '@main/lib/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@main/components/auth/AuthLayout';
@@ -10,15 +10,20 @@ import { useI18n } from '@main/lib/i18n';
 export default function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, loading } = useAuth();
+    const { login, loading, error } = useAuth();
+    const errorRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
     const { t } = useI18n();
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!email || !password) return;
-        await login(email, password);
-        navigate('/');
+        try {
+            await login(email, password);
+            navigate('/');
+        } catch {
+            // 로그인 실패 시 error는 context에서 설정됨
+        }
     };
 
     const disabled = !email || !password;
@@ -36,6 +41,11 @@ export default function SignInPage() {
                                 {t('auth.subtitleSignIn')}
                             </Text>
                         </div>
+                        {error && (
+                            <Alert ref={errorRef} aria-live="assertive" color="red" radius="md" title={t('auth.signInFailed', undefined, '로그인 실패')} variant="light">
+                                {error}
+                            </Alert>
+                        )}
                         <Stack gap="sm">
                             <TextInput autoComplete="email" label={t('auth.email')} placeholder="you@email.com" size="sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <TextInput
