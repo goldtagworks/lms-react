@@ -896,5 +896,24 @@
         "browseCourses": "瀏覽課程",
         "goSupport": "客戶支持",
         "searchPlaceholder": "在網站內搜索..."
+    },
+    "cert": {
+        "page": {
+            "title": "我的證書",
+            "loading": "證書載入中...",
+            "errorTitle": "發生錯誤",
+            "errorBody": "載入證書列表時發生錯誤。",
+            "emptyTitle": "尚無證書",
+            "emptyBody": "尚未發放任何證書。通過考試即可取得！"
+        },
+        "item": {
+            "instructor": "講師: {{name}}",
+            "passedBadge": "通過",
+            "issuedAt": "發放日期: {{date}}",
+            "serial": "序號",
+            "score": "成績: {{score}}",
+            "pdfDownload": "下載 PDF",
+            "viewCourse": "查看課程"
+        }
     }
 }

@@ -6,9 +6,11 @@ import HeroLayout from '@main/components/layout/HeroLayout';
 import { EmptyStateHero } from '@main/components/EmptyStateHero';
 import { useCertificates } from '@main/hooks/useCertificate';
 import { getCertificatePdfUrl } from '@main/services/certificateService';
+import { useI18n } from '@main/lib/i18n';
 
 export default function CertificatesPage() {
     const { data: certificates, isLoading, error } = useCertificates();
+    const { t } = useI18n();
 
     const handleDownloadPdf = async (pdfPath: string, courseName: string) => {
         try {
@@ -30,7 +32,7 @@ export default function CertificatesPage() {
     if (isLoading) {
         return (
             <PageContainer roleMain py={48}>
-                <Text>수료증을 불러오는 중...</Text>
+                <Text>{t('cert.page.loading')}</Text>
             </PageContainer>
         );
     }
@@ -38,8 +40,8 @@ export default function CertificatesPage() {
     if (error) {
         return (
             <PageContainer roleMain py={48}>
-                <Alert color="red" title="오류가 발생했습니다">
-                    수료증 목록을 불러오는 중 오류가 발생했습니다.
+                <Alert color="red" title={t('cert.page.errorTitle')}>
+                    {t('cert.page.errorBody')}
                 </Alert>
             </PageContainer>
         );
@@ -50,8 +52,8 @@ export default function CertificatesPage() {
         return (
             <HeroLayout hero={<EmptyStateHero variant="certificates" />}>
                 <Card withBorder p="lg" radius="lg" shadow="sm">
-                    <Alert color="blue" title="수료증이 없습니다">
-                        <Text>아직 발급받은 수료증이 없습니다. 시험에 합격하여 수료증을 발급받아보세요!</Text>
+                    <Alert color="blue" title={t('cert.page.emptyTitle')}>
+                        <Text>{t('cert.page.emptyBody')}</Text>
                     </Alert>
                 </Card>
             </HeroLayout>
@@ -61,7 +63,7 @@ export default function CertificatesPage() {
     return (
         <PageContainer roleMain py={48}>
             <Stack gap="xl">
-                <Title order={1}>내 수료증</Title>
+                <Title order={1}>{t('cert.page.title')}</Title>
 
                 <Stack gap="md">
                     {certificates.map((certificate) => (
@@ -75,11 +77,11 @@ export default function CertificatesPage() {
                                             <Title order={3}>{certificate.enrollment.course.title}</Title>
                                         </Group>
                                         <Text c="dimmed" size="sm">
-                                            강사: {certificate.enrollment.course.instructorName}
+                                            {t('cert.item.instructor', { name: certificate.enrollment.course.instructorName })}
                                         </Text>
                                     </Stack>
                                     <Badge color="green" variant="light">
-                                        합격
+                                        {t('cert.item.passedBadge')}
                                     </Badge>
                                 </Group>
 
@@ -87,25 +89,27 @@ export default function CertificatesPage() {
                                 <Group>
                                     <Group gap="xs">
                                         <Calendar size={16} />
-                                        <Text size="sm">발급일: {new Date(certificate.issuedAt).toLocaleDateString('ko-KR')}</Text>
+                                        <Text size="sm">{t('cert.item.issuedAt', { date: new Date(certificate.issuedAt).toLocaleDateString() })}</Text>
                                     </Group>
                                     <Group gap="xs">
                                         <FileText size={16} />
-                                        <Text size="sm">일련번호: {certificate.serialNo}</Text>
+                                        <Text size="sm">
+                                            {t('cert.item.serial')}: {certificate.serialNo}
+                                        </Text>
                                     </Group>
                                     <Group gap="xs">
                                         <Trophy size={16} />
-                                        <Text size="sm">점수: {certificate.examAttempt.score}점</Text>
+                                        <Text size="sm">{t('cert.item.score', { score: certificate.examAttempt.score })}</Text>
                                     </Group>
                                 </Group>
 
                                 {/* 액션 버튼 */}
                                 <Group>
                                     <Button leftSection={<Download size={16} />} variant="filled" onClick={() => handleDownloadPdf(certificate.pdfPath, certificate.enrollment.course.title)}>
-                                        PDF 다운로드
+                                        {t('cert.item.pdfDownload')}
                                     </Button>
                                     <Button component={Link} to={`/course/${certificate.enrollment.course.id}`} variant="outline">
-                                        강의 보기
+                                        {t('cert.item.viewCourse')}
                                     </Button>
                                 </Group>
                             </Stack>

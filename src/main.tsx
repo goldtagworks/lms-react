@@ -10,6 +10,7 @@ import { queryClient } from '@main/lib/queryClient';
 
 import App from './App';
 import '@main/styles/app.css';
+import '@main/lib/supabase/boot';
 
 const rootElement = document.getElementById('root');
 

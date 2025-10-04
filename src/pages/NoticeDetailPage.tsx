@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@main/lib/supabase';
+import { supabase, supabasePublic } from '@main/lib/supabase';
 import { mapSupabaseError } from '@main/lib/errors';
 import { useNoticeMutations } from '@main/hooks/useNoticeMutations';
 import PageContainer from '@main/components/layout/PageContainer';
@@ -26,6 +26,11 @@ export default function NoticeDetailPage() {
         queryKey: ['notice', id],
         enabled: !!id,
         queryFn: async () => {
+            // 1차: 공개(발행) 공지 anon 조회
+            const pub = await supabasePublic.from('notices').select('*').eq('id', id).eq('published', true).single();
+
+            if (pub.data) return pub.data as any;
+            // 발행 안 된 경우(초안) → 인증 클라이언트 재조회 (관리자 권한 필요)
             const { data, error } = await supabase.from('notices').select('*').eq('id', id).single();
 
             if (error) throw mapSupabaseError(error);

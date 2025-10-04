@@ -896,5 +896,24 @@
         "browseCourses": "코스 둘러보기",
         "goSupport": "고객지원",
         "searchPlaceholder": "사이트 내 검색..."
+    },
+    "cert": {
+        "page": {
+            "title": "내 수료증",
+            "loading": "수료증을 불러오는 중...",
+            "errorTitle": "오류가 발생했습니다",
+            "errorBody": "수료증 목록을 불러오는 중 오류가 발생했습니다.",
+            "emptyTitle": "수료증이 없습니다",
+            "emptyBody": "아직 발급된 수료증이 없습니다. 시험에 합격해 발급받아보세요!"
+        },
+        "item": {
+            "instructor": "강사: {{name}}",
+            "passedBadge": "합격",
+            "issuedAt": "발급일: {{date}}",
+            "serial": "일련번호",
+            "score": "점수: {{score}}점",
+            "pdfDownload": "PDF 다운로드",
+            "viewCourse": "강의 보기"
+        }
     }
 }

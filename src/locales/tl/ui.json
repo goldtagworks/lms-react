@@ -896,5 +896,24 @@
         "browseCourses": "Mag-browse ng mga kurso",
         "goSupport": "Suporta sa customer",
         "searchPlaceholder": "Maghanap sa loob ng site..."
+    },
+    "cert": {
+        "page": {
+            "title": "Aking mga sertipiko",
+            "loading": "Naglo-load ng mga sertipiko...",
+            "errorTitle": "Nagkaroon ng error",
+            "errorBody": "Nagkaroon ng error habang naglo-load ng listahan ng sertipiko.",
+            "emptyTitle": "Walang mga sertipiko",
+            "emptyBody": "Wala pang naisyung sertipiko. Pumasa sa exam upang makakuha!"
+        },
+        "item": {
+            "instructor": "Instruktor: {{name}}",
+            "passedBadge": "Pumasa",
+            "issuedAt": "Petsa ng pag-isyu: {{date}}",
+            "serial": "Serial number",
+            "score": "Iskor: {{score}}",
+            "pdfDownload": "I-download ang PDF",
+            "viewCourse": "Tingnan ang kurso"
+        }
     }
 }

@@ -896,5 +896,24 @@
         "browseCourses": "コースを探る",
         "goSupport": "カスタマーサポート",
         "searchPlaceholder": "サイト内を検索..."
+    },
+    "cert": {
+        "page": {
+            "title": "マイ証明書",
+            "loading": "証明書を読み込み中...",
+            "errorTitle": "エラーが発生しました",
+            "errorBody": "証明書一覧の読み込み中にエラーが発生しました。",
+            "emptyTitle": "証明書がありません",
+            "emptyBody": "まだ発行された証明書はありません。試験に合格して取得しましょう！"
+        },
+        "item": {
+            "instructor": "講師: {{name}}",
+            "passedBadge": "合格",
+            "issuedAt": "発行日: {{date}}",
+            "serial": "シリアル番号",
+            "score": "スコア: {{score}}",
+            "pdfDownload": "PDFダウンロード",
+            "viewCourse": "コースを見る"
+        }
     }
 }

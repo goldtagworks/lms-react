@@ -1,10 +1,11 @@
--- LMS schema v1.5 (2025-10-04)
+-- LMS schema v1.6 (2025-10-04)
 -- Change Log:
 --  * v1.1: Removed course_sections table; simplified curriculum model.
 --          Added lessons.is_section boolean; deprecated lessons.section_id.
 --          Rationale: 프론트/UX 단순화 요구. (섹션 헤더를 레슨 Row로 통합)
 --  * v1.4: Added notices, instructor_applications tables (migrating from in-memory repository)
 --  * v1.5: Public RLS 추가 (courses/preview lessons/notices/reviews), recursion 위험 정책 정리
+--  * v1.6: notices RLS 개선 (is_admin helper, draft 접근, delete 정책, updated_at trigger)
 -- =============================
 
 -- =====================================================================
@@ -453,33 +454,72 @@ CREATE TABLE IF NOT EXISTS notices (
   pinned boolean NOT NULL DEFAULT false, -- 상단 고정 여부
   published boolean NOT NULL DEFAULT true, -- 공개 여부
   created_at timestamptz NOT NULL DEFAULT now(), -- 생성일
-  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일
+  updated_at timestamptz NOT NULL DEFAULT now() -- 수정일 (trigger 로 자동 갱신)
 );
 CREATE INDEX IF NOT EXISTS idx_notices_pinned ON notices(pinned) WHERE pinned = true;
 CREATE INDEX IF NOT EXISTS idx_notices_created ON notices(created_at DESC);
 
--- RLS (notices) simplified (remove dependency on profiles)
+-- v1.6 helpers (admin claim + updated_at trigger)
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT current_setting('request.jwt.claim.app_role', true) = 'admin'
+      OR current_setting('request.jwt.claim.role', true) = 'service_role';
+$$;
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_notices_updated_at ON notices;
+CREATE TRIGGER trg_notices_updated_at
+  BEFORE UPDATE ON notices
+  FOR EACH ROW
+  EXECUTE PROCEDURE set_updated_at();
+
+-- RLS (redefined v1.6)
 ALTER TABLE notices ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS notices_read_public ON notices;
-DROP POLICY IF EXISTS notices_admin_all ON notices;
+-- 기존 정책 정리
 DROP POLICY IF EXISTS notices_public_read ON notices;
-DROP POLICY IF EXISTS notices_write_admin_only ON notices;
-DROP POLICY IF EXISTS notices_update_admin_only ON notices;
+DROP POLICY IF EXISTS notices_draft_admin_read ON notices;
+DROP POLICY IF EXISTS notices_insert_admin ON notices;
+DROP POLICY IF EXISTS notices_update_admin ON notices;
+DROP POLICY IF EXISTS notices_delete_admin ON notices;
 
+-- 공개(발행) 읽기
 CREATE POLICY notices_public_read ON notices
   FOR SELECT TO anon, authenticated
   USING (published = true);
 
--- service_role only write (replace with dedicated admin claim mechanism later)
-CREATE POLICY notices_write_admin_only ON notices
-  FOR INSERT TO authenticated
-  WITH CHECK ( current_setting('request.jwt.claim.role', true) = 'service_role' );
+-- 관리자(초안 포함) 읽기
+CREATE POLICY notices_draft_admin_read ON notices
+  FOR SELECT TO authenticated
+  USING (is_admin());
 
-CREATE POLICY notices_update_admin_only ON notices
+-- 생성
+CREATE POLICY notices_insert_admin ON notices
+  FOR INSERT TO authenticated
+  WITH CHECK (is_admin());
+
+-- 수정
+CREATE POLICY notices_update_admin ON notices
   FOR UPDATE TO authenticated
-  USING ( current_setting('request.jwt.claim.role', true) = 'service_role' )
-  WITH CHECK ( current_setting('request.jwt.claim.role', true) = 'service_role' );
+  USING (is_admin())
+  WITH CHECK (is_admin());
+
+-- 삭제
+CREATE POLICY notices_delete_admin ON notices
+  FOR DELETE TO authenticated
+  USING (is_admin());
 
 -- =============================================================
 -- PUBLIC ACCESS RLS (v1.5)

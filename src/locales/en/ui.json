@@ -896,5 +896,24 @@
         "browseCourses": "Browse courses",
         "goSupport": "Customer support",
         "searchPlaceholder": "Search within the site..."
+    },
+    "cert": {
+        "page": {
+            "title": "My certificates",
+            "loading": "Loading certificates...",
+            "errorTitle": "Error occurred",
+            "errorBody": "An error occurred while loading certificates.",
+            "emptyTitle": "No certificates",
+            "emptyBody": "No certificates issued yet. Pass an exam to get one!"
+        },
+        "item": {
+            "instructor": "Instructor: {{name}}",
+            "passedBadge": "Passed",
+            "issuedAt": "Issued: {{date}}",
+            "serial": "Serial",
+            "score": "Score: {{score}}",
+            "pdfDownload": "Download PDF",
+            "viewCourse": "View course"
+        }
     }
 }

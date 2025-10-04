@@ -1,7 +1,7 @@
 import type { PaginatedResult } from '@main/types/pagination';
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@main/lib/supabase';
+import { supabase, supabasePublic } from '@main/lib/supabase';
 import { mapSupabaseError } from '@main/lib/errors';
 import { qk } from '@main/lib/queryKeys';
 
@@ -31,9 +31,15 @@ interface FetchParams {
 async function fetchNotices({ page, pageSize, includePinnedFirst, includeUnpublished }: FetchParams) {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
-    let query = supabase.from('notices').select('id,title,body,pinned,published,created_at,updated_at', { count: 'exact' });
+    // 공개 목록(초안 제외)은 supabasePublic 사용 → 항상 anon 접근 (세션 간섭 방지)
+    let base = includeUnpublished
+        ? supabase // 관리자 / 초안 포함
+        : supabasePublic; // 공개 전용
+    let query = base.from('notices').select('id,title,body,pinned,published,created_at,updated_at', { count: 'exact' });
 
-    if (!includeUnpublished) query = query.eq('published', true);
+    if (!includeUnpublished) {
+        query = query.eq('published', true);
+    }
 
     if (includePinnedFirst) {
         query = query.order('pinned', { ascending: false }).order('created_at', { ascending: false });

@@ -896,5 +896,24 @@
         "browseCourses": "浏览课程",
         "goSupport": "客户支持",
         "searchPlaceholder": "在本站内搜索..."
+    },
+    "cert": {
+        "page": {
+            "title": "我的证书",
+            "loading": "正在加载证书...",
+            "errorTitle": "发生错误",
+            "errorBody": "加载证书列表时发生错误。",
+            "emptyTitle": "暂无证书",
+            "emptyBody": "还没有颁发任何证书。通过考试后即可获得！"
+        },
+        "item": {
+            "instructor": "讲师: {{name}}",
+            "passedBadge": "通过",
+            "issuedAt": "颁发日期: {{date}}",
+            "serial": "序列号",
+            "score": "成绩: {{score}}",
+            "pdfDownload": "下载 PDF",
+            "viewCourse": "查看课程"
+        }
     }
 }

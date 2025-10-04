@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@main/components/auth/AuthLayout';
 import AuthHero from '@main/components/auth/AuthHero';
 import { useI18n } from '@main/lib/i18n';
-import { supabase } from '@main/lib/supabase';
+// supabase 직접 signOut 사용 제거 (단순 로직)
 
 export default function SignInPage() {
     const [email, setEmail] = useState('');
@@ -16,19 +16,9 @@ export default function SignInPage() {
     const navigate = useNavigate();
     const { t } = useI18n();
 
+    // 가장 단순: 이미 로그인되어 있으면 홈으로 내보낸다.
     useEffect(() => {
-        const signOut = async () => {
-            await supabase.auth.signOut();
-        };
-
-        signOut();
-    }, []);
-
-    // 이미 로그인된 사용자는 메인으로 리다이렉트
-    useEffect(() => {
-        if (user) {
-            navigate('/', { replace: true });
-        }
+        if (user) navigate('/', { replace: true });
     }, [user, navigate]);
 
     const handleSubmit = async (e?: React.FormEvent) => {

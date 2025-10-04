@@ -896,5 +896,24 @@
         "browseCourses": "ສຳລັບຄອສ",
         "goSupport": "ສະໜອງ",
         "searchPlaceholder": "ຄົ້ນຫາໃນເວັບໄຊຕ໌..."
+    },
+    "cert": {
+        "page": {
+            "title": "ໃບຮັບຮອງຂອງຂ້ອຍ",
+            "loading": "ກຳລັງໂຫຼດໃບຮັບຮອງ...",
+            "errorTitle": "ເກີດຂໍ້ຜິດພາດ",
+            "errorBody": "ເກີດຂໍ້ຜິດພາດໃນຂະນະກຳລັງໂຫຼດລາຍການໃບຮັບຮອງ.",
+            "emptyTitle": "ຍັງບໍ່ມີໃບຮັບຮອງ",
+            "emptyBody": "ຍັງບໍ່ມີການອອກໃບຮັບຮອງ. ຜ່ານການສອບເສັງເພື່ອໄດ້ຮັບ!"
+        },
+        "item": {
+            "instructor": "ອາຈານ: {{name}}",
+            "passedBadge": "ຜ່ານ",
+            "issuedAt": "ວັນທີອອກ: {{date}}",
+            "serial": "ເລກຊີຣີ",
+            "score": "ຄະແນນ: {{score}}",
+            "pdfDownload": "ດາວໂຫຼດ PDF",
+            "viewCourse": "ເບິ່ງຄອສ"
+        }
     }
 }

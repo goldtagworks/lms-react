@@ -896,5 +896,24 @@
         "browseCourses": "Kurslarni ko'rish",
         "goSupport": "Mijozlarni qo'llab-quvvatlash",
         "searchPlaceholder": "Sayt ichida qidirish..."
+    },
+    "cert": {
+        "page": {
+            "title": "Mening sertifikatlarim",
+            "loading": "Sertifikatlar yuklanmoqda...",
+            "errorTitle": "Xatolik yuz berdi",
+            "errorBody": "Sertifikatlar roʻyxatini yuklashda xatolik yuz berdi.",
+            "emptyTitle": "Sertifikat yoʻq",
+            "emptyBody": "Hozircha hech qanday sertifikat berilmagan. Imtihondan oʻtib birinchisini oling!"
+        },
+        "item": {
+            "instructor": "Oʻqituvchi: {{name}}",
+            "passedBadge": "Oʻtdi",
+            "issuedAt": "Berilgan sana: {{date}}",
+            "serial": "Seriya raqami",
+            "score": "Ball: {{score}}",
+            "pdfDownload": "PDF yuklab olish",
+            "viewCourse": "Kursni ko‘rish"
+        }
     }
 }

@@ -905,5 +905,24 @@
         "browseCourses": "Duyệt khóa học",
         "goSupport": "Hỗ trợ khách hàng",
         "searchPlaceholder": "Tìm kiếm trong trang web..."
+    },
+    "cert": {
+        "page": {
+            "title": "Chứng chỉ của tôi",
+            "loading": "Đang tải chứng chỉ...",
+            "errorTitle": "Đã xảy ra lỗi",
+            "errorBody": "Có lỗi khi tải danh sách chứng chỉ.",
+            "emptyTitle": "Chưa có chứng chỉ",
+            "emptyBody": "Chưa có chứng chỉ nào được cấp. Hãy thi đỗ để nhận chứng chỉ!"
+        },
+        "item": {
+            "instructor": "Giảng viên: {{name}}",
+            "passedBadge": "Đỗ",
+            "issuedAt": "Ngày cấp: {{date}}",
+            "serial": "Số seri",
+            "score": "Điểm: {{score}}",
+            "pdfDownload": "Tải PDF",
+            "viewCourse": "Xem khóa học"
+        }
     }
 }

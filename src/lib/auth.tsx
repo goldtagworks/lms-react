@@ -20,15 +20,30 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 // ---------- Internal helpers ----------
 async function ensureProfile(userId: string, email: string, name?: string): Promise<{ display_name: string | null; role: UserRole }> {
-    const display_name = name || email.split('@')[0];
+    const desiredDisplayName = name || email.split('@')[0];
 
-    const { data, error } = await supabase.from('profiles').upsert({ user_id: userId, display_name, role: 'student' }, { onConflict: 'user_id' }).select('display_name,role').single();
+    // 1) 기존 프로필 조회 (역할 보존이 핵심)
+    const { data: existing, error: selectError } = await supabase.from('profiles').select('display_name, role').eq('user_id', userId).single();
 
-    if (error || !data) {
-        return { display_name, role: 'student' };
+    if (existing && !selectError) {
+        // 이름만 새로 주어진 경우에 한해 display_name 최소 업데이트 (role 은 절대 덮어쓰지 않음)
+        if (name && existing.display_name !== desiredDisplayName) {
+            await supabase.from('profiles').update({ display_name: desiredDisplayName }).eq('user_id', userId);
+
+            return { display_name: desiredDisplayName, role: existing.role as UserRole };
+        }
+
+        return { display_name: existing.display_name ?? desiredDisplayName, role: existing.role as UserRole };
     }
 
-    return { display_name: data.display_name, role: data.role as UserRole };
+    // 2) 없으면 새로 생성 (기본 student). 관리자 계정은 별도 수동/관리 프로세스로 승격됨.
+    const { data: inserted, error: insertError } = await supabase.from('profiles').insert({ user_id: userId, display_name: desiredDisplayName, role: 'student' }).select('display_name, role').single();
+
+    if (insertError || !inserted) {
+        return { display_name: desiredDisplayName, role: 'student' };
+    }
+
+    return { display_name: inserted.display_name, role: inserted.role as UserRole };
 }
 
 function mapToAuthUser(sessionUser: any, profile: { display_name: string | null; role: UserRole } | null): AuthUser {
@@ -49,17 +64,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const loadSession = useCallback(async () => {
         try {
-            const { data, error } = await supabase.auth.getSession();
+            const { data } = await supabase.auth.getSession();
+            const sessionUser = data.session?.user;
 
-            if (error || !data.session?.user) {
+            if (!sessionUser) {
                 setUser(null);
 
                 return;
             }
 
-            const profile = await ensureProfile(data.session.user.id, data.session.user.email || '');
+            setUser(mapToAuthUser(sessionUser, null));
 
-            setUser(mapToAuthUser(data.session.user, profile));
+            ensureProfile(sessionUser.id, sessionUser.email || '')
+                .then((p) => {
+                    setUser(mapToAuthUser(sessionUser, p));
+                })
+                .catch(() => void 0);
         } catch {
             setUser(null);
         } finally {
@@ -72,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loadSession();
 
         // 세션 변경 구독
-        const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
             if (!session?.user) {
                 setUser(null);
                 setLoading(false);
@@ -80,16 +100,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return;
             }
 
-            setLoading(true);
-            try {
-                const profile = await ensureProfile(session.user.id, session.user.email || '');
+            const sessionUser = session.user;
 
-                setUser(mapToAuthUser(session.user, profile));
-            } catch {
-                setUser(mapToAuthUser(session.user, null));
-            } finally {
-                setLoading(false);
-            }
+            setUser(mapToAuthUser(sessionUser, null));
+            setLoading(false);
+
+            ensureProfile(sessionUser.id, sessionUser.email || '')
+                .then((p) => {
+                    setUser(mapToAuthUser(sessionUser, p));
+                })
+                .catch(() => void 0);
         });
 
         return () => {
@@ -99,30 +119,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = useCallback(async (email: string, password: string) => {
         setError(null);
+        setLoading(true);
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
             setError(error.message);
+            setLoading(false); // 실패 즉시 해제
             throw error;
         }
-        // 성공하면 onAuthStateChange에서 자동 처리
+        // 성공 시 onAuthStateChange가 loading=false 이미 처리(또는 즉시 처리)
     }, []);
 
     const register = useCallback(async (name: string, email: string, password: string) => {
         setError(null);
+        setLoading(true);
         const { data, error } = await supabase.auth.signUp({ email, password });
 
         if (error) {
             setError(error.message);
+            setLoading(false);
             throw error;
         }
 
         if (!data.user) {
             setError('확인 메일을 발송했습니다. 이메일 인증 후 로그인하세요.');
+            setLoading(false);
 
             return;
         }
-        // 성공하면 onAuthStateChange에서 자동 처리
+        // onAuthStateChange 에서 처리
     }, []);
 
     const logout = useCallback(async () => {
@@ -135,9 +160,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (e: any) {
             setError(e.message || '로그아웃 실패');
         } finally {
+            // onAuthStateChange 가 user/null 세팅, 여기서는 loading 즉시 해제 (이미 처리되었을 수도 있음)
             setLoading(false);
         }
-        // onAuthStateChange에서 자동으로 user null 설정됨
     }, []);
 
     const refresh = useCallback(async () => {

@@ -59,7 +59,7 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                         const groupActive = !!activeItemHref;
 
                         return (
-                            <Menu key={g.id} withinPortal closeDelay={120} openDelay={80} position="bottom-start" shadow="md" trigger="hover" width={200}>
+                            <Menu key={g.id} withinPortal closeDelay={120} openDelay={80} position="bottom-start" radius="md" shadow="md" trigger="hover" width={200}>
                                 <Menu.Target>
                                     <Button
                                         px={rem(16)}
@@ -87,9 +87,11 @@ const Header = ({ navOpened, toggleNav, burgerRef }: HeaderProps) => {
                     {!user && <LinkButton href="/signup" label={t('auth.signUp')} variant="filled" />}
                     <LanguageSwitch />
                     {user && (
-                        <Menu withinPortal position="bottom-end" shadow="md" width={180}>
+                        <Menu withinPortal position="bottom-end" radius="md" shadow="md" width={180}>
                             <Menu.Target>
-                                <Button variant="default">{user.name}</Button>
+                                <Button size="xs" variant="default">
+                                    {user.name}
+                                </Button>
                             </Menu.Target>
                             <Menu.Dropdown aria-label={t('nav.myPage', undefined, t('common.view'))}>
                                 <Menu.Label>{t('nav.myPage')}</Menu.Label>

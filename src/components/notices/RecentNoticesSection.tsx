@@ -1,7 +1,7 @@
 import type { Tables } from '@main/types/database';
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@main/lib/supabase';
+import { supabasePublic } from '@main/lib/supabase';
 import { mapSupabaseError } from '@main/lib/errors';
 import PageSection from '@main/components/layout/PageSection';
 import { Badge, Card, Group, Stack, Text, Anchor } from '@mantine/core';
@@ -14,10 +14,15 @@ interface Props {
 }
 
 export function RecentNoticesSection({ limit = 2 }: Props) {
-    const { data: notices = [] } = useQuery<Tables<'notices'>[]>({
+    const { t } = useI18n();
+
+    const query = useQuery<Tables<'notices'>[]>({
         queryKey: ['notices', 'recent', { limit }],
+        staleTime: 300_000, // 5분 캐시 (공지 빈도 낮음)
+        retry: 1,
+        refetchOnWindowFocus: false,
         queryFn: async () => {
-            const { data, error } = await supabase
+            const { data, error } = await supabasePublic
                 .from('notices')
                 .select('id,title,body,pinned,created_at')
                 .eq('published', true)
@@ -28,12 +33,41 @@ export function RecentNoticesSection({ limit = 2 }: Props) {
             if (error) throw mapSupabaseError(error);
 
             return (data as Tables<'notices'>[] | null) || [];
-        },
-        staleTime: 60_000
+        }
     });
-    const { t } = useI18n();
 
-    if (notices.length === 0) return null;
+    const notices = query.data || [];
+
+    // 로딩 Skeleton (레이아웃 안정)
+    if (query.isLoading) {
+        return (
+            <PageSection withGapTop title={t('notice.list')}>
+                <Stack gap="sm">
+                    {Array.from({ length: limit }).map((_, i) => (
+                        <Card key={i} withBorder p="sm" radius="lg" shadow="xs">
+                            <Stack gap={4}>
+                                <div style={{ height: 12, background: 'light-dark(var(--mantine-color-gray-3), var(--mantine-color-gray-7))', borderRadius: 4, width: '70%' }} />
+                                <div style={{ height: 10, background: 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-gray-8))', borderRadius: 4, width: '40%' }} />
+                            </Stack>
+                        </Card>
+                    ))}
+                </Stack>
+            </PageSection>
+        );
+    }
+
+    // 에러 UI (조용한 실패 표시)
+    if (query.isError) {
+        return (
+            <PageSection withGapTop title={t('notice.list')}>
+                <Text c="dimmed" size="xs">
+                    {t('common.fetchError') || '일시적으로 공지를 불러오지 못했습니다.'}
+                </Text>
+            </PageSection>
+        );
+    }
+
+    if (notices.length === 0) return null; // 비어있으면 섹션 자체 미노출 (홈 단순화)
 
     return (
         <PageSection withGapTop title={t('notice.list')}>

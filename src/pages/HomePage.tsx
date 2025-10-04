@@ -10,7 +10,7 @@ import { InstructorsSection } from '../features/home/components/InstructorsSecti
 import { PromoBannerSection } from '../features/home/components/PromoBannerSection';
 import { GuideSection } from '../features/home/components/GuideSection';
 import { SupportSection } from '../features/home/components/SupportSection';
-import { RecentNoticesSection } from '../features/notices/components/RecentNoticesSection';
+import { RecentNoticesSection } from '../components/notices/RecentNoticesSection';
 import PageContainer from '../components/layout/PageContainer';
 import PageSection from '../components/layout/PageSection';
 
